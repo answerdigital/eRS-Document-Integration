@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using eRS.Models.Models;
+using eRS.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 

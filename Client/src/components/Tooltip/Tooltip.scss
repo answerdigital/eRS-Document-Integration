@@ -1,0 +1,22 @@
+.tooltip-container {
+    position: relative;
+
+    .tooltip-box {
+        position: absolute;
+        background-color: rgba(0, 0, 0, 0.75);
+        padding: 10px;
+        border-radius: 5px;
+        top: calc(100% + 5px);
+        display: none;
+        z-index: 10;
+        width: 300px;
+        
+        h4, p {
+            color: white;
+        }
+
+        &.visible {
+            display: block;
+        }
+    }
+}

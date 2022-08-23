@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace eRS.Models.Models;
+﻿namespace eRS.Data.Entities;
 
 public partial class ErsdocAttachment
 {
