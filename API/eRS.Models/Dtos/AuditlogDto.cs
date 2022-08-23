@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace eRS.Models.Dtos;
 
-namespace eRS.Models.Models;
-
-public partial class Auditlog
+public partial class AuditlogDto
 {
-    public int AuditRowId { get; set; }
     public DateTime? EventDttm { get; set; }
     public string? EventCode { get; set; }
     public string? EventDescription { get; set; }

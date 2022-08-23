@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace eRS.Models.Dtos;
 
-namespace eRS.Models.Models;
-
-public partial class WfsHistory
+public partial class WfsHistoryDto
 {
-    public int ErsdocsRowid { get; set; }
     public int? RefReqRowId { get; set; }
     public int? RefDocRowId { get; set; }
     public string? ErstrnsUid { get; set; }

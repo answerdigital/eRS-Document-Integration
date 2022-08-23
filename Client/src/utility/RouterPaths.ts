@@ -1,3 +1,6 @@
 export const RouterPaths = {
-    HomePath: "/"
+    HomePath: '/',
+    WorklistPath: '/worklist',
+    UsersPath: '/users',
+    AuditsPath: '/audits'
 }
