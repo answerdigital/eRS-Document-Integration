@@ -1,5 +1,5 @@
 {
-  "name": "ersWebapp",
+  "name": "ers-webapp",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -19,9 +19,14 @@
     "react": "^18.2.0",
     "react-datepicker": "^4.8.0",
     "react-dom": "^18.2.0",
+    "react-icons": "^4.4.0",
+    "react-pdf": "^5.7.2",
     "react-router-dom": "^6.3.0",
     "react-scripts": "5.0.1",
+    "react-select": "^5.4.0",
+    "react-toastify": "^9.0.8",
     "sass": "^1.54.4",
+    "ts-debounce": "^4.0.0",
     "typescript": "^4.7.4",
     "web-vitals": "^2.1.4"
   },
@@ -29,7 +34,10 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "copy-worker": "node ./scripts/copy-worker.js",
+    "copy-cmaps": "node ./scripts/copy-cmaps.js",
+    "copy-standard-fonts": "node ./scripts/copy-standard-fonts.js"
   },
   "eslintConfig": {
     "extends": [
@@ -50,6 +58,7 @@
     ]
   },
   "devDependencies": {
-    "@types/react-datepicker": "^4.4.2"
+    "@types/react-datepicker": "^4.4.2",
+    "@types/react-pdf": "^5.7.2"
   }
 }

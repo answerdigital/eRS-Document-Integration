@@ -2,8 +2,6 @@
 
 public partial class WfsHistoryDto
 {
-    public int? RefReqRowId { get; set; }
-    public int? RefDocRowId { get; set; }
     public string? ErstrnsUid { get; set; }
     public string? DoctrnsUid { get; set; }
     public string? StatusCode { get; set; }

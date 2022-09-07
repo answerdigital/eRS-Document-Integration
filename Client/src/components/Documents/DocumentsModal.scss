@@ -1,0 +1,11 @@
+.pdf-column {
+    height: 1000px;
+}
+
+.pdf-container {
+    display: flex;
+    width: 100%;
+    min-height: 50vh;
+    overflow-x: auto;
+    overflow-y: auto;
+}

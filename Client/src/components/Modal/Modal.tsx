@@ -14,7 +14,7 @@ const Modal: React.FC<IModalProps> = ({title, show, setShow, children, footer}) 
     return (
         <>
         {show &&
-            <div className='modal' style={{'display':'block'}}>
+            <div className='modal modal-xl' style={{'display':'block'}}>
                 <div className='modal-dialog'>
                     <div className='modal-content'>
                         <div className='modal-header'>

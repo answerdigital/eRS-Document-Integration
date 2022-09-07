@@ -1,23 +1,21 @@
 import { IPagedResult, IRequest } from "./api-common.interface";
 
 export interface IAuditLog {
-    auditRowId : number;
-    eventDttm? : Date;
-    eventCode? : string;
-    eventDescription? : string;
-    eventDetails? : string;
-    recStatus? : string;
-    recInserted? : Date;
-    recInsertedBy? : string;
+    auditRowId: number;
+    eventDttm?: Date;
+    eventCode?: string;
+    eventDescription?: string;
+    eventDetails?: string;
+    recStatus?: string;
+    recInserted?: Date;
+    recInsertedBy?: string;
 }
 
 export interface IAuditFilters {
-    searchByEventCode? : string;
-    searchByEventDescription? : string;
-    searchByEventDetails? : string;
-    filterByRecInsertedFrom? : Date;
-    filterByRecInsertedTo? : Date;
-    searchByRecInsertedBy? : string;
+    eventCode?: string;
+    recInsertedFrom?: Date;
+    recInsertedTo?: Date;
+    recInsertedBy?: string;
 }
 
 export interface IAuditResult extends IPagedResult<IAuditLog> {

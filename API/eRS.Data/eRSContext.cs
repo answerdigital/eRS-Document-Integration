@@ -57,7 +57,7 @@ namespace eRS.Data
                     .HasColumnName("Event_Dttm");
 
                 entity.Property(e => e.RecInserted)
-                    .HasColumnType("datetime")
+                    .HasColumnType("timestamp")
                     .HasColumnName("rec_inserted");
 
                 entity.Property(e => e.RecInsertedBy)
@@ -83,6 +83,10 @@ namespace eRS.Data
 
                 entity.Property(e => e.RefReqRowId).HasColumnName("RefReq_RowID");
 
+                entity.HasMany(d => d.WfsHistoryList)
+                    .WithOne(w => w.ErsRefReqDetail)
+                    .HasForeignKey(w => w.RefReqRowId);
+
                 entity.Property(e => e.ApptEndDttm)
                     .HasColumnType("datetime")
                     .HasColumnName("Appt_EndDttm");
@@ -94,10 +98,6 @@ namespace eRS.Data
                 entity.Property(e => e.RecExpiryDttm)
                     .HasColumnType("datetime")
                     .HasColumnName("rec_ExpiryDttm");
-
-                entity.Property(e => e.RecInserted)
-                    .HasColumnType("datetime")
-                    .HasColumnName("rec_inserted");
 
                 entity.Property(e => e.RecInsertedBy)
                     .HasMaxLength(15)
@@ -111,7 +111,7 @@ namespace eRS.Data
                     .IsFixedLength();
 
                 entity.Property(e => e.RecUpdated)
-                    .HasColumnType("datetime")
+                    .HasColumnType("timestamp")
                     .HasColumnName("rec_Updated");
 
                 entity.Property(e => e.RecUpdatedBy)
@@ -183,6 +183,10 @@ namespace eRS.Data
 
                 entity.HasIndex(e => new { e.RefrequestRowId, e.RefDocRowId }, "Indx_RefReq_RowID");
 
+                entity.HasMany(d => d.WfsHistoryList)
+                    .WithOne(w => w.ErsdocAttachment)
+                    .HasForeignKey(w => w.RefDocRowId);
+
                 entity.Property(e => e.RefDocRowId).HasColumnName("RefDoc_RowID");
 
                 entity.Property(e => e.AttachContentType)
@@ -229,10 +233,6 @@ namespace eRS.Data
                     .IsUnicode(false)
                     .HasColumnName("DocLocationURI");
 
-                entity.Property(e => e.RecInserted)
-                    .HasColumnType("datetime")
-                    .HasColumnName("rec_inserted");
-
                 entity.Property(e => e.RecInsertedBy)
                     .HasMaxLength(15)
                     .IsUnicode(false)
@@ -245,7 +245,7 @@ namespace eRS.Data
                     .IsFixedLength();
 
                 entity.Property(e => e.RecUpdated)
-                    .HasColumnType("datetime")
+                    .HasColumnType("timestamp")
                     .HasColumnName("rec_Updated");
 
                 entity.Property(e => e.RecUpdatedBy)
@@ -263,11 +263,6 @@ namespace eRS.Data
                     .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasColumnName("RefDoc_UniqueID");
-
-                entity.Property(e => e.RefReqUniqueId)
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
-                    .HasColumnName("RefReq_UniqueID");
 
                 entity.Property(e => e.RefrequestRowId).HasColumnName("Refrequest_RowID");
             });
@@ -374,7 +369,7 @@ namespace eRS.Data
                     .IsFixedLength();
 
                 entity.Property(e => e.RecUpdated)
-                    .HasColumnType("datetime")
+                    .HasColumnType("timestamp")
                     .HasColumnName("rec_Updated");
 
                 entity.Property(e => e.RecUpdatedBy)
@@ -385,6 +380,14 @@ namespace eRS.Data
                 entity.Property(e => e.RefDocRowId).HasColumnName("RefDoc_RowID");
 
                 entity.Property(e => e.RefReqRowId).HasColumnName("RefReq_RowID");
+
+                entity.HasOne(w => w.ErsRefReqDetail)
+                    .WithMany(r => r.WfsHistoryList)
+                    .HasForeignKey(w => w.RefReqRowId);
+
+                entity.HasOne(w => w.ErsdocAttachment)
+                    .WithMany(d => d.WfsHistoryList)
+                    .HasForeignKey(w => w.RefDocRowId);
 
                 entity.Property(e => e.StatusCancelledBy)
                     .HasMaxLength(15)
@@ -446,7 +449,7 @@ namespace eRS.Data
                     .IsFixedLength();
 
                 entity.Property(e => e.RecUpdated)
-                    .HasColumnType("datetime")
+                    .HasColumnType("timestamp")
                     .HasColumnName("rec_Updated");
 
                 entity.Property(e => e.RecUpdatedBy)

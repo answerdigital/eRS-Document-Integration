@@ -1,4 +1,6 @@
-﻿namespace eRS.Data.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace eRS.Data.Entities;
 
 public partial class Auditlog
 {
@@ -8,6 +10,7 @@ public partial class Auditlog
     public string? EventDescription { get; set; }
     public string? EventDetails { get; set; }
     public string? RecStatus { get; set; }
+    [Timestamp]
     public DateTime? RecInserted { get; set; }
     public string? RecInsertedBy { get; set; }
 }

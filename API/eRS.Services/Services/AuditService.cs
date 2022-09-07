@@ -18,7 +18,7 @@ public class AuditService : IAuditService
         this.mapper = mapper;
     }
 
-    public async Task<PagedResult<AuditlogDto>?> GetAllFiltered(AuditRequest request)
+    public async Task<PagedResult<AuditlogDto>> GetAllFiltered(AuditRequest request)
     {
         if (request is null)
         {
@@ -26,22 +26,22 @@ public class AuditService : IAuditService
         }
 
         var filters = request.Filters;
-        var auditsQuery = this.context.Auditlogs.Where(a => a.RecStatus != "D").AsQueryable();
+        var auditsQuery = this.context.Auditlogs.Where(a => a.RecStatus != "D").OrderBy(a => a.RecInserted).AsQueryable();
 
         auditsQuery.Where(a =>
-            (!string.IsNullOrWhiteSpace(a.EventCode) && EF.Functions.Like(a.EventCode, $"%{filters.SearchByEventCode}%")) ||
-            (!string.IsNullOrWhiteSpace(a.EventDescription) && EF.Functions.Like(a.EventDescription, $"%{filters.SearchByEventDescription}%")) ||
-            (!string.IsNullOrWhiteSpace(a.EventDetails) && EF.Functions.Like(a.EventDetails, $"%{filters.SearchByEventDetails}%")) ||
-            (!string.IsNullOrWhiteSpace(a.RecInsertedBy) && EF.Functions.Like(a.RecInsertedBy, $"%{filters.SearchByRecInsertedBy}%")));
+            (!string.IsNullOrWhiteSpace(a.EventCode) && EF.Functions.Like(a.EventCode, $"%{filters.EventCode}%")) ||
+            (!string.IsNullOrWhiteSpace(a.EventDescription) && EF.Functions.Like(a.EventDescription, $"%{filters.EventDescription}%")) ||
+            (!string.IsNullOrWhiteSpace(a.EventDetails) && EF.Functions.Like(a.EventDetails, $"%{filters.EventDetails}%")) ||
+            (!string.IsNullOrWhiteSpace(a.RecInsertedBy) && EF.Functions.Like(a.RecInsertedBy, $"%{filters.RecInsertedBy}%")));
 
-        if (filters.FilterByRecInsertedFrom != null)
+        if (filters.RecInsertedFrom != null)
         {
-            auditsQuery = auditsQuery.Where(a => a.RecInserted > filters.FilterByRecInsertedFrom);
+            auditsQuery = auditsQuery.Where(a => a.RecInserted > filters.RecInsertedFrom);
         }
 
-        if (filters.FilterByRecInsertedTo != null)
+        if (filters.RecInsertedTo != null)
         {
-            auditsQuery = auditsQuery.Where(a => a.RecInserted < filters.FilterByRecInsertedTo);
+            auditsQuery = auditsQuery.Where(a => a.RecInserted < filters.RecInsertedTo);
         }
 
         var pageSize = 10;

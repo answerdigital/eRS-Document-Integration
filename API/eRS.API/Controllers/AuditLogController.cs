@@ -31,7 +31,8 @@ public class AuditLogController : ControllerBase
                 ? this.NotFound()
                 : this.Ok(audits);
 
-        } catch (Exception ex)
+        }
+        catch (Exception ex)
         {
             this.logger.LogError(ex.Message.ToString());
             return new BadRequestObjectResult(ex);
