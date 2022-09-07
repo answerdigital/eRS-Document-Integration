@@ -3,7 +3,6 @@
 public partial class ErsdocAttachmentDto
 {
     public int? RefrequestRowId { get; set; }
-    public string? RefReqUniqueId { get; set; }
     public int? RefDocSrlno { get; set; }
     public string? RefDocUniqueId { get; set; }
     public string? RefDocStatus { get; set; }
@@ -19,6 +18,7 @@ public partial class ErsdocAttachmentDto
     public string? RecStatus { get; set; }
     public DateTime? RecUpdated { get; set; }
     public string? RecUpdatedBy { get; set; }
-    public DateTime? RecInserted { get; set; }
     public string? RecInsertedBy { get; set; }
+
+    public WfsHistoryDto? WfsHistory { get; set; }
 }

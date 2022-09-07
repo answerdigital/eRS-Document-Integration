@@ -2,11 +2,10 @@
 
 public class AuditFilter
 {
-    public DateTime? FilterByEventDttm { get; set; }
-    public string? SearchByEventCode { get; set; }
-    public string? SearchByEventDescription { get; set; }
-    public string? SearchByEventDetails { get; set; }
-    public DateTime? FilterByRecInsertedFrom { get; set; }
-    public DateTime? FilterByRecInsertedTo { get; set; }
-    public string? SearchByRecInsertedBy { get; set; }
+    public string? EventCode { get; set; }
+    public string? EventDescription { get; set; }
+    public string? EventDetails { get; set; }
+    public DateTime? RecInsertedFrom { get; set; }
+    public DateTime? RecInsertedTo { get; set; }
+    public string? RecInsertedBy { get; set; }
 }

@@ -6,6 +6,7 @@ using eRS.Services.Services;
 using Microsoft.EntityFrameworkCore;
 using Playground.Service.Mappers;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,12 +20,13 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<eRSContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("LaptopConnection"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
 builder.Services.Configure<JsonSerializerOptions>(jsonSerializerOptions =>
 {
     jsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    jsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 });
 
 builder.Services.AddCors(options =>
@@ -37,6 +39,7 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddTransient<IAuditService, AuditService>();
+builder.Services.AddTransient<IWorklistService, WorklistService>();
 
 var mapperConfig = new MapperConfiguration(mc =>
 {

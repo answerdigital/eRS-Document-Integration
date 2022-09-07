@@ -1,4 +1,6 @@
-﻿namespace eRS.Data.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace eRS.Data.Entities;
 
 public partial class WfsMaster
 {
@@ -10,6 +12,7 @@ public partial class WfsMaster
     public string? WfsmPrevHierarchy { get; set; }
     public string? WfsmNextHierarchy { get; set; }
     public string? RecStatus { get; set; }
+    [Timestamp]
     public DateTime? RecUpdated { get; set; }
     public string? RecUpdatedBy { get; set; }
     public DateTime? RecInserted { get; set; }

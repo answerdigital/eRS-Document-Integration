@@ -1,4 +1,7 @@
-﻿namespace eRS.Data.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+
+namespace eRS.Data.Entities;
 
 public partial class ErsRefReqDetail
 {
@@ -18,8 +21,9 @@ public partial class ErsRefReqDetail
     public string? WfsCode { get; set; }
     public DateTime? RecExpiryDttm { get; set; }
     public string? RecStatus { get; set; }
+    [Timestamp]
     public DateTime? RecUpdated { get; set; }
     public string? RecUpdatedBy { get; set; }
-    public DateTime? RecInserted { get; set; }
     public string? RecInsertedBy { get; set; }
+    public List<WfsHistory> WfsHistoryList { get; }
 }

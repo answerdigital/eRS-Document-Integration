@@ -7,7 +7,7 @@ interface PaginationProps {
 }
 
 const Pagination : React.FC<PaginationProps> = ({pageCurrent, handlePageChange, pagesTotal}) => {
-    
+
     const changePage = (page: number) => {
         if (page > 0 && page <= pagesTotal) {
             handlePageChange(page);
@@ -21,14 +21,18 @@ const Pagination : React.FC<PaginationProps> = ({pageCurrent, handlePageChange, 
         <nav aria-label='Page navigation example'>
             <ul className='pagination'>
                 <li className='page-item'>
-                <button className='page-link' aria-label='Previous' onClick={() => changePage(pageCurrent + 1)}>
+                <button className='page-link' aria-label='Previous' onClick={() => changePage(pageCurrent - 1)}>
                     <span aria-hidden='true'>&laquo;</span>
                 </button>
                 </li>
                 {visiblePageNumbers.map((i) => {
                     return (
-                        <li className='page-item'>
-                            <button className={`page-link ${pageCurrent === i + 1 ? 'active' : ''}`}>{i + 1}</button>
+                        <li key={i} className='page-item'>
+                            <button
+                            className={`page-link ${pageCurrent === i + 1 ? 'active' : ''}`}
+                            onClick={() => changePage(i + 1)}>
+                                {i + 1}
+                                </button>
                         </li>
                     );
                 })}

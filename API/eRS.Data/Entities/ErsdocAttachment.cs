@@ -1,10 +1,12 @@
-﻿namespace eRS.Data.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+
+namespace eRS.Data.Entities;
 
 public partial class ErsdocAttachment
 {
     public int RefDocRowId { get; set; }
     public int? RefrequestRowId { get; set; }
-    public string? RefReqUniqueId { get; set; }
     public int? RefDocSrlno { get; set; }
     public string? RefDocUniqueId { get; set; }
     public string? RefDocStatus { get; set; }
@@ -18,8 +20,9 @@ public partial class ErsdocAttachment
     public string? DocDownloadUrl { get; set; }
     public string? DocLocationUri { get; set; }
     public string? RecStatus { get; set; }
+    [Timestamp]
     public DateTime? RecUpdated { get; set; }
     public string? RecUpdatedBy { get; set; }
-    public DateTime? RecInserted { get; set; }
     public string? RecInsertedBy { get; set; }
+    public List<WfsHistory> WfsHistoryList { get; }
 }
