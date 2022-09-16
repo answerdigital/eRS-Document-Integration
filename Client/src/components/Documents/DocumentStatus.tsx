@@ -1,6 +1,7 @@
 import { IWorkflowHistory } from 'common/interfaces/workflow-history.interface';
 import { IWorkflowStatus } from 'common/interfaces/workflow-status.interface';
 import { useWorkflowStates } from 'contexts/WorkflowStatesContext';
+import { useWorklist } from 'contexts/WorklistContext';
 import React, { useState } from 'react';
 import Select from 'react-select';
 import { addToWorkflowHistory } from 'services/worklist-service';
@@ -11,12 +12,14 @@ interface DocumentStatus {
 }
 
 const DocumentStatus: React.FC<DocumentStatus> = ({docUid, handleOnAddStatus}) => {
-    const workflowStates= useWorkflowStates();
+    const { selectedReferral } = useWorklist();
+    const {states: workflowStates, getStatus}= useWorkflowStates();
     const [status, setStatus] = useState<string | undefined>('');
     const [comment, setComment] = useState<string>('');
 
     const handleAddToWfh = () => {
         const update: IWorkflowHistory = {
+            erstrnsUid: selectedReferral?.refReqUniqueId,
             doctrnsUid: docUid,
             statusCode: status,
             statusComments: comment,
@@ -35,7 +38,7 @@ const DocumentStatus: React.FC<DocumentStatus> = ({docUid, handleOnAddStatus}) =
                 <div className='mb-3'>
                     <Select
                         value={status ? {label: status, value: status} : null}
-                        options={workflowStates?.map((wfs: IWorkflowStatus) => ({label: wfs.wfsmCode ?? '', value: wfs.wfsmCode ?? '' }))}
+                        options={workflowStates?.refDocStates?.map((wfs: IWorkflowStatus) => ({label: getStatus(wfs.wfsmCode)?.wfsmDisplayValue ?? '', value: wfs.wfsmCode ?? '' }))}
                         onChange={(opts) => setStatus(opts?.value ?? '')}
                         />
                 </div>

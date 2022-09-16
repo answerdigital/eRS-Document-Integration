@@ -11,4 +11,5 @@ public class WorklistFilter
     public DateTime? ApptDttmTo { get; set; }
     public DateTime? RecInsertedFrom { get; set; }
     public DateTime? RecInsertedTo { get; set; }
+    public bool? InvestigationMode { get; set; }
 }

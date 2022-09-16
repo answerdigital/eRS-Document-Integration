@@ -4,7 +4,9 @@ public partial class WfsHistoryDto
 {
     public string? ErstrnsUid { get; set; }
     public string? DoctrnsUid { get; set; }
+    public string? AttachTitle { get; set; }
     public string? StatusCode { get; set; }
+    public WfsMasterDto? WfsMaster { get; set; }
     public int? StatusHierarchy { get; set; }
     public string? StatusComments { get; set; }
     public DateTime? StatusEffdttm { get; set; }

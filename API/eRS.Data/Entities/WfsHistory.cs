@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace eRS.Data.Entities;
+﻿namespace eRS.Data.Entities;
 
 public partial class WfsHistory
 {
@@ -12,6 +10,7 @@ public partial class WfsHistory
     public string? ErstrnsUid { get; set; }
     public string? DoctrnsUid { get; set; }
     public string? StatusCode { get; set; }
+    public WfsMaster? WfsMaster { get; set; }
     public int? StatusHierarchy { get; set; }
     public string? StatusComments { get; set; }
     public DateTime? StatusEffdttm { get; set; }
@@ -19,7 +18,6 @@ public partial class WfsHistory
     public DateTime? StatusCancelledDttm { get; set; }
     public string? StatusCancelledBy { get; set; }
     public string? RecStatus { get; set; }
-    [Timestamp]
     public DateTime? RecUpdated { get; set; }
     public string? RecUpdatedBy { get; set; }
     public DateTime? RecInserted { get; set; }

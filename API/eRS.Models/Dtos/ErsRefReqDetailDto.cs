@@ -17,12 +17,14 @@ public partial class ErsRefReqDetailDto
     public string? WfsCode { get; set; }
     public DateTime? RecExpiryDttm { get; set; }
     public string? RecStatus { get; set; }
+    public DateTime? RecUpdated { get; set; }
     public string? RecUpdatedBy { get; set; }
     public string? RecInsertedBy { get; set; }
+    public WfsHistoryDto? WfsHistory { get; set; }
+    public PatientDto? Patient { get; set; }
 
     //Not yet included
     public string? Consultant { get; set; }
     public string? ErsService { get; set; }
 
-    public WfsHistoryDto? WfsHistory { get; set; }
 }

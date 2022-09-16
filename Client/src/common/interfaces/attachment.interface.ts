@@ -1,3 +1,4 @@
+import { IPatient } from "./patient.interface";
 import { IWorkflowHistory } from "./workflow-history.interface";
 
 export interface IAttachment {
@@ -20,4 +21,5 @@ export interface IAttachment {
     recInserted?: Date;
     recInsertedBy?: string;
     wfsHistory?: IWorkflowHistory;
+    patient?: IPatient;
 }

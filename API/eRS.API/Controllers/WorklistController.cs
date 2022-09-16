@@ -118,7 +118,7 @@ public class WorklistController : ControllerBase
     {
         try
         {
-            var updatedWfsHistory = await this.worklistService.UpdateWorkflowHistory(wfh);
+            var updatedWfsHistory = await this.worklistService.UpdateWorkflowHistory(wfh, null);
 
             return updatedWfsHistory is null
                 ? this.NotFound()

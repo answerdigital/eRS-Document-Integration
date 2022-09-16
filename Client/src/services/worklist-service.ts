@@ -1,4 +1,4 @@
-import { IWorkflowStatus } from 'common/interfaces/workflow-status.interface';
+import { IWorkflowStatusResponse } from 'common/interfaces/workflow-status.interface';
 import { IAttachment } from './../common/interfaces/attachment.interface';
 import { IWorkflowHistory } from 'common/interfaces/workflow-history.interface';
 import { IReferralRequest, IReferralResult } from "common/interfaces/referral.interface";
@@ -19,7 +19,7 @@ export const getWorklist = async (request: IReferralRequest): Promise<IReferralR
         });
 };
 
-export const getWorkflowStates = async () : Promise<IWorkflowStatus[]>  => {
+export const getWorkflowStates = async () : Promise<IWorkflowStatusResponse>  => {
     return api.get('/Worklist/states')
         .then((response: AxiosResponse) => {
             return response.data;

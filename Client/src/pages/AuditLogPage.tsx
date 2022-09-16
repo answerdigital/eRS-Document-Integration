@@ -14,7 +14,7 @@ const AuditLogPage : React.FC = () => {
     const [pageNumber, setPageNumber] = useState<number>(1);
     const [filters, setFilters] = useState<IAuditFilters>({});
 
-    const fetchAudits = debounce(async () => {
+    const fetchAudits = () => {
         const request : IAuditRequest = {
             pageNumber: pageNumber,
             filters: filters
@@ -22,12 +22,20 @@ const AuditLogPage : React.FC = () => {
 
         getAudits(request).then((response : IAuditResult) => {
             setAuditLogs(response);
-        })
+        });
+    }
+
+    const fetchAuditsDebounce = debounce(async () => {
+        fetchAudits();
     }, 1000);
 
     useEffect(() => {
-        fetchAudits().then();
+        fetchAuditsDebounce().then();
     }, [filters]);
+
+    useEffect(() => {
+        fetchAudits();
+    }, [pageNumber]);
 
     return (
         <>
@@ -44,10 +52,13 @@ const AuditLogPage : React.FC = () => {
                     <thead>
                         <tr>
                         <th scope='col'>Event Date</th>
-                        <th scope='col'>Event Code</th>
-                        <th scope='col'>Description</th>
-                        <th scope='col'>Details</th>
-                        <th scope='col'>User</th>
+                        <th scope='col'>Status To</th>
+                        <th scope='col'></th>
+                        <th scope='col'>Status From</th>
+                        <th scope='col'>Referral ID</th>
+                        <th scope='col'>Attachment ID</th>
+                        <th scope='col'>Patient</th>
+                        <th scope='col'>Performed By</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -55,10 +66,13 @@ const AuditLogPage : React.FC = () => {
                         auditLogs.results.map((log : IAuditLog) => {
                             return (
                                 <tr key={log.auditRowId}>
-                                    <td>{moment(log.eventDttm).format('DD-MM-YYYY')}</td>
-                                    <td>{log.eventCode}</td>
-                                    <td>{log.eventDescription}</td>
-                                    <td>{log.eventDetails}</td>
+                                    <td>{moment(log.recInserted).format('DD-MM-YYYY h:mma')}</td>
+                                    <td>{log.toEventCode ?? ''}</td>
+                                    <td>{'<-'}</td>
+                                    <td>{log.fromEventCode ?? ''}</td>
+                                    <td>{log.erstrnsUid}</td>
+                                    <td>{log.doctrnsUid}</td>
+                                    <td>{log.patName} {log.nhsNo && `- ${log.nhsNo}`}</td>
                                     <td>{log.recInsertedBy}</td>
                                 </tr>
                             );

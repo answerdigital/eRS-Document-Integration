@@ -1,4 +1,5 @@
 import { IReferralFilters, IReferralRequest } from "common/interfaces/referral.interface"
+import Checkbox from "components/Checkbox/Checkbox";
 import FiltersDropdown from "components/FiltersDropdown/FiltersDropdown";
 import Select from "react-select";
 
@@ -29,6 +30,16 @@ const WorklistFilters: React.FC<WorklistFiltersProps> = ({filters, setFilters}) 
     
     return (
         <FiltersDropdown>
+            <div className='row mb-2'>
+                <div className='col-md-12'>
+                    <Checkbox
+                        label={'Only show referrals marked for investigation.'}
+                        clickableLabel={true}
+                        checked={filters.investigationMode ?? false}
+                        setChecked={(b: boolean) => setFilters({...filters, investigationMode: b})}
+                        />
+                </div>
+            </div>
             <div className='row mb-3'>
                 <div className='col-md-3 mb-3'>
                     <label className='form-label'>Pathway</label>

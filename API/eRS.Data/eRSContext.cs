@@ -23,6 +23,7 @@ namespace eRS.Data
         public virtual DbSet<ErseventErrorlog> ErseventErrorlogs { get; set; } = null!;
         public virtual DbSet<WfsHistory> WfsHistories { get; set; } = null!;
         public virtual DbSet<WfsMaster> WfsMasters { get; set; } = null!;
+        public virtual DbSet<Patient> Patients { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -35,29 +36,60 @@ namespace eRS.Data
 
                 entity.HasIndex(e => e.EventDttm, "Indx_Event_Dttm");
 
+                entity.HasIndex(e => new { e.RefDocRowId, e.RefReqRowId }, "Indx_auditlog_rowid");
+
+                entity.HasIndex(e => new { e.ErstrnsUid, e.DoctrnsUid }, "Indx_auditlog_uid");
+
                 entity.Property(e => e.AuditRowId).HasColumnName("Audit_RowID");
 
-                entity.Property(e => e.EventCode)
+                entity.Property(e => e.RefDocRowId).HasColumnName("RefDoc_RowID");
+
+                entity.Property(e => e.RefReqRowId).HasColumnName("RefReq_RowID");
+
+                entity.HasOne(a => a.ErsRefReqDetail)
+                    .WithMany(r => r.Audits)
+                    .HasForeignKey(a => a.RefReqRowId);
+
+                entity.HasOne(a => a.ErsdocAttachment)
+                    .WithMany(r => r.Audits)
+                    .HasForeignKey(a => a.RefDocRowId);
+
+                entity.Property(e => e.DoctrnsUid)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("Doctrns_uid");
+
+                entity.Property(e => e.ErstrnsUid)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("Erstrns_uid");
+
+                entity.Property(e => e.FromEventCode)
                     .HasMaxLength(20)
                     .IsUnicode(false)
-                    .HasColumnName("Event_Code");
+                    .HasColumnName("From_Event_Code");
 
-                entity.Property(e => e.EventDescription)
+                entity.Property(e => e.FromStatusComments)
                     .HasMaxLength(100)
                     .IsUnicode(false)
-                    .HasColumnName("Event_Description");
+                    .HasColumnName("From_Status_Comments");
 
-                entity.Property(e => e.EventDetails)
-                    .HasMaxLength(500)
+                entity.Property(e => e.ToEventCode)
+                    .HasMaxLength(20)
                     .IsUnicode(false)
-                    .HasColumnName("Event_Details");
+                    .HasColumnName("To_Event_Code");
+
+                entity.Property(e => e.ToStatusComments)
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .HasColumnName("To_Status_Comments");
 
                 entity.Property(e => e.EventDttm)
                     .HasColumnType("datetime")
                     .HasColumnName("Event_Dttm");
 
                 entity.Property(e => e.RecInserted)
-                    .HasColumnType("timestamp")
+                    .HasColumnType("datetime")
                     .HasColumnName("rec_inserted");
 
                 entity.Property(e => e.RecInsertedBy)
@@ -87,6 +119,19 @@ namespace eRS.Data
                     .WithOne(w => w.ErsRefReqDetail)
                     .HasForeignKey(w => w.RefReqRowId);
 
+                entity.HasMany(r => r.Audits)
+                    .WithOne(a => a.ErsRefReqDetail)
+                    .HasForeignKey(a => a.RefReqRowId);
+
+                entity.HasOne(r => r.Patient)
+                    .WithOne(p => p.ErsRefReqDetail)
+                    .HasPrincipalKey<ErsRefReqDetail>(r => r.RefReqUbrn)
+                    .HasForeignKey<Patient>(p => p.PatUbrn);
+
+                entity.HasMany(r => r.ErsdocAttachments)
+                    .WithOne(a => a.RefReqDetail)
+                    .HasForeignKey(a => a.RefrequestRowId);
+
                 entity.Property(e => e.ApptEndDttm)
                     .HasColumnType("datetime")
                     .HasColumnName("Appt_EndDttm");
@@ -111,7 +156,7 @@ namespace eRS.Data
                     .IsFixedLength();
 
                 entity.Property(e => e.RecUpdated)
-                    .HasColumnType("timestamp")
+                    .HasColumnType("datetime")
                     .HasColumnName("rec_Updated");
 
                 entity.Property(e => e.RecUpdatedBy)
@@ -183,11 +228,19 @@ namespace eRS.Data
 
                 entity.HasIndex(e => new { e.RefrequestRowId, e.RefDocRowId }, "Indx_RefReq_RowID");
 
-                entity.HasMany(d => d.WfsHistoryList)
+                entity.Property(e => e.RefDocRowId).HasColumnName("RefDoc_RowID");
+
+                entity.HasMany(a => a.WfsHistoryList)
                     .WithOne(w => w.ErsdocAttachment)
                     .HasForeignKey(w => w.RefDocRowId);
 
-                entity.Property(e => e.RefDocRowId).HasColumnName("RefDoc_RowID");
+                entity.HasMany(r => r.Audits)
+                    .WithOne(a => a.ErsdocAttachment)
+                    .HasForeignKey(r => r.RefDocRowId);
+
+                entity.HasOne(a => a.RefReqDetail)
+                    .WithMany(r => r.ErsdocAttachments)
+                    .HasForeignKey(a => a.RefrequestRowId);
 
                 entity.Property(e => e.AttachContentType)
                     .HasMaxLength(15)
@@ -244,8 +297,14 @@ namespace eRS.Data
                     .HasColumnName("rec_status")
                     .IsFixedLength();
 
+                entity.Property(e => e.PreviouslyDownloadedDoc)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("PreviouslyDownloadedDoc")
+                    .IsFixedLength();
+
                 entity.Property(e => e.RecUpdated)
-                    .HasColumnType("timestamp")
+                    .HasColumnType("datetime")
                     .HasColumnName("rec_Updated");
 
                 entity.Property(e => e.RecUpdatedBy)
@@ -369,7 +428,7 @@ namespace eRS.Data
                     .IsFixedLength();
 
                 entity.Property(e => e.RecUpdated)
-                    .HasColumnType("timestamp")
+                    .HasColumnType("datetime")
                     .HasColumnName("rec_Updated");
 
                 entity.Property(e => e.RecUpdatedBy)
@@ -402,6 +461,11 @@ namespace eRS.Data
                     .HasMaxLength(10)
                     .IsUnicode(false)
                     .HasColumnName("status_Code");
+
+                entity.HasOne(h => h.WfsMaster)
+                    .WithMany(m => m.WfsHistories)
+                    .HasPrincipalKey(m => m.WfsmCode)
+                    .HasForeignKey(h => h.StatusCode);
 
                 entity.Property(e => e.StatusComments)
                     .HasMaxLength(100)
@@ -449,7 +513,7 @@ namespace eRS.Data
                     .IsFixedLength();
 
                 entity.Property(e => e.RecUpdated)
-                    .HasColumnType("timestamp")
+                    .HasColumnType("datetime")
                     .HasColumnName("rec_Updated");
 
                 entity.Property(e => e.RecUpdatedBy)
@@ -461,6 +525,11 @@ namespace eRS.Data
                     .HasMaxLength(10)
                     .IsUnicode(false)
                     .HasColumnName("wfsm_Code");
+
+                entity.HasMany(m => m.WfsHistories)
+                    .WithOne(h => h.WfsMaster)
+                    .HasPrincipalKey(m => m.WfsmCode)
+                    .HasForeignKey(h => h.StatusCode);
 
                 entity.Property(e => e.WfsmDescription)
                     .HasMaxLength(100)
@@ -483,6 +552,101 @@ namespace eRS.Data
                     .HasMaxLength(15)
                     .IsUnicode(false)
                     .HasColumnName("wfsm_PrevHierarchy");
+            });
+
+            modelBuilder.Entity<Patient>(entity =>
+            {
+                entity.HasKey(e => e.PatRowID)
+                    .HasName("PK__patients__979035C4621E421B");
+
+                entity.ToTable("patients");
+
+                entity.Property(e => e.PatRowID).HasColumnName("pat_rowID");
+
+                entity.HasOne(p => p.ErsRefReqDetail)
+                    .WithOne(r => r.Patient)
+                    .HasPrincipalKey<Patient>(p => p.PatUbrn)
+                    .HasForeignKey<ErsRefReqDetail>(r => r.RefReqUbrn);
+
+                entity.Property(e => e.PatUbrn)
+                    .HasMaxLength(35)
+                    .IsUnicode(false)
+                    .HasColumnName("pat_ubrn");
+
+                entity.Property(e => e.PatMrn)
+                    .HasMaxLength(10)
+                    .IsUnicode(false)
+                    .HasColumnName("pat_mrn");
+
+                entity.Property(e => e.PatNhs)
+                    .HasMaxLength(15)
+                    .IsUnicode(false)
+                    .HasColumnName("pat_nhs");
+
+                entity.Property(e => e.PatFamilyName)
+                    .HasMaxLength(30)
+                    .IsUnicode(false)
+                    .HasColumnName("pat_familyName");
+
+                entity.Property(e => e.PatGivenName)
+                    .HasMaxLength(30)
+                    .IsUnicode(false)
+                    .HasColumnName("pat_givenName");
+
+                entity.Property(e => e.PatFullName)
+                    .HasMaxLength(60)
+                    .IsUnicode(false)
+                    .HasColumnName("pat_fullName");
+
+                entity.Property(e => e.PatSex)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("pat_sex")
+                    .IsFixedLength();
+
+                entity.Property(e => e.PatDob)
+                    .HasColumnType("datetime")
+                    .HasColumnName("pat_dob");
+
+                entity.Property(e => e.PatAddressOne)
+                    .HasMaxLength(30)
+                    .IsUnicode(false)
+                    .HasColumnName("pat_addressOne");
+
+                entity.Property(e => e.PatAddressTwo)
+                    .HasMaxLength(30)
+                    .IsUnicode(false)
+                    .HasColumnName("pat_addressTwo");
+
+                entity.Property(e => e.PatAddressThree)
+                    .HasMaxLength(30)
+                    .IsUnicode(false)
+                    .HasColumnName("pat_addressThree");
+
+                entity.Property(e => e.PatPostCode)
+                    .HasMaxLength(8)
+                    .IsUnicode(false)
+                    .HasColumnName("pat_PostCode");
+
+                entity.Property(e => e.PatContactNumber)
+                    .HasMaxLength(20)
+                    .IsUnicode(false)
+                    .HasColumnName("pat_contactNumber");
+
+                entity.Property(e => e.PatSpeciality)
+                    .HasMaxLength(35)
+                    .IsUnicode(false)
+                    .HasColumnName("pat_speciality");
+
+                entity.Property(e => e.RecUpdated)
+                    .HasColumnType("datetime")
+                    .HasColumnName("rec_Updated");
+
+                entity.Property(e => e.RecUpdatedBy)
+                    .HasMaxLength(15)
+                    .IsUnicode(false)
+                    .HasColumnName("rec_UpdatedBy");
+
             });
 
             OnModelCreatingPartial(modelBuilder);
