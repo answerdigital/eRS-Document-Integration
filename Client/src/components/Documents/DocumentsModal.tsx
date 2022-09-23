@@ -8,12 +8,13 @@ import { FaCheck, FaCheckCircle, FaExclamation, FaExclamationCircle, FaExclamati
 import './DocumentsModal.scss';
 import { IWorkflowHistory } from "common/interfaces/workflow-history.interface";
 import DocumentStatus from "./DocumentStatus";
+import moment from "moment";
+import { useWorkflowStates } from "contexts/WorkflowStatesContext";
+import { useWorklist } from "contexts/WorklistContext";
 
-interface DocumentsModalProps {
-    refUid: string;
-}
-
-const DocumentsModal : React.FC<DocumentsModalProps> = ({refUid}) => {
+const DocumentsModal : React.FC = () => {
+    const { selectedReferral: referral, handleReloadWorklist } = useWorklist();
+    const { getStatus } = useWorkflowStates();
     const [attachments, setAttachments] = useState<IAttachment[]>();
     const [selectedAttachment, setSelectedAttachment] = useState<IAttachment>();
     const [isDocumentLoading, setIsDocumentLoading] = useState<boolean>(false);
@@ -27,7 +28,11 @@ const DocumentsModal : React.FC<DocumentsModalProps> = ({refUid}) => {
     }, []);
 
     const fetchAttachments = () => {
-        getAttachments(refUid).then((response: IAttachment[]) => {
+        if (referral === undefined) {
+            return;
+        }
+
+        getAttachments(referral.refReqUniqueId).then((response: IAttachment[]) => {
             setAttachments(response);
         });
     };
@@ -53,34 +58,42 @@ const DocumentsModal : React.FC<DocumentsModalProps> = ({refUid}) => {
         setStatusMode(false);
     };
 
-    const handleOnAddStatus = () => {
+    const handleStatusUpdate = () => {
         setPageNumber(1);
         setSelectedAttachment(undefined);
         setStatusMode(false);
         fetchAttachments();
+        handleReloadWorklist();
     }
 
     const handleApproveDocument = () => {
         const update: IWorkflowHistory = {
+            erstrnsUid: referral?.refReqUniqueId,
             doctrnsUid: selectedAttachment?.attachId,
-            statusCode: 'ERSDL-SUCC',
+            statusCode: 'D-QCEPR-SUCC',
             statusComments: '',
             recInsertedBy: 'User'
         };
 
         addToWorkflowHistory(update).then((response : IWorkflowHistory[]) => {
             setSelectedAttachment(undefined);
-            fetchAttachments();
+            handleStatusUpdate();
         });
     };
+
+    const patient = referral?.patient;
+    const age = moment().diff(patient?.patDob, 'years');
 
     return (
         <>
             <div className='row'>
-                <div className='input-group mb-3'>
-                    <input className='form-control' placeholder={'Patient Name, Gender & Age, DOB'} />
-                    <input className='form-control' placeholder={'Referral Context'} />
-                </div>
+                {patient &&
+                <>
+                    <div className='col-md-4'><b>Name</b> {patient?.patGivenName}  {patient?.patFamilyName}</div>
+                    <div className='col-md-4'><b>Sex</b> {patient?.patSex}</div>
+                    <div className='col-md-4'><b>DOB</b> {moment(patient?.patDob).format('DD-MM-YYYY')} : <b>Age</b> {age}</div>
+                </>
+                }
             </div>
             <div className='row'>
                 <div className='col-md-4'>
@@ -107,7 +120,7 @@ const DocumentsModal : React.FC<DocumentsModalProps> = ({refUid}) => {
                                                 <div className='d-flex justify-content-center'>
                                                 {
                                                     a.wfsHistory?.statusCode === undefined ? <FaQuestionCircle /> :
-                                                    a.wfsHistory?.statusCode === 'ERSDL-SUCC' ? <FaCheckCircle /> : <FaExclamationTriangle />
+                                                    getStatus(a.wfsHistory.statusCode)?.errorStatus ? <FaExclamationTriangle /> : <FaCheckCircle />
                                                 }
                                                 </div>
                                             </td>
@@ -129,7 +142,6 @@ const DocumentsModal : React.FC<DocumentsModalProps> = ({refUid}) => {
                             onClick={() => setStatusMode(!statusMode)}>
                                 Flag Issue <FaExclamationCircle />
                             </button>
-                            <p>{selectedAttachment?.wfsHistory?.statusCode}</p>
                             <button
                             className='btn btn-outline-success m-2'
                             onClick={handleApproveDocument}>
@@ -139,7 +151,7 @@ const DocumentsModal : React.FC<DocumentsModalProps> = ({refUid}) => {
                     </div>
                     {statusMode &&
                         <div className='row'>
-                            <DocumentStatus docUid={selectedAttachment?.attachId} handleOnAddStatus={handleOnAddStatus} />
+                            <DocumentStatus docUid={selectedAttachment?.attachId} handleOnAddStatus={handleStatusUpdate} />
                         </div>
                     }
                     <div className='pdf-container mb-3'>

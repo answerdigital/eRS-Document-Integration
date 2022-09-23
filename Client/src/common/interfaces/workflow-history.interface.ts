@@ -16,4 +16,5 @@ export interface IWorkflowHistory {
     recUpdatedBy?: string;
     recInserted?: Date;
     recInsertedBy?: string;
+    attachTitle?: string;
 }

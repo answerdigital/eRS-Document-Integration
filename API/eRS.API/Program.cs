@@ -20,13 +20,19 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<eRSContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("LaptopConnection"));
 });
 
 builder.Services.Configure<JsonSerializerOptions>(jsonSerializerOptions =>
 {
     jsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
     jsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+});
+
+builder.Host.ConfigureLogging(logging =>
+{
+    logging.ClearProviders();
+    logging.AddConsole();
 });
 
 builder.Services.AddCors(options =>

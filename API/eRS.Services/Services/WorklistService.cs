@@ -3,20 +3,26 @@ using eRS.Data;
 using eRS.Data.Entities;
 using eRS.Models.Dtos;
 using eRS.Models.Models.ersRefRequests;
+using eRS.Models.Models.Wfs;
 using eRS.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace eRS.Services.Services;
 
 public class WorklistService : IWorklistService
 {
     private readonly eRSContext context;
+    private readonly ILogger<WorklistService> logger;
     private readonly IMapper mapper;
+    private readonly IAuditService auditService;
 
-    public WorklistService(eRSContext context, IMapper mapper)
+    public WorklistService(eRSContext context, ILogger<WorklistService> logger, IMapper mapper, IAuditService auditService)
     {
         this.context = context;
         this.mapper = mapper;
+        this.logger = logger;
+        this.auditService = auditService;
     }
 
     public async Task<PagedResult<ErsRefReqDetailDto>> GetWorklistFiltered(WorklistRequest request)
@@ -30,45 +36,56 @@ public class WorklistService : IWorklistService
         var worklistQuery = this.context.ErsRefReqDetails
             .Where(r => r.RecStatus != "D")
             .Include(r => r.WfsHistoryList)
+            .Include(r => r.Patient)
+            .Include(r => r.ErsdocAttachments)
+            .ThenInclude(a => a.WfsHistoryList)
             .OrderBy(r => r.RecUpdated)
             .AsQueryable();
 
-        worklistQuery.Where(r => !string.IsNullOrWhiteSpace(r.RefReqStatus) && EF.Functions.Like(r.RefReqStatus, $"%{filters.RefReqStatus}%"));
-
-        if (filters.ApptDttmFrom != null)
+        if (!string.IsNullOrWhiteSpace(filters.RefReqStatus))
         {
-            worklistQuery = worklistQuery.Where(r => r.ApptStDttm > filters.ApptDttmFrom);
+            worklistQuery = worklistQuery.Where(r => !string.IsNullOrWhiteSpace(r.RefReqStatus) && EF.Functions.Like(r.RefReqStatus, $"%{filters.RefReqStatus}%"));
         }
 
-        if (filters.ApptDttmFrom != null)
+        if (filters.InvestigationMode is not null && filters.InvestigationMode == true)
         {
-            worklistQuery = worklistQuery.Where(r => r.ApptEndDttm < filters.ApptDttmFrom);
+            worklistQuery = worklistQuery.Where(r => r.WfsHistoryList.Any(h => h.StatusCode != null && h.StatusCode.Contains("FAIL")));
         }
 
-        if (filters.RecInsertedFrom != null)
+        if (filters.ApptDttmFrom is not null)
         {
-            worklistQuery = worklistQuery.Where(r => r.RecUpdated > filters.RecInsertedFrom);
+            worklistQuery = worklistQuery.Where(r => r.ApptStDttm >= filters.ApptDttmFrom);
         }
 
-        if (filters.RecInsertedTo != null)
+        if (filters.ApptDttmTo is not null)
         {
-            worklistQuery = worklistQuery.Where(r => r.RecUpdated < filters.RecInsertedTo);
+            worklistQuery = worklistQuery.Where(r => r.ApptEndDttm <= filters.ApptDttmTo);
+        }
+
+        if (filters.RecInsertedFrom is not null)
+        {
+            worklistQuery = worklistQuery.Where(r => r.RecUpdated >= filters.RecInsertedFrom);
+        }
+
+        if (filters.RecInsertedTo is not null)
+        {
+            worklistQuery = worklistQuery.Where(r => r.RecUpdated <= filters.RecInsertedTo);
         }
 
         /*
-        if (filters.MeditechPathway != null && filters.MeditechPathway.Any())
+        if (filters.MeditechPathway is not null && filters.MeditechPathway.Any())
         {
             worklistQuery = worklistQuery.Where(r => r.RefReqPathway != null && filters.MeditechPathway.Contains(r.RefReqPathway));
-        }*/
+        }
+        if (filters.ErsService is not null)
+        {
+            worklistQuery = worklistQuery.Where(r => r.RecInserted < filters.FilterByRecInsertedTo);
+        }
+        */
 
-        if (filters.RefReqSpecialty != null && filters.RefReqSpecialty.Any())
+        if (filters.RefReqSpecialty is not null && filters.RefReqSpecialty.Any())
         {
             worklistQuery = worklistQuery.Where(r => r.RefReqSpecialty != null && filters.RefReqSpecialty.Contains(r.RefReqSpecialty));
-        }
-
-        if (filters.ErsService != null)
-        {
-            //worklistQuery = worklistQuery.Where(r => r.RecInserted < filters.FilterByRecInsertedTo);
         }
 
         var pageSize = 10;
@@ -80,7 +97,6 @@ public class WorklistService : IWorklistService
         var skip = (request.PageNumber - 1) * pageSize;
 
         var resultItems = await worklistQuery.Skip(skip).Take(pageSize).ToListAsync();
-
         result.Results = this.mapper.Map<List<ErsRefReqDetailDto>>(resultItems);
 
         return result;
@@ -94,20 +110,45 @@ public class WorklistService : IWorklistService
             .OrderBy(a => a.RefDocSrlno)
             .ToListAsync();
 
-        return this.mapper.Map<List<ErsdocAttachmentDto>>(attachments);
+        //For each attachment, get the most recent one not marked as PreviouslyDownloadedDoc
+        var groupedAttachments = attachments.GroupBy(a => a.AttachId);
+        var filteredAttachments = new List<ErsdocAttachment>();
+
+        foreach(var attachId in groupedAttachments)
+        {
+            var newestValidAttach = attachId.FirstOrDefault(a => a.PreviouslyDownloadedDoc == null || a.PreviouslyDownloadedDoc != "N");
+
+            if (newestValidAttach is not null)
+            {
+                filteredAttachments.Add(newestValidAttach);
+            }
+        }
+
+        return this.mapper.Map<List<ErsdocAttachmentDto>>(filteredAttachments);
     }
 
-    public async Task<List<WfsMasterDto>> GetWorkflowStates()
+    public async Task<WfsMasterResponse> GetWorkflowStates()
     {
         var wfs = await this.context.WfsMasters.ToListAsync();
 
-        return this.mapper.Map<List<WfsMasterDto>>(wfs);
+        var refReqStates = this.mapper.Map<List<WfsMasterDto>>(wfs.Where(s => s.WfsmCode[0] == 'R'));
+        var refDocStates = this.mapper.Map<List<WfsMasterDto>>(wfs.Where(s => s.WfsmCode[0] == 'D'));
+
+        var wfsResponse = new WfsMasterResponse
+        {
+            RefReqStates = refReqStates,
+            RefDocStates = refDocStates
+        };
+
+        return wfsResponse;
     }
 
     public async Task<List<WfsHistoryDto>> GetWorkflowHistory(string? refUid, string? docUid)
     {
         var wfh = await this.context.WfsHistories
             .Where(h => (refUid != null && h.ErstrnsUid == refUid) || (docUid != null && h.DoctrnsUid == docUid))
+            .Include(h => h.WfsMaster)
+            .Include(h => h.ErsdocAttachment)
             .OrderBy(h => h.RecInserted)
             .ToListAsync();
 
@@ -123,20 +164,12 @@ public class WorklistService : IWorklistService
 
         if (existingHistory is not null)
         {
-            existingHistory.StatusCode = newHistory.StatusCode;
-            existingHistory.StatusComments = newHistory.StatusComments;
-
-            this.context.WfsHistories.Update(existingHistory);
-
-            if (await this.context.SaveChangesAsync() == 0)
-            {
-                return null;
-            }
-
-            return await GetWorkflowHistory(newHistory.ErstrnsUid, newHistory.DoctrnsUid);
+            return await this.UpdateWorkflowHistory(newHistory, existingHistory);
         }
 
-        newHistory.RecInserted = DateTime.UtcNow;
+        var now = DateTime.UtcNow;
+        newHistory.RecInserted = now;
+        newHistory.RecUpdated = now;
 
         var history = this.mapper.Map<WfsHistory>(newHistory);
 
@@ -152,48 +185,85 @@ public class WorklistService : IWorklistService
 
             history.ErsRefReqDetail = refReq;
             history.RefReqRowId = refReq.RefReqRowId;
-        }
 
-        if (history.DoctrnsUid is not null)
-        {
-            var doc = await this.context.ErsdocAttachments.FirstOrDefaultAsync(r => r.AttachId == history.DoctrnsUid);
-
-            if (doc is null)
+            if (history.DoctrnsUid is not null)
             {
-                return null;
-            }
+                var doc = await this.context.ErsdocAttachments
+                    .FirstOrDefaultAsync(r => r.AttachId == history.DoctrnsUid && r.RefDocUniqueId == history.ErstrnsUid);
 
-            history.ErsdocAttachment = doc;
-            history.RefDocRowId = doc.RefDocRowId;
+                if (doc is null)
+                {
+                    return null;
+                }
+
+                history.ErsdocAttachment = doc;
+                history.RefDocRowId = doc.RefDocRowId;
+            }
         }
 
-        this.context.WfsHistories.Add(history);
+        await this.context.WfsHistories.AddAsync(history);
 
-        return await this.context.SaveChangesAsync() == 0
-            ? null
-            : await GetWorkflowHistory(history.ErstrnsUid, history.DoctrnsUid);
+        var audit = new AuditlogDto
+        {
+            ToEventCode = history.StatusCode,
+            ToStatusComments = history.StatusComments,
+            ErstrnsUid = history.ErstrnsUid,
+            DoctrnsUid = history.DoctrnsUid,
+            RecInsertedBy = history.RecInsertedBy
+        };
+
+        if (!await this.auditService.AddAudit(audit))
+        {
+            this.logger.LogWarning(
+                $"Audit failed to log for event transition from No Status to ${audit.ToEventCode} in referral ${audit.ErstrnsUid} or attachment ${audit.DoctrnsUid}"
+            );
+        }
+
+        await this.context.SaveChangesAsync();
+
+        return await GetWorkflowHistory(history.ErstrnsUid, history.DoctrnsUid);
     }
 
-    public async Task<List<WfsHistoryDto>?> UpdateWorkflowHistory(WfsHistoryDto updatedHistory)
+    public async Task<List<WfsHistoryDto>?> UpdateWorkflowHistory(WfsHistoryDto newHistory, WfsHistory? oldHistory)
     {
-        var history = await this.context.WfsHistories
-            .FirstOrDefaultAsync(h =>
-            h.ErstrnsUid == updatedHistory.ErstrnsUid &&
-            h.DoctrnsUid == updatedHistory.DoctrnsUid);
+        var existingHistory = oldHistory ??
+            await this.context.WfsHistories
+                .FirstOrDefaultAsync(h =>
+                h.ErstrnsUid == newHistory.ErstrnsUid &&
+                h.DoctrnsUid == newHistory.DoctrnsUid);
 
-        if (history is null)
+        if (existingHistory is null)
         {
             return null;
         }
 
-        history.StatusCode = updatedHistory.StatusCode;
-        history.StatusComments = updatedHistory.StatusComments;
+        existingHistory.RecUpdated = DateTime.UtcNow;
+        existingHistory.StatusCode = newHistory.StatusCode;
+        existingHistory.StatusComments = newHistory.StatusComments;
 
-        var result = await this.context.SaveChangesAsync() == 0;
+        this.context.WfsHistories.Update(existingHistory);
 
-        return result
-            ? null
-            : await GetWorkflowHistory(history.ErstrnsUid, history.DoctrnsUid);
+        var audit = new AuditlogDto
+        {
+            FromEventCode = existingHistory.StatusCode,
+            FromStatusComments = existingHistory.StatusComments,
+            ToEventCode = newHistory.StatusCode,
+            ToStatusComments = newHistory.StatusComments,
+            ErstrnsUid = newHistory.ErstrnsUid,
+            DoctrnsUid = newHistory.DoctrnsUid,
+            RecInsertedBy = newHistory.RecInsertedBy
+        };
+
+        if (!await this.auditService.AddAudit(audit))
+        {
+            this.logger.LogWarning(
+                $"Audit failed to log for event transition from ${audit.FromEventCode} to ${audit.ToEventCode} in referral ${audit.ErstrnsUid} or attachment ${audit.DoctrnsUid}"
+            );
+        }
+
+        await this.context.SaveChangesAsync();
+
+        return await GetWorkflowHistory(newHistory.ErstrnsUid, newHistory.DoctrnsUid);
     }
 
-} 
+}

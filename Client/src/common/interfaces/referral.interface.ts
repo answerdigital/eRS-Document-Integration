@@ -1,4 +1,6 @@
 import { IPagedResult, IRequest } from "./api-common.interface";
+import { IPatient } from './patient.interface';
+import { IWorkflowHistory } from "./workflow-history.interface";
 
 export interface IReferral {
     refReqUniqueId: string;
@@ -18,6 +20,8 @@ export interface IReferral {
     refReqSpecialty?: string;
     consultant?: string;
     ersService?: string;
+    patient?: IPatient;
+    wfsHistory?: IWorkflowHistory;
 }
 
 export interface IReferralFilters {
@@ -25,6 +29,7 @@ export interface IReferralFilters {
     refReqSpecialty?: string[];
     consultant?: string;
     ersService?: string;
+    investigationMode?: boolean;
 }
 
 export interface IReferralResult extends IPagedResult<IReferral> {

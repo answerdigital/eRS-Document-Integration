@@ -1,28 +1,36 @@
 import { IWorkflowHistory } from "common/interfaces/workflow-history.interface";
 import { IWorkflowStatus } from "common/interfaces/workflow-status.interface";
 import { useWorkflowStates } from "contexts/WorkflowStatesContext";
+import { useWorklist } from "contexts/WorklistContext";
 import React, { useEffect, useState } from "react";
 import Select from "react-select";
 import { addToWorkflowHistory, getWorkflowHistory, updateWorkflowHistory } from "services/worklist-service";
 import WorkflowHistory from "./WorkflowHistory";
 
-interface WorkflowStatusModalProps {
-    refUid: string;
-}
 
-const WorkflowStatusModal : React.FC<WorkflowStatusModalProps> = ({refUid}) => {
+const WorkflowStatusModal : React.FC = () => {
+    const { selectedReferral } = useWorklist();
     const [workflowHistory, setWorkflowHistory] = useState<IWorkflowHistory[]>();
     const [selectedHistoryItem, setSelectedHistoryItem] = useState<IWorkflowHistory>();
 
-    const workflowStates= useWorkflowStates();
+    const {states: workflowStates, getStatus}= useWorkflowStates();
     const [status, setStatus] = useState<string | undefined>('');
     const [comment, setComment] = useState<string>('');
 
+    const refUid = selectedReferral?.refReqUniqueId;
+
     useEffect(() => {
+        fetchWfsHistory();
+    }, []);
+
+    const fetchWfsHistory = () => {
+        if (refUid === undefined) {
+            return;
+        }
         getWorkflowHistory(refUid).then((response: IWorkflowHistory[]) => {
             setWorkflowHistory(response);
         });
-    }, []);
+    }
 
     const handleSelectWfhToEdit = (wfh?: IWorkflowHistory) => {
         setStatus(wfh?.statusCode);
@@ -66,12 +74,12 @@ const WorkflowStatusModal : React.FC<WorkflowStatusModalProps> = ({refUid}) => {
                     setSelectedHistoryItem={setSelectedHistoryItem} />
                 </div>
                 <div className='col-md-6'>
-                    <h4>{selectedHistoryItem ? 'Edit Status' : 'New Status'}</h4>
+                    <h4>{selectedHistoryItem ? 'Edit Status' : 'Set Referral Status'}</h4>
                     <div className='d-flex flex-column'>
                         <div className='mb-3'>
                             <Select
-                                value={status ? {label: status, value: status} : null}
-                                options={workflowStates?.map((wfs: IWorkflowStatus) => ({label: wfs.wfsmCode ?? '', value: wfs.wfsmCode ?? '' }))}
+                                value={status ? {label: getStatus(status)?.wfsmDisplayValue, value: status} : null}
+                                options={workflowStates?.refReqStates?.map((wfs: IWorkflowStatus) => ({label: getStatus(wfs.wfsmCode)?.wfsmDisplayValue, value: wfs.wfsmCode ?? '' }))}
                                 onChange={opts => setStatus(opts?.value ?? '')}
                                 />
                         </div>

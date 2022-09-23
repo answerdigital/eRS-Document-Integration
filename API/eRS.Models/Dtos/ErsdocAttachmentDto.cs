@@ -21,4 +21,5 @@ public partial class ErsdocAttachmentDto
     public string? RecInsertedBy { get; set; }
 
     public WfsHistoryDto? WfsHistory { get; set; }
+    public PatientDto? Patient { get; set; }
 }

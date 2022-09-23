@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
-
-namespace eRS.Data.Entities;
+﻿namespace eRS.Data.Entities;
 
 public partial class ErsRefReqDetail
 {
@@ -9,6 +6,7 @@ public partial class ErsRefReqDetail
     public string? RefReqUniqueId { get; set; }
     public string? RefReqNhsno { get; set; }
     public string? RefReqUbrn { get; set; }
+    public Patient? Patient { get; set; }
     public string? RefReqTrustNacs { get; set; }
     public DateTime? ApptStDttm { get; set; }
     public DateTime? ApptEndDttm { get; set; }
@@ -21,9 +19,10 @@ public partial class ErsRefReqDetail
     public string? WfsCode { get; set; }
     public DateTime? RecExpiryDttm { get; set; }
     public string? RecStatus { get; set; }
-    [Timestamp]
     public DateTime? RecUpdated { get; set; }
     public string? RecUpdatedBy { get; set; }
     public string? RecInsertedBy { get; set; }
     public List<WfsHistory> WfsHistoryList { get; }
+    public List<Auditlog> Audits { get; }
+    public List<ErsdocAttachment> ErsdocAttachments { get; }
 }

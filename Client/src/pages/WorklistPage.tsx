@@ -9,17 +9,21 @@ import React, { useEffect, useState } from 'react';
 import { getWorklist } from 'services/worklist-service';
 import { debounce } from 'ts-debounce';
 import WorklistFilters from 'components/Worklist/WorklistFilters';
+import { useWorkflowStates } from 'contexts/WorkflowStatesContext';
+import { FaCheckCircle, FaExclamationTriangle, FaQuestionCircle } from 'react-icons/fa';
+import WorklistContext from 'contexts/WorklistContext';
 
 const WorklistPage : React.FC = () => {
+    const { getStatus } = useWorkflowStates();
     const [worklist, setWorklist] = useState<IReferralResult>();
-    const [selectedRef, setSelectedRef] = useState<IReferral | null>();
+    const [selectedRef, setSelectedRef] = useState<IReferral>();
     const [pageNumber, setPageNumber] = useState<number>(1);
     const [filters, setFilters] = useState<IReferralFilters>({});
 
     const [showWorkflowModal, setShowWorkflowModal] = useState<boolean>(false);
     const [showDocumentsModal, setShowDocumentsModal] = useState<boolean>(false);
 
-    const fetchWorklist = debounce(async () => {
+    const fetchWorklist = () => {
         const request : IReferralRequest = {
             pageNumber: pageNumber,
             filters: filters
@@ -28,11 +32,19 @@ const WorklistPage : React.FC = () => {
         getWorklist(request).then((response : IReferralResult | undefined) => {
             setWorklist(response);
         });
+    };
+
+    const fetchWorklistDebounce = debounce(async () => {
+        fetchWorklist();
     }, 1000);
 
     useEffect(() => {
-        fetchWorklist().then();
+        fetchWorklistDebounce().then();
     }, [filters]);
+
+    useEffect(() => {
+        fetchWorklist();
+    }, [pageNumber]);
 
     const openModal = (modalFunc : (show: boolean) => void) => {
         if (selectedRef) {
@@ -46,15 +58,15 @@ const WorklistPage : React.FC = () => {
     };
 
     return (
-        <>
+        <WorklistContext.Provider value={{selectedReferral: selectedRef, handleReloadWorklist: () => fetchWorklist()}}>
             <h1>Worklist</h1>
             {selectedRef &&
             <>
                 <Modal title={'Workflow Status Update'} show={showWorkflowModal} setShow={setShowWorkflowModal}>
-                    <WorkflowStatusModal refUid={selectedRef?.refReqUniqueId} />
+                    <WorkflowStatusModal />
                 </Modal>
                 <Modal title={'Documents'} show={showDocumentsModal} setShow={setShowDocumentsModal}>
-                    <DocumentsModal refUid={selectedRef?.refReqUniqueId} />
+                    <DocumentsModal />
                 </Modal>
             </>
             }
@@ -63,17 +75,17 @@ const WorklistPage : React.FC = () => {
                 <table className='table'>
                     <thead>
                         <tr>
+                            <th scope='col'>UBRN</th>
                             <th scope='col'>Hospital ID</th>
                             <th scope='col'>NHS No.</th>
                             <th scope='col'>Name</th>
                             <th scope='col'>DOB</th>
                             <th scope='col'>Gender</th>
-                            <th scope='col'>Referral Details</th>
                             <th scope='col'>Meditech Speciality</th>
-                            <th scope='col'>UBRN</th>
-                            <th scope='col'>USRN</th>
+                            <th scope='col'>Referral Details</th>
                             <th scope='col'>Appointment Details</th>
-                            <th scope='col'>Status</th>
+                            <th scope='col'>Referral Status</th>
+                            <th scope='col'></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -83,17 +95,22 @@ const WorklistPage : React.FC = () => {
                                 key={wl.refReqUniqueId}
                                 className={`cursor-pointer ${wl === selectedRef && 'table-primary'}`}
                                 onClick={() => toggleSelect(wl)}>
+                                    <td>{wl.refReqUbrn}</td>
                                     <td>{wl.hospitalId}</td>
                                     <td>{wl.refReqNhsno}</td>
-                                    <td>{wl.name}</td>
-                                    <td>{moment(wl.dob).format('DD-MM-YYYY')}</td>
-                                    <td>{wl.gender}</td>
-                                    <td>{wl.referralDetails}</td>
+                                    <td>{wl.patient?.patGivenName} {wl.patient?.patFamilyName}</td>
+                                    <td>{wl.patient?.patDob && moment(wl.patient.patDob).format('DD-MM-YYYY')}</td>
+                                    <td>{wl.patient?.patSex}</td>
                                     <td>{wl.refReqSpecialty}</td>
-                                    <td>{wl.refReqUbrn}</td>
-                                    <td>{wl.usrn}</td>
+                                    <td>{wl.referralDetails}</td>
                                     <td>{wl.apptDetails}</td>
                                     <td>{wl.refReqStatus}</td>
+                                    <td>
+                                    {
+                                        wl.wfsHistory?.statusCode === undefined ? <FaQuestionCircle /> :
+                                        getStatus(wl.wfsHistory.statusCode)?.errorStatus ? <FaExclamationTriangle /> : <FaCheckCircle />
+                                    }
+                                    </td>
                                 </tr>
                             );
                         })
@@ -125,7 +142,7 @@ const WorklistPage : React.FC = () => {
                     </div>
                 </div>
             }
-        </>
+        </WorklistContext.Provider>
     );
 }
 

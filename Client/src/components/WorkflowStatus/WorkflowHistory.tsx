@@ -28,6 +28,7 @@ const WorkflowHistory : React.FC<WorkflowHistoryProps> = ({workflowHistory, hand
                                 <th scope='col'>Date</th>
                                 <th scope='col'>Status</th>
                                 <th scope='col'>User</th>
+                                <th scope='col'>Attachment</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -41,6 +42,9 @@ const WorkflowHistory : React.FC<WorkflowHistoryProps> = ({workflowHistory, hand
                                             <td>{moment(wfh.recInserted).format('DD-MM-YYYY')}</td>
                                             <td>{wfh.statusCode}</td>
                                             <td>{wfh.recInsertedBy}</td>
+                                            <td>
+                                            { wfh.doctrnsUid && <button className='btn btn-outline-primary'>{wfh.attachTitle}</button> }
+                                            </td>
                                         </tr>
                                     );
                                 })

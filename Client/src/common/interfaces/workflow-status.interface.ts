@@ -18,4 +18,10 @@ export interface IWorkflowStatus {
     recInserted?: Date;
     recInsertedBy?: string;
     recPurgeDays?: number;
+    errorStatus?: boolean;
+}
+
+export interface IWorkflowStatusResponse {
+    refReqStates?: IWorkflowStatus[];
+    refDocStates?: IWorkflowStatus[];
 }

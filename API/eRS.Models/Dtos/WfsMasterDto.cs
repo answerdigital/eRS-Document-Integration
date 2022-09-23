@@ -14,4 +14,6 @@ public partial class WfsMasterDto
     public DateTime? RecInserted { get; set; }
     public string? RecInsertedBy { get; set; }
     public int? RecPurgeDays { get; set; }
+
+    public bool? ErrorStatus { get; set; }
 }
