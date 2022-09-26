@@ -1,6 +1,6 @@
-import { IReferralFilters, IReferralRequest } from "common/interfaces/referral.interface"
+import { IReferralFilters } from "common/interfaces/referral.interface"
 import Checkbox from "components/Checkbox/Checkbox";
-import FiltersDropdown from "components/FiltersDropdown/FiltersDropdown";
+import FiltersDropdown from "components/FiltersDropdown";
 import Select from "react-select";
 
 const pathwaysOpts = [
@@ -27,7 +27,7 @@ const WorklistFilters: React.FC<WorklistFiltersProps> = ({filters, setFilters}) 
     const updateFilters = (field: keyof IReferralFilters, value: string | string[] | undefined) => {
         setFilters({...filters, [field]: value});
     };
-    
+
     return (
         <FiltersDropdown>
             <div className='row mb-2'>

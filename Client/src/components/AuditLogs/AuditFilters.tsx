@@ -1,5 +1,5 @@
 import { IAuditFilters } from "common/interfaces/audit.interface";
-import FiltersDropdown from "components/FiltersDropdown/FiltersDropdown";
+import FiltersDropdown from "components/FiltersDropdown";
 import DatePicker from "react-datepicker";
 
 interface AuditFiltersProps {
@@ -12,7 +12,7 @@ const AuditFilters: React.FC<AuditFiltersProps> = ({filters, setFilters}) => {
     const updateFilters = (field: keyof IAuditFilters, value: string | Date | undefined) => {
         setFilters({...filters, [field]: value});
     };
-    
+
     return (
         <FiltersDropdown>
             <div className='row mb-3'>

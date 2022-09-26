@@ -7,6 +7,6 @@ export interface IPagedResult<T> {
 }
 
 export interface IRequest<T> {
-    pageNumber: number;
+    pageNumber?: number;
     filters: T;
 }

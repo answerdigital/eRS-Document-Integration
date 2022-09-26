@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
+using CsvHelper;
 using eRS.Data;
 using eRS.Data.Entities;
 using eRS.Models.Dtos;
 using eRS.Models.Models.Audits;
 using eRS.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using System.Globalization;
 
 namespace eRS.Services.Services;
 
@@ -12,21 +15,60 @@ public class AuditService : IAuditService
 {
     private readonly eRSContext context;
     private readonly IMapper mapper;
+    private readonly ILogger<AuditService> logger;
 
-    public AuditService(eRSContext context, IMapper mapper)
+    public AuditService(eRSContext context, IMapper mapper, ILogger<AuditService> logger)
     {
         this.context = context;
         this.mapper = mapper;
+        this.logger = logger;
     }
 
-    public async Task<PagedResult<AuditlogDto>> GetAllFiltered(AuditRequest request)
+    public async Task<List<AuditlogDto>> GetAllFiltered(AuditRequest request)
     {
         if (request is null)
         {
             throw new ArgumentNullException(nameof(request));
         }
 
-        var filters = request.Filters;
+        var auditsQuery = await GetAllFilteredQuery(request.Filters);
+
+        var resultItems = await auditsQuery.ToListAsync();
+
+        return this.mapper.Map<List<AuditlogDto>>(resultItems);
+    }
+
+    public async Task<PagedResult<AuditlogDto>> GetAllFilteredPaged(AuditRequest request)
+    {
+        if (request is null)
+        {
+            throw new ArgumentNullException(nameof(request));
+        }
+
+        if (request.PageNumber is null)
+        {
+            throw new ArgumentNullException(nameof(request.PageNumber));
+        }
+
+        var auditsQuery = await GetAllFilteredQuery(request.Filters);
+
+        var pageSize = 10;
+        var result = new PagedResult<AuditlogDto> { CurrentPage = request.PageNumber.Value, PageSize = pageSize, RowCount = auditsQuery.Count() };
+
+        var pageCount = (double)result.RowCount / pageSize;
+        result.PageCount = (int)Math.Ceiling(pageCount);
+
+        var skip = (request.PageNumber.Value - 1) * pageSize;
+
+        var resultItems = await auditsQuery.Skip(skip).Take(pageSize).ToListAsync();
+
+        result.Results = this.mapper.Map<List<AuditlogDto>>(resultItems);
+
+        return result;
+    }
+
+    private async Task<IQueryable<Auditlog>> GetAllFilteredQuery(AuditFilter filters)
+    {
         var auditsQuery = this.context.Auditlogs
             .Where(a => a.RecStatus != "D")
             .Include(a => a.ErsRefReqDetail)
@@ -76,19 +118,7 @@ public class AuditService : IAuditService
             auditsQuery = auditsQuery.Where(a => a.RecInserted <= filters.RecInsertedTo);
         }
 
-        var pageSize = 10;
-        var result = new PagedResult<AuditlogDto> { CurrentPage = request.PageNumber, PageSize = pageSize, RowCount = auditsQuery.Count() };
-
-        var pageCount = (double)result.RowCount / pageSize;
-        result.PageCount = (int)Math.Ceiling(pageCount);
-
-        var skip = (request.PageNumber - 1) * pageSize;
-
-        var resultItems = await auditsQuery.Skip(skip).Take(pageSize).ToListAsync();
-
-        result.Results = this.mapper.Map<List<AuditlogDto>>(resultItems);
-
-        return result;
+        return auditsQuery;
     }
 
     public async Task<bool> AddAudit(AuditlogDto auditlogAdd)
@@ -113,5 +143,20 @@ public class AuditService : IAuditService
         await this.context.Auditlogs.AddAsync(audit);
 
         return await this.context.SaveChangesAsync() > 0;
+    }
+
+    public async Task<string> GenerateCsv(List<AuditlogDto> audits)
+    {
+        string csvString = "";
+
+        using (var writer = new StringWriter())
+        using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+        {
+            csv.WriteRecords(audits);
+            csv.Flush();
+            csvString = writer.ToString();
+        }
+
+        return csvString;
     }
 }

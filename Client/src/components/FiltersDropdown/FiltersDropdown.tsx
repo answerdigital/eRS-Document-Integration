@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import './FiltersDropdown.scss';
 
 interface FiltersDropdownProps {
     children: React.ReactNode;

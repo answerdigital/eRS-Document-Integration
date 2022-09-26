@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using eRS.Data.Entities;
 using eRS.Models.Dtos;
+using eRS.Models.Models.Users;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Playground.Service.Mappers;
@@ -15,6 +16,7 @@ public class MappingProfiles : Profile
         this.CreateMap_ErsdocAttachment();
         this.CreateMap_Wfs();
         this.CreateMap_Patient();
+        this.CreateMap_User();
     }
 
     private void CreateMap_Audit()
@@ -60,4 +62,11 @@ public class MappingProfiles : Profile
         this.CreateMap<PatientDto, Patient>();
     }
 
+    private void CreateMap_User()
+    {
+        this.CreateMap<User, UserDto>()
+            .ForMember(dto => dto.UserFullName, map => map.MapFrom(u => u.UserForename != null && u.UserSurname != null ? $"{u.UserForename} {u.UserSurname}" : null));
+        this.CreateMap<UserDto, User>();
+        this.CreateMap<UserCreate, User>();
+    }
 }

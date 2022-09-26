@@ -1,7 +1,7 @@
 import { IReferral, IReferralFilters, IReferralRequest, IReferralResult } from 'common/interfaces/referral.interface';
-import DocumentsModal from 'components/Documents/DocumentsModal';
+import DocumentsModal from 'components/DocumentsModal';
 import Loading from 'components/Loading/Loading';
-import Modal from 'components/Modal/Modal';
+import Modal from 'components/Modal';
 import Pagination from 'components/Pagination/Pagination';
 import WorkflowStatusModal from 'components/WorkflowStatus/WorkflowStatusModal';
 import moment from 'moment';
@@ -19,6 +19,8 @@ const WorklistPage : React.FC = () => {
     const [selectedRef, setSelectedRef] = useState<IReferral>();
     const [pageNumber, setPageNumber] = useState<number>(1);
     const [filters, setFilters] = useState<IReferralFilters>({});
+
+    const [selectedDocUid, setSelectedDocUid] = useState<string|undefined>();
 
     const [showWorkflowModal, setShowWorkflowModal] = useState<boolean>(false);
     const [showDocumentsModal, setShowDocumentsModal] = useState<boolean>(false);
@@ -40,7 +42,14 @@ const WorklistPage : React.FC = () => {
 
     useEffect(() => {
         fetchWorklistDebounce().then();
-    }, [filters]);
+    }, [filters.consultant,
+        filters.ersService]);
+
+    useEffect(() => {
+        fetchWorklist();
+    }, [filters.investigationMode,
+        filters.meditechPathway,
+        filters.refReqSpecialty]);
 
     useEffect(() => {
         fetchWorklist();
@@ -53,20 +62,30 @@ const WorklistPage : React.FC = () => {
     };
 
     const toggleSelect = (select: IReferral) => {
-        const newSelectState = selectedRef === select ? undefined : select;
+        const newSelectState = selectedRef?.refReqUniqueId === select.refReqUniqueId ? undefined : select;
         setSelectedRef(newSelectState);
     };
+
+    const openDocument = (docUid: string | undefined) => {
+        if (docUid) {
+            setSelectedDocUid(docUid);
+            setShowWorkflowModal(false);
+            openModal(setShowDocumentsModal);
+        }
+    };
+
+    const pagesTotal = worklist?.pageCount ?? 1;
 
     return (
         <WorklistContext.Provider value={{selectedReferral: selectedRef, handleReloadWorklist: () => fetchWorklist()}}>
             <h1>Worklist</h1>
             {selectedRef &&
             <>
-                <Modal title={'Workflow Status Update'} show={showWorkflowModal} setShow={setShowWorkflowModal}>
-                    <WorkflowStatusModal />
+                <Modal title={'Workflow Status'} show={showWorkflowModal} setShow={setShowWorkflowModal}>
+                    <WorkflowStatusModal openDocument={openDocument} />
                 </Modal>
                 <Modal title={'Documents'} show={showDocumentsModal} setShow={setShowDocumentsModal}>
-                    <DocumentsModal />
+                    <DocumentsModal selectedDocUid={selectedDocUid} resetSelectedDocUid={() => setSelectedDocUid(undefined)} />
                 </Modal>
             </>
             }
@@ -93,7 +112,7 @@ const WorklistPage : React.FC = () => {
                             return (
                                 <tr
                                 key={wl.refReqUniqueId}
-                                className={`cursor-pointer ${wl === selectedRef && 'table-primary'}`}
+                                className={`cursor-pointer ${wl.refReqUniqueId === selectedRef?.refReqUniqueId && 'table-primary'}`}
                                 onClick={() => toggleSelect(wl)}>
                                     <td>{wl.refReqUbrn}</td>
                                     <td>{wl.hospitalId}</td>
@@ -119,10 +138,15 @@ const WorklistPage : React.FC = () => {
                 </table>
             </div>
             <div className='d-flex justify-content-center'>
-                {!worklist ? <Loading /> : worklist.results?.length === 0 && <p>Worklist is empty</p>}
+                {!worklist ? <Loading /> : worklist.results?.length === 0 && <p>No results found.</p>}
             </div>
             <div className='d-flex justify-content-center'>
-                <Pagination pageCurrent={pageNumber} handlePageChange={setPageNumber} pagesTotal={worklist?.pageCount ?? 1} />
+                <Pagination
+                pageCurrent={pageNumber}
+                handlePageChange={setPageNumber}
+                pagesTotal={pagesTotal}
+                showPageInput={pagesTotal > 5}
+                />
             </div>
             {selectedRef &&
                 <div className='d-flex justify-content-end'>
@@ -130,7 +154,7 @@ const WorklistPage : React.FC = () => {
                         <button
                         className='btn btn-outline-primary'
                         onClick={() => openModal(setShowWorkflowModal)}>
-                            View Workflow Status
+                            Workflow Status
                         </button>
                     </div>
                     <div>

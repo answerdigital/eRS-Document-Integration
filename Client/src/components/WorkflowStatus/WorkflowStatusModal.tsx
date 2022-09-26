@@ -1,5 +1,6 @@
 import { IWorkflowHistory } from "common/interfaces/workflow-history.interface";
 import { IWorkflowStatus } from "common/interfaces/workflow-status.interface";
+import { useUserDetails } from "contexts/SessionContext";
 import { useWorkflowStates } from "contexts/WorkflowStatesContext";
 import { useWorklist } from "contexts/WorklistContext";
 import React, { useEffect, useState } from "react";
@@ -7,13 +8,17 @@ import Select from "react-select";
 import { addToWorkflowHistory, getWorkflowHistory, updateWorkflowHistory } from "services/worklist-service";
 import WorkflowHistory from "./WorkflowHistory";
 
+interface IWorkflowStatusModal {
+    openDocument: (docUid: string | undefined) => void;
+}
 
-const WorkflowStatusModal : React.FC = () => {
+const WorkflowStatusModal : React.FC<IWorkflowStatusModal> = ({openDocument}) => {
     const { selectedReferral } = useWorklist();
     const [workflowHistory, setWorkflowHistory] = useState<IWorkflowHistory[]>();
     const [selectedHistoryItem, setSelectedHistoryItem] = useState<IWorkflowHistory>();
 
     const {states: workflowStates, getStatus}= useWorkflowStates();
+    const { userDetails } = useUserDetails();
     const [status, setStatus] = useState<string | undefined>('');
     const [comment, setComment] = useState<string>('');
 
@@ -47,7 +52,7 @@ const WorkflowStatusModal : React.FC = () => {
             erstrnsUid: refUid,
             statusCode: status,
             statusComments: comment,
-            recInsertedBy: 'User'
+            recInsertedBy: userDetails?.userEmail
         }
 
         if (selectedHistoryItem) {
@@ -63,6 +68,10 @@ const WorkflowStatusModal : React.FC = () => {
         }
     };
 
+    const doesRefStatusExist = (): boolean => {
+        return workflowHistory?.find(h => !h.doctrnsUid) !== undefined;
+    };
+
     return (
         <div className='container-fluid'>
             <div className='row'>
@@ -71,34 +80,40 @@ const WorkflowStatusModal : React.FC = () => {
                     workflowHistory={workflowHistory}
                     handleWfhOnClick={handleSelectWfhToEdit}
                     selectedHistoryItem={selectedHistoryItem}
-                    setSelectedHistoryItem={setSelectedHistoryItem} />
+                    setSelectedHistoryItem={setSelectedHistoryItem}
+                    openDocument={openDocument}
+                    />
                 </div>
                 <div className='col-md-6'>
-                    <h4>{selectedHistoryItem ? 'Edit Status' : 'Set Referral Status'}</h4>
-                    <div className='d-flex flex-column'>
-                        <div className='mb-3'>
-                            <Select
-                                value={status ? {label: getStatus(status)?.wfsmDisplayValue, value: status} : null}
-                                options={workflowStates?.refReqStates?.map((wfs: IWorkflowStatus) => ({label: getStatus(wfs.wfsmCode)?.wfsmDisplayValue, value: wfs.wfsmCode ?? '' }))}
-                                onChange={opts => setStatus(opts?.value ?? '')}
+                    {selectedHistoryItem || !doesRefStatusExist() ?
+                    <>
+                        <h4>{selectedHistoryItem?.doctrnsUid ? 'Edit Status' : 'Set Referral Status'}</h4>
+                        <div className='d-flex flex-column'>
+                            <div className='mb-3'>
+                                <Select
+                                    value={status ? {label: getStatus(status)?.wfsmDisplayValue, value: status} : null}
+                                    options={workflowStates?.refReqStates?.map((wfs: IWorkflowStatus) => ({label: getStatus(wfs.wfsmCode)?.wfsmDisplayValue, value: wfs.wfsmCode ?? '' }))}
+                                    onChange={opts => setStatus(opts?.value ?? '')}
+                                    />
+                            </div>
+                            <div className='input-group mb-3'>
+                                <textarea
+                                className='form-control'
+                                placeholder={'Comments'}
+                                value={comment}
+                                onChange={e => setComment(e.target.value)}
                                 />
+                            </div>
+                            <div className='d-flex flex-row-reverse'>
+                                <button
+                                className='btn btn-outline-success'
+                                onClick={() => handleAddToWfh()}>
+                                    {selectedHistoryItem ? 'Update' : 'Add'}
+                                </button>
+                            </div>
                         </div>
-                        <div className='input-group mb-3'>
-                            <textarea
-                            className='form-control'
-                            placeholder={'New Comments'}
-                            value={comment}
-                            onChange={e => setComment(e.target.value)}
-                            />
-                        </div>
-                        <div className='d-flex flex-row-reverse'>
-                            <button
-                            className='btn btn-outline-success'
-                            onClick={() => handleAddToWfh()}>
-                                {selectedHistoryItem ? 'Update' : 'Add'}
-                            </button>
-                        </div>
-                    </div>
+                    </>
+                    : null}
                 </div>
             </div>
         </div>

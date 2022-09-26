@@ -24,6 +24,7 @@ namespace eRS.Data
         public virtual DbSet<WfsHistory> WfsHistories { get; set; } = null!;
         public virtual DbSet<WfsMaster> WfsMasters { get; set; } = null!;
         public virtual DbSet<Patient> Patients { get; set; } = null!;
+        public virtual DbSet<User> Users { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -646,6 +647,42 @@ namespace eRS.Data
                     .HasMaxLength(15)
                     .IsUnicode(false)
                     .HasColumnName("rec_UpdatedBy");
+
+            });
+
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.HasKey(e => e.UserRowID)
+                    .HasName("PK__users__189ACA9638B38139");
+
+                entity.ToTable("users");
+
+                entity.Property(e => e.UserRowID).HasColumnName("user_rowID");
+
+                entity.Property(e => e.UserReference)
+                    .HasColumnType("uniqueidentifier")
+                    .IsUnicode(false)
+                    .HasColumnName("user_reference");
+
+                entity.Property(e => e.UserEmail)
+                    .HasMaxLength(30)
+                    .IsUnicode(false)
+                    .HasColumnName("user_email");
+
+                entity.Property(e => e.UserPassword)
+                    .HasMaxLength(260)
+                    .IsUnicode(false)
+                    .HasColumnName("user_password");
+
+                entity.Property(e => e.UserSurname)
+                    .HasMaxLength(30)
+                    .IsUnicode(false)
+                    .HasColumnName("user_surname");
+
+                entity.Property(e => e.UserForename)
+                    .HasMaxLength(30)
+                    .IsUnicode(false)
+                    .HasColumnName("user_forename");
 
             });
 

@@ -1,5 +1,8 @@
 import NavbarLink from 'components/Navbar/NavbarLink/NavbarLink';
+import { useUserDetails } from 'contexts/SessionContext';
+import { useSession } from 'hooks/useSession';
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { RouterPaths } from 'utility/RouterPaths';
 
 interface NavbarProps {
@@ -8,6 +11,18 @@ interface NavbarProps {
 
 const Navbar : React.FC<NavbarProps> = ({children}) => {
     const [collapsed, setCollapsed] = useState<boolean>(false);
+
+    const { userDetails, setUserDetails } = useUserDetails();
+    const { hasJWT, clearJWT } = useSession();
+    const navigate = useNavigate();
+
+    const logout = () => {
+        clearJWT();
+        setUserDetails(undefined);
+        navigate(RouterPaths.LoginPath);
+    };
+
+    const loggedIn = hasJWT();
 
     return (
         <>
@@ -20,13 +35,22 @@ const Navbar : React.FC<NavbarProps> = ({children}) => {
                     </button>
                     <div className={`collapse navbar-collapse ${collapsed && 'show'}`}>
                         <ul className='navbar-nav me-auto mb-2 mb-lg-0'>
-                            <NavbarLink title={'Home'} link={RouterPaths.HomePath} />
-                            <NavbarLink title={'Worklist'} link={RouterPaths.WorklistPath} />
-                            <NavbarLink title={'Users'} link={RouterPaths.UsersPath} />
-                            <NavbarLink title={'Audit Log'} link={RouterPaths.AuditsPath} />
+                            {loggedIn ?
+                            <>
+                                <NavbarLink title={'Worklist'} link={RouterPaths.WorklistPath} />
+                                <NavbarLink title={'Audit Log'} link={RouterPaths.AuditsPath} />
+                                <NavbarLink title={'Manage Users'} link={RouterPaths.UsersPath} />
+                            </>
+                            : null}
                         </ul>
                         <div className='d-flex'>
-                            <button className='btn btn-outline-success'>Sign out</button>    
+                            {loggedIn ?
+                            <>
+                                <div className='d-flex m-2'>{userDetails?.userFullName}</div>
+                                <button onClick={() => logout()} className='btn btn-outline-success'>Sign out</button>
+                            </>
+                            : null
+                            }
                         </div>
                     </div>
                 </div>

@@ -1,27 +1,37 @@
 import { IWorkflowStatus, IWorkflowStatusResponse } from "common/interfaces/workflow-status.interface";
+import { useSession } from "hooks/useSession";
 import { createContext, useContext, useEffect, useState } from "react";
 import { getWorkflowStates } from "services/worklist-service";
 
 interface IWorkflowStatesContext {
     states: IWorkflowStatusResponse;
+    fetchStatusList: () => void;
     getStatus: (wfsmCode?: string) => IWorkflowStatus | undefined;
 }
 
 const WorkflowStatesContext = createContext<IWorkflowStatesContext>({
     states: {},
+    fetchStatusList: () => undefined,
     getStatus: () => undefined
 });
 
-interface WorkflowStatesContextProviderProps {
+interface IWorkflowStatesContextProviderProps {
     children: React.ReactNode;
 }
 
-const WorkflowStatesContextProvider: React.FC<WorkflowStatesContextProviderProps> = ({children}) => {
+const WorkflowStatesContextProvider: React.FC<IWorkflowStatesContextProviderProps> = ({children}) => {
     const [workflowStates, setWorkflowStates] = useState<IWorkflowStatusResponse>({});
+    const { hasJWT } = useSession();
 
     useEffect(() => {
-        getWorkflowStates().then((response: IWorkflowStatusResponse) => setWorkflowStates(response));
+        if (hasJWT()) {
+            fetchStatusList();
+        }
     }, []);
+
+    const fetchStatusList = () => {
+        getWorkflowStates().then((response: IWorkflowStatusResponse) => setWorkflowStates(response));
+    };
 
     const getStatus = (wfsmCode?: string): IWorkflowStatus | undefined => {
         let allStates = workflowStates.refReqStates?.concat(workflowStates.refDocStates ?? []);
@@ -31,6 +41,7 @@ const WorkflowStatesContextProvider: React.FC<WorkflowStatesContextProviderProps
     return (
         <WorkflowStatesContext.Provider value={{
             states: workflowStates,
+            fetchStatusList: fetchStatusList,
             getStatus: getStatus
         }}>
             {children}
@@ -41,7 +52,7 @@ const WorkflowStatesContextProvider: React.FC<WorkflowStatesContextProviderProps
 export const useWorkflowStates = () => {
     const context = useContext(WorkflowStatesContext);
     if (context === undefined) {
-        throw new Error('useWorkflowStates must be used within a CaseContextProvider');
+        throw new Error('useWorkflowStates must be used within a WorkflowStatesContextProvider');
     }
     return context;
 }

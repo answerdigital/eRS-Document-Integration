@@ -1,18 +1,35 @@
 import { IAuditFilters, IAuditLog, IAuditRequest, IAuditResult } from 'common/interfaces/audit.interface';
 import Pagination from 'components/Pagination/Pagination';
-import Tooltip from 'components/Tooltip/Tooltip';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
-import { getAudits } from 'services/audit-service';
+import { generateCsv, getAudits } from 'services/audit-service';
 import "react-datepicker/dist/react-datepicker.css";
 import Loading from 'components/Loading/Loading';
 import { debounce } from 'ts-debounce';
 import AuditFilters from 'components/AuditLogs/AuditFilters';
+import { ICsvFile } from 'common/interfaces/files.interface';
 
 const AuditLogPage : React.FC = () => {
     const [auditLogs, setAuditLogs] = useState<IAuditResult>();
     const [pageNumber, setPageNumber] = useState<number>(1);
     const [filters, setFilters] = useState<IAuditFilters>({});
+
+    const exportCsv = (useFilters: boolean) => {
+        const request : IAuditRequest = {
+            filters: useFilters ? filters : {}
+        };
+
+        generateCsv(request).then((file: ICsvFile | undefined) => {
+            if (!file) {
+                return;
+            }
+            const url = window.URL.createObjectURL(new Blob([file.fileContents]));
+            const downloadLink = document.createElement('a');
+            downloadLink.href = url;
+            downloadLink.setAttribute('download', file.fileName);
+            downloadLink.click();
+        });
+    };
 
     const fetchAudits = () => {
         const request : IAuditRequest = {
@@ -20,10 +37,10 @@ const AuditLogPage : React.FC = () => {
             filters: filters
         };
 
-        getAudits(request).then((response : IAuditResult) => {
+        getAudits(request).then((response : IAuditResult | undefined) => {
             setAuditLogs(response);
         });
-    }
+    };
 
     const fetchAuditsDebounce = debounce(async () => {
         fetchAudits();
@@ -42,8 +59,11 @@ const AuditLogPage : React.FC = () => {
             <div className='d-flex justify-content-between align-items-center'>
                 <h1>Audits</h1>
                 <div>
-                <button className='btn btn-sm btn-success'>Export as CSV</button>
-
+                <button
+                    className='btn btn-sm btn-success'
+                    onClick={() => exportCsv(true)}>
+                    Export as CSV
+                    </button>
                 </div>
             </div>
             <AuditFilters filters={filters} setFilters={setFilters} />

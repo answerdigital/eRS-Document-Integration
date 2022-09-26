@@ -129,7 +129,7 @@ public class WorklistService : IWorklistService
 
     public async Task<WfsMasterResponse> GetWorkflowStates()
     {
-        var wfs = await this.context.WfsMasters.ToListAsync();
+        var wfs = await this.context.WfsMasters.OrderBy(w => w.WfsmHierarchy).ToListAsync();
 
         var refReqStates = this.mapper.Map<List<WfsMasterDto>>(wfs.Where(s => s.WfsmCode[0] == 'R'));
         var refDocStates = this.mapper.Map<List<WfsMasterDto>>(wfs.Where(s => s.WfsmCode[0] == 'D'));
