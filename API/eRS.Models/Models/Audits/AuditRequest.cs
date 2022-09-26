@@ -2,6 +2,6 @@
 
 public class AuditRequest
 {
-    public int PageNumber { get; set; }
+    public int? PageNumber { get; set; }
     public AuditFilter Filters { get; set; }
 }

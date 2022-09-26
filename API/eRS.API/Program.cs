@@ -1,10 +1,15 @@
 using AutoMapper;
 using AutoMapper.EquivalencyExpression;
+using eRS.API.Models;
 using eRS.Data;
 using eRS.Services.Interfaces;
 using eRS.Services.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Playground.Service.Mappers;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -16,11 +21,52 @@ builder.Services.AddControllers();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "PlaygroundWebApi", Version = "v1" });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+    {
+        Name = JwtAuthenticationDefaults.HeaderName,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 1safsfsdfdfd\"",
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {{
+        new OpenApiSecurityScheme
+        {
+            Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = JwtAuthenticationDefaults.AuthenticationScheme }
+        },
+        new List<string> {}
+    }});
+});
+
+var jwtSettings = builder.Configuration.GetSection("JwtBearer").Get<JwtBearerConfiguration>();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.MapInboundClaims = false;
+        options.SaveToken = true;
+        options.RequireHttpsMetadata = false;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtSettings.Issuer,
+            ValidAudience = jwtSettings.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key))
+        };
+    });
 
 builder.Services.AddDbContext<eRSContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("LaptopConnection"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
 builder.Services.Configure<JsonSerializerOptions>(jsonSerializerOptions =>
@@ -46,6 +92,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddTransient<IAuditService, AuditService>();
 builder.Services.AddTransient<IWorklistService, WorklistService>();
+builder.Services.AddTransient<IAccountService, AccountService>();
 
 var mapperConfig = new MapperConfiguration(mc =>
 {
@@ -67,6 +114,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

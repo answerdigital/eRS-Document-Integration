@@ -2,20 +2,15 @@ import { IWorkflowStatusResponse } from 'common/interfaces/workflow-status.inter
 import { IAttachment } from './../common/interfaces/attachment.interface';
 import { IWorkflowHistory } from 'common/interfaces/workflow-history.interface';
 import { IReferralRequest, IReferralResult } from "common/interfaces/referral.interface";
-import api from "./api";
-import { toast } from 'react-toastify';
+import api, { printApiError } from "./api";
 import { AxiosError, AxiosResponse } from 'axios';
-
-const printError = (error: any) => {
-    toast.error(`Server error! Code ${error.response?.status}`, { });
-};
 
 export const getWorklist = async (request: IReferralRequest): Promise<IReferralResult | undefined> => {
     return api.post('/Worklist', request)
         .then((response: AxiosResponse) => {
             return response.data;
         }).catch((error: AxiosError) => {
-            printError(error);
+            printApiError(error);
         });
 };
 
@@ -24,7 +19,6 @@ export const getWorkflowStates = async () : Promise<IWorkflowStatusResponse>  =>
         .then((response: AxiosResponse) => {
             return response.data;
         }).catch((error: AxiosError) => {
-            printError(error);
             return [];
         });
 };
@@ -34,7 +28,7 @@ export const getWorkflowHistory = async (refUid: string): Promise<IWorkflowHisto
         .then((response: AxiosResponse) => {
             return response.data;
         }).catch((error: AxiosError) => {
-            printError(error);
+            printApiError(error);
             return [];
         });
 };
@@ -44,7 +38,7 @@ export const addToWorkflowHistory = async (wfh: IWorkflowHistory): Promise<IWork
         .then((response: AxiosResponse) => {
             return response.data;
         }).catch((error: AxiosError) => {
-            printError(error);
+            printApiError(error);
             return [];
         });
 };
@@ -54,7 +48,7 @@ export const updateWorkflowHistory = async (wfh: IWorkflowHistory): Promise<IWor
         .then((response: AxiosResponse) => {
             return response.data;
         }).catch((error: AxiosError) => {
-            printError(error);
+            printApiError(error);
             return [];
         });
 };
@@ -65,7 +59,7 @@ export const getAttachments = async (refUid: string): Promise<IAttachment[]> => 
         .then((response: AxiosResponse) => {
             return response.data;
         }).catch((error: AxiosError) => {
-            printError(error);
+            printApiError(error);
             return [];
         });
 };

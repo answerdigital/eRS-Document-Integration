@@ -2,10 +2,12 @@ using eRS.Models.Dtos;
 using eRS.Models.Models.Audits;
 using eRS.Models.Models.ersRefRequests;
 using eRS.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eRS.API.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class WorklistController : ControllerBase
