@@ -1,5 +1,4 @@
 ﻿using eRS.API.Models;
-using eRS.Data.Entities;
 using eRS.Models.Dtos;
 using eRS.Models.Models.Users;
 using eRS.Services.Interfaces;
@@ -14,7 +13,7 @@ namespace eRS.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AccountController : Controller
+public sealed class AccountController : Controller
 {
     private readonly IConfiguration configuration;
     private readonly IAccountService accountService;

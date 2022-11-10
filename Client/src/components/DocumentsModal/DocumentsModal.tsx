@@ -12,12 +12,12 @@ import { useWorklist } from "contexts/WorklistContext";
 import DocumentStatus from "./DocumentStatus";
 import { useUserDetails } from "contexts/SessionContext";
 
-interface IDocumentsModal {
+interface IDocumentsModalProps {
     selectedDocUid: string | undefined;
     resetSelectedDocUid: () => void;
 }
 
-const DocumentsModal : React.FC<IDocumentsModal> = ({selectedDocUid, resetSelectedDocUid}) => {
+const DocumentsModal : React.FC<IDocumentsModalProps> = ({selectedDocUid, resetSelectedDocUid}) => {
     const { selectedReferral: referral, handleReloadWorklist } = useWorklist();
     const { getStatus, getStatusIcon } = useWorkflowStates();
     const { userDetails } = useUserDetails();

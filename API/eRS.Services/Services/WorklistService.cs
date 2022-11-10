@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace eRS.Services.Services;
 
-public class WorklistService : IWorklistService
+public sealed class WorklistService : IWorklistService
 {
     private readonly eRSContext context;
     private readonly ILogger<WorklistService> logger;
@@ -28,10 +28,7 @@ public class WorklistService : IWorklistService
 
     public async Task<PagedResult<ErsRefReqDetailDto>> GetWorklistFiltered(WorklistRequest request)
     {
-        if (request is null)
-        {
-            throw new ArgumentNullException(nameof(request));
-        }
+        ArgumentNullException.ThrowIfNull(request, nameof(request));
 
         var worklistQuery = GetWorklistFilteredQuery(request.Filters);
 
@@ -190,13 +187,10 @@ public class WorklistService : IWorklistService
 
         var history = this.mapper.Map<WfsHistory>(newHistory);
 
-        if (history.ErstrnsUid is null)
-        {
-            throw new ArgumentNullException(nameof(history.ErstrnsUid));
-        }
+        ArgumentNullException.ThrowIfNull(history.ErstrnsUid, nameof(history.ErstrnsUid));
 
         var refReq = await this.context.ErsRefReqDetails.FirstOrDefaultAsync(r => r.RefReqUniqueId == history.ErstrnsUid);
-            
+
         if (refReq is null)
         {
             return null;
@@ -235,6 +229,8 @@ public class WorklistService : IWorklistService
                 $"Audit failed to log for event transition from No Status to ${audit.ToEventCode} in referral ${audit.ErstrnsUid} or attachment ${audit.DoctrnsUid}"
             );
         }
+
+        this.logger.LogInformation("Workflow history added");
 
         return await GetWorkflowHistory(history.ErstrnsUid, history.DoctrnsUid);
     }
@@ -277,6 +273,8 @@ public class WorklistService : IWorklistService
                 $"Audit failed to log for event transition from ${audit.FromEventCode} to ${audit.ToEventCode} in referral ${audit.ErstrnsUid} or attachment ${audit.DoctrnsUid}"
             );
         }
+
+        this.logger.LogInformation("Workflow history updated");
 
         return await GetWorkflowHistory(newHistory.ErstrnsUid, newHistory.DoctrnsUid);
     }

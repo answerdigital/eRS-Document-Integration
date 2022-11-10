@@ -1,6 +1,6 @@
 ﻿namespace eRS.Models.Dtos;
 
-public partial class ErsRefReqDetailDto
+public sealed class ErsRefReqDetailDto
 {
     public string? RefReqUniqueId { get; set; }
     public string? RefReqNhsno { get; set; }

@@ -1,6 +1,6 @@
 ﻿namespace eRS.Data.Entities;
 
-public partial class ErsRefReqDetail
+public sealed class ErsRefReqDetail
 {
     public int RefReqRowId { get; set; }
     public string? RefReqUniqueId { get; set; }

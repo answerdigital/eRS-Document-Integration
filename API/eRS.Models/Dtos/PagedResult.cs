@@ -12,7 +12,7 @@ public abstract class PagedResultBase
 }
 
 [Serializable]
-public class PagedResult<T> : PagedResultBase where T : class
+public sealed class PagedResult<T> : PagedResultBase where T : class
 {
     public IList<T> Results { get; set; }
 

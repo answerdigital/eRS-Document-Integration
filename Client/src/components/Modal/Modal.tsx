@@ -1,5 +1,6 @@
+import IconButton from 'components/IconButton';
 import React from 'react';
-import { BsBackspace } from 'react-icons/bs';
+import { BsXSquare, BsXSquareFill } from 'react-icons/bs';
 
 interface IModalProps {
     title?: string;
@@ -18,15 +19,8 @@ const Modal: React.FC<IModalProps> = ({title, show, setShow, children, footer}) 
                 <div className='modal-dialog modal-fullscreen'>
                     <div className='modal-content'>
                         <div className='modal-header'>
-                            <div className='d-flex flex-row align-items-center'>
-                                <div className='me-3'>
-                                    <button type='button' className='btn-transparent' aria-label='Close' onClick={() => setShow(false)}><BsBackspace/></button>
-                                </div>
-                                <div>
-                                    <h5 className='modal-title'>{title}</h5>
-                                </div>
-                            </div>
-
+                            <h5 className='modal-title'>{title}</h5>
+                            <IconButton icon={<BsXSquare/>} iconHover={<BsXSquareFill/>} onClick={() => setShow(false)} aria-label='Close' />
                         </div>
                         <div className='modal-body'>
                             {children}

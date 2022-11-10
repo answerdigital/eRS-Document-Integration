@@ -1,6 +1,6 @@
 ﻿namespace eRS.Data.Entities;
 
-public partial class ErsdocAttachment
+public sealed class ErsdocAttachment
 {
     public int RefDocRowId { get; set; }
     public int? RefrequestRowId { get; set; }

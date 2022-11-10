@@ -1,6 +1,6 @@
 ﻿namespace eRS.Models.Dtos;
 
-public partial class WfsHistoryDto
+public sealed class WfsHistoryDto
 {
     public string? ErstrnsUid { get; set; }
     public string? DoctrnsUid { get; set; }
