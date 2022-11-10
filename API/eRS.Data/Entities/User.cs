@@ -1,6 +1,6 @@
 ﻿namespace eRS.Data.Entities;
 
-public partial class User
+public sealed class User
 {
     public int UserRowID { get; set; }
     public Guid UserReference { get; set; } = Guid.NewGuid();

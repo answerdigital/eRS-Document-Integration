@@ -1,9 +1,36 @@
 @import "~bootstrap/scss/bootstrap";
 
+* {
+    /*outline: 1px solid red;*/
+}
+
 .cursor-pointer {
     cursor: pointer;
 }
 
 .dropdown-menu-end {
     right: 0;
+}
+
+.icon-success {
+    color: green;
+}
+
+.icon-failure {
+    color: darkred;
+}
+
+.icon-default {
+    color: grey;
+}
+
+button {
+    &.btn-transparent {
+        background-color: transparent;
+        background-repeat: no-repeat;
+        border: none;
+        cursor: pointer;
+        overflow: hidden;
+        outline: none;
+    }
 }

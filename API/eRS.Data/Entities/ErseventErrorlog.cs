@@ -1,6 +1,6 @@
 ﻿namespace eRS.Data.Entities;
 
-public partial class ErseventErrorlog
+public sealed class ErseventErrorlog
 {
     public int ERseventRowId { get; set; }
     public string? ERsEvent { get; set; }

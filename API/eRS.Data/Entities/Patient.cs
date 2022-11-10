@@ -1,6 +1,6 @@
 ﻿namespace eRS.Data.Entities;
 
-public partial class Patient
+public sealed class Patient
 {
     public int PatRowID { get; set; }
     public string? PatUbrn { get; set; }

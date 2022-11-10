@@ -3,22 +3,23 @@ import { IWorkflowStatus } from "common/interfaces/workflow-status.interface";
 import { useUserDetails } from "contexts/SessionContext";
 import { useWorkflowStates } from "contexts/WorkflowStatesContext";
 import { useWorklist } from "contexts/WorklistContext";
+import { msalInstance } from "index";
 import React, { useEffect, useState } from "react";
 import Select from "react-select";
 import { addToWorkflowHistory, getWorkflowHistory, updateWorkflowHistory } from "services/worklist-service";
 import WorkflowHistory from "./WorkflowHistory";
 
-interface IWorkflowStatusModal {
+interface IWorkflowStatusModalProps {
     openDocument: (docUid: string | undefined) => void;
 }
 
-const WorkflowStatusModal : React.FC<IWorkflowStatusModal> = ({openDocument}) => {
+const WorkflowStatusModal : React.FC<IWorkflowStatusModalProps> = ({openDocument}) => {
     const { selectedReferral } = useWorklist();
     const [workflowHistory, setWorkflowHistory] = useState<IWorkflowHistory[]>();
     const [selectedHistoryItem, setSelectedHistoryItem] = useState<IWorkflowHistory>();
 
     const {states: workflowStates, getStatus}= useWorkflowStates();
-    const { userDetails } = useUserDetails();
+    const account = msalInstance.getAllAccounts()[0];
     const [status, setStatus] = useState<string | undefined>('');
     const [comment, setComment] = useState<string>('');
 
@@ -52,7 +53,7 @@ const WorkflowStatusModal : React.FC<IWorkflowStatusModal> = ({openDocument}) =>
             erstrnsUid: refUid,
             statusCode: status,
             statusComments: comment,
-            recInsertedBy: userDetails?.userEmail
+            recInsertedBy: account?.name
         }
 
         if (selectedHistoryItem) {

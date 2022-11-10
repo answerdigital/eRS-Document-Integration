@@ -1,4 +1,4 @@
-﻿namespace eRS.Models.Models;
+﻿namespace eRS.Models.Models.Files;
 
 public class CsvFile
 {

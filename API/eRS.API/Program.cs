@@ -12,36 +12,61 @@ using Playground.Service.Mappers;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Serilog;
+using Serilog.Filters;
+using eRS.Data.Entities;
+using Serilog.Formatting.Compact;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.Identity.Web;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using System.IdentityModel.Tokens.Jwt;
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Logger(lc => lc
+        .Filter.ByExcluding(Matching.FromSource<Auditlog>())
+        .WriteTo.Console())
+    .WriteTo.Logger(lc => lc
+        .Filter.ByExcluding(Matching.FromSource<Auditlog>())
+        .WriteTo.File("Logs/log-{Date}.log", rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true))
+    .WriteTo.Logger(lc => lc
+        .Filter.ByIncludingOnly(Matching.FromSource<Auditlog>())
+        .WriteTo.File(new CompactJsonFormatter(), "Logs/auditlog-{Date}.json", rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true))
+    .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "PlaygroundWebApi", Version = "v1" });
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
-    {
-        Name = JwtAuthenticationDefaults.HeaderName,
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer",
-        BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 1safsfsdfdfd\"",
-    });
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "ersWebApi", Version = "v1" });
+
+    c.AddSecurityDefinition(JwtAuthenticationDefaults.AuthenticationScheme,
         new OpenApiSecurityScheme
         {
-            Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = JwtAuthenticationDefaults.AuthenticationScheme }
-        },
-        new List<string> {}
-    }});
+            Description = "JWT Authorization header using the Bearer scheme.",
+            Name = JwtAuthenticationDefaults.HeaderName,
+            In = ParameterLocation.Header,
+            Type = SecuritySchemeType.Http,
+            Scheme = "bearer"
+        });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = JwtAuthenticationDefaults.AuthenticationScheme
+                }
+            },
+            new List<string>()
+        }
+    });
 });
 
 var jwtSettings = builder.Configuration.GetSection("JwtBearer").Get<JwtBearerConfiguration>();
@@ -49,6 +74,7 @@ var jwtSettings = builder.Configuration.GetSection("JwtBearer").Get<JwtBearerCon
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
+        options.Authority = jwtSettings.Authority;
         options.MapInboundClaims = false;
         options.SaveToken = true;
         options.RequireHttpsMetadata = false;
@@ -56,11 +82,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         {
             ValidateIssuer = true,
             ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
             ValidIssuer = jwtSettings.Issuer,
             ValidAudience = jwtSettings.Audience,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key))
         };
     });
 
@@ -81,14 +104,22 @@ builder.Host.ConfigureLogging(logging =>
     logging.AddConsole();
 });
 
+builder.Host.UseSerilog();
+
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(
         policy =>
         {
-            policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+            policy.AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader();
         });
 });
+
+builder.Services.AddHttpClient();
+
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddTransient<IAuditService, AuditService>();
 builder.Services.AddTransient<IWorklistService, WorklistService>();

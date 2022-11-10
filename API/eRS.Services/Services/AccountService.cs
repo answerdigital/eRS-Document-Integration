@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace eRS.Services.Services;
 
-public class AccountService : IAccountService
+public sealed class AccountService : IAccountService
 {
     private readonly eRSContext context;
     private readonly IMapper mapper;

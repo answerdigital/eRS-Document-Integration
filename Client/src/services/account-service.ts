@@ -9,8 +9,8 @@ export const tryLogin = async (request: ILoginRequest): Promise<IAuthenticatedRe
         });
 };
 
-export const getUserDetails = async (jwt: string): Promise<IUser | undefined> => {
-    return api.post('/Account/details', {token: jwt})
+export const getUserDetails = async (): Promise<IUser | undefined> => {
+    return api.get('/Account/details')
         .then((response: AxiosResponse) => {
             return response.data;
         }).catch((error: AxiosError) => {

@@ -1,6 +1,6 @@
 ﻿namespace eRS.Models.Dtos;
 
-public partial class PatientDto
+public sealed class PatientDto
 {
     public string? PatUbrn { get; set; }
     public string? PatMrn { get; set; }

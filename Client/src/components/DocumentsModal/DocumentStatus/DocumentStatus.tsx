@@ -3,6 +3,7 @@ import { IWorkflowStatus } from 'common/interfaces/workflow-status.interface';
 import { useUserDetails } from 'contexts/SessionContext';
 import { useWorkflowStates } from 'contexts/WorkflowStatesContext';
 import { useWorklist } from 'contexts/WorklistContext';
+import { msalInstance } from 'index';
 import React, { useState } from 'react';
 import Select from 'react-select';
 import { addToWorkflowHistory } from 'services/worklist-service';
@@ -10,14 +11,16 @@ import { addToWorkflowHistory } from 'services/worklist-service';
 interface DocumentStatus {
     docUid?: string;
     handleOnAddStatus: () => void;
+    comments?: string;
 }
 
-const DocumentStatus: React.FC<DocumentStatus> = ({docUid, handleOnAddStatus}) => {
+const DocumentStatus: React.FC<DocumentStatus> = ({docUid, handleOnAddStatus, comments}) => {
     const { selectedReferral } = useWorklist();
+    const account = msalInstance.getAllAccounts()[0];
     const {states: workflowStates, getStatus}= useWorkflowStates();
-    const { userDetails } = useUserDetails();
+
     const [status, setStatus] = useState<string | undefined>('');
-    const [comment, setComment] = useState<string>('');
+    const [comment, setComment] = useState<string>(comments ?? '');
 
     const handleAddToWfh = () => {
         const update: IWorkflowHistory = {
@@ -26,7 +29,7 @@ const DocumentStatus: React.FC<DocumentStatus> = ({docUid, handleOnAddStatus}) =
             //statusCode: status,
             statusCode: 'D-QCEPR-FAIL',
             statusComments: comment,
-            recInsertedBy: userDetails?.userEmail
+            recInsertedBy: account?.name
         };
 
         addToWorkflowHistory(update).then((response : IWorkflowHistory[]) => {
@@ -49,7 +52,6 @@ const DocumentStatus: React.FC<DocumentStatus> = ({docUid, handleOnAddStatus}) =
                     </div>
                     */
                 }
-                
                 <div className='input-group mb-3'>
                     <textarea
                     className='form-control'

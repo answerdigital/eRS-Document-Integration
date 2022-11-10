@@ -25,8 +25,9 @@ export interface IReferral {
 }
 
 export interface IReferralFilters {
-    meditechPathway?: string[];
-    refReqSpecialty?: string[];
+    refReqUbrn?: string;
+    meditechPathway?: string;
+    refReqSpecialty?: string;
     consultant?: string;
     ersService?: string;
     investigationMode?: boolean;

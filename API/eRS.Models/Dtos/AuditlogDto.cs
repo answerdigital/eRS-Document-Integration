@@ -3,7 +3,7 @@ using CsvHelper.Configuration.Attributes;
 
 namespace eRS.Models.Dtos;
 
-public class AuditlogDto
+public sealed class AuditlogDto
 {
     [Optional]
     public string? ErstrnsUid { get; set; }
