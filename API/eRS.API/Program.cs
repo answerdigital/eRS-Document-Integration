@@ -12,36 +12,47 @@ using Playground.Service.Mappers;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Serilog;
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("Logs/log.txt", rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true)
+    .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "PlaygroundWebApi", Version = "v1" });
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
-    {
-        Name = JwtAuthenticationDefaults.HeaderName,
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer",
-        BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 1safsfsdfdfd\"",
-    });
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "ersWebApi", Version = "v1" });
+
+    c.AddSecurityDefinition(JwtAuthenticationDefaults.AuthenticationScheme,
         new OpenApiSecurityScheme
         {
-            Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = JwtAuthenticationDefaults.AuthenticationScheme }
-        },
-        new List<string> {}
-    }});
+            Description = "JWT Authorization header using the Bearer scheme.",
+            Name = JwtAuthenticationDefaults.HeaderName,
+            In = ParameterLocation.Header,
+            Type = SecuritySchemeType.Http,
+            Scheme = "bearer"
+        });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = JwtAuthenticationDefaults.AuthenticationScheme
+                }
+            },
+            new List<string>()
+        }
+    });
 });
 
 var jwtSettings = builder.Configuration.GetSection("JwtBearer").Get<JwtBearerConfiguration>();
@@ -81,6 +92,8 @@ builder.Host.ConfigureLogging(logging =>
     logging.AddConsole();
 });
 
+builder.Host.UseSerilog();
+
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(
@@ -89,6 +102,10 @@ builder.Services.AddCors(options =>
             policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
         });
 });
+
+builder.Services.AddHttpClient();
+
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddTransient<IAuditService, AuditService>();
 builder.Services.AddTransient<IWorklistService, WorklistService>();

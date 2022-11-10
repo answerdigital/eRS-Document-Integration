@@ -28,6 +28,7 @@ const AuditLogPage : React.FC = () => {
             downloadLink.href = url;
             downloadLink.setAttribute('download', file.fileName);
             downloadLink.click();
+            downloadLink.remove();
         });
     };
 

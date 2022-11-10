@@ -10,14 +10,15 @@ import { addToWorkflowHistory } from 'services/worklist-service';
 interface DocumentStatus {
     docUid?: string;
     handleOnAddStatus: () => void;
+    comments?: string;
 }
 
-const DocumentStatus: React.FC<DocumentStatus> = ({docUid, handleOnAddStatus}) => {
+const DocumentStatus: React.FC<DocumentStatus> = ({docUid, handleOnAddStatus, comments}) => {
     const { selectedReferral } = useWorklist();
     const {states: workflowStates, getStatus}= useWorkflowStates();
     const { userDetails } = useUserDetails();
     const [status, setStatus] = useState<string | undefined>('');
-    const [comment, setComment] = useState<string>('');
+    const [comment, setComment] = useState<string>(comments ?? '');
 
     const handleAddToWfh = () => {
         const update: IWorkflowHistory = {
@@ -49,7 +50,6 @@ const DocumentStatus: React.FC<DocumentStatus> = ({docUid, handleOnAddStatus}) =
                     </div>
                     */
                 }
-                
                 <div className='input-group mb-3'>
                     <textarea
                     className='form-control'

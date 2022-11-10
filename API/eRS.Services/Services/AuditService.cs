@@ -31,7 +31,7 @@ public class AuditService : IAuditService
             throw new ArgumentNullException(nameof(request));
         }
 
-        var auditsQuery = await GetAllFilteredQuery(request.Filters);
+        var auditsQuery = GetAllFilteredQuery(request.Filters);
 
         var resultItems = await auditsQuery.ToListAsync();
 
@@ -50,7 +50,7 @@ public class AuditService : IAuditService
             throw new ArgumentNullException(nameof(request.PageNumber));
         }
 
-        var auditsQuery = await GetAllFilteredQuery(request.Filters);
+        var auditsQuery = GetAllFilteredQuery(request.Filters);
 
         var pageSize = 10;
         var result = new PagedResult<AuditlogDto> { CurrentPage = request.PageNumber.Value, PageSize = pageSize, RowCount = auditsQuery.Count() };
@@ -67,7 +67,7 @@ public class AuditService : IAuditService
         return result;
     }
 
-    private async Task<IQueryable<Auditlog>> GetAllFilteredQuery(AuditFilter filters)
+    private IQueryable<Auditlog> GetAllFilteredQuery(AuditFilter filters)
     {
         var auditsQuery = this.context.Auditlogs
             .Where(a => a.RecStatus != "D")
@@ -108,12 +108,12 @@ public class AuditService : IAuditService
             auditsQuery = auditsQuery.Where(a => !string.IsNullOrWhiteSpace(a.RecInsertedBy) && EF.Functions.Like(a.RecInsertedBy, $"%{filters.RecInsertedBy}%"));
         }
 
-        if (filters.RecInsertedFrom != null)
+        if (filters.RecInsertedFrom is not null)
         {
             auditsQuery = auditsQuery.Where(a => a.RecInserted >= filters.RecInsertedFrom);
         }
 
-        if (filters.RecInsertedTo != null)
+        if (filters.RecInsertedTo is not null)
         {
             auditsQuery = auditsQuery.Where(a => a.RecInserted <= filters.RecInsertedTo);
         }
@@ -121,13 +121,10 @@ public class AuditService : IAuditService
         return auditsQuery;
     }
 
-    public async Task<bool> AddAudit(AuditlogDto auditlogAdd)
+    public async Task<bool> AddAudit(Auditlog audit)
     {
-        var audit = this.mapper.Map<Auditlog>(auditlogAdd);
-
         audit.RecInserted = DateTime.UtcNow;
 
-        //Get rowIDs if needed
         if (audit.ErstrnsUid is not null)
         {
             var refReq = await this.context.ErsRefReqDetails.FirstOrDefaultAsync(r => r.RefReqUniqueId == audit.ErstrnsUid);

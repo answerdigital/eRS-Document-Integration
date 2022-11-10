@@ -49,41 +49,27 @@ public class AccountController : Controller
     {
         var user = await this.accountService.AuthenticateLogin(userLogin);
 
-        if (user is not null)
+        if (user is null)
         {
-            var token = Generate(user);
-
-            return this.Ok(
-                new AuthenticatedResponse
-                {
-                    Token = new JwtSecurityTokenHandler().WriteToken(token),
-                    ValidTo = token.ValidTo
-                }
-            );
+            return this.NotFound();
         }
 
-        return this.NotFound();
+        var token = Generate(user);
+
+        return this.Ok(
+            new AuthenticatedResponse
+            {
+                Token = new JwtSecurityTokenHandler().WriteToken(token),
+                ValidTo = token.ValidTo
+            }
+        );
     }
 
     [Authorize]
-    [HttpPost("details")]
-    public async Task<IActionResult> GetUser([FromBody] UserDetailsRequest request)
+    [HttpGet("details")]
+    public async Task<IActionResult> GetUser()
     {
-        var token = new JwtSecurityTokenHandler().ReadJwtToken(request.Token);
-
-        if (token is null)
-        {
-            return this.BadRequest();
-        }
-
-        var email = token.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub);
-
-        if (email is null)
-        {
-            return this.BadRequest();
-        }
-
-        var user = await this.accountService.GetUser(email.Value);
+        var user = await this.GetCurrentUser();
 
         return user != null ? this.Ok(user) : this.NotFound();
     }
@@ -115,5 +101,28 @@ public class AccountController : Controller
             signingCredentials: credentials);
 
         return token;
+    }
+
+    private async Task<UserDto?> GetCurrentUser()
+    {
+        var identity = HttpContext.User.Identity as ClaimsIdentity;
+
+        if (identity is null)
+        {
+            return null;
+        }
+
+        var userClaims = identity.Claims;
+        var userRef = userClaims.FirstOrDefault(uc => uc.Type == ClaimTypes.NameIdentifier)?.Value;
+        var email = userClaims.FirstOrDefault(uc => uc.Type == JwtRegisteredClaimNames.Sub)?.Value;
+
+        if (email is null)
+        {
+            return null;
+        }
+
+        var user = await this.accountService.GetUser(email);
+
+        return user;
     }
 }
