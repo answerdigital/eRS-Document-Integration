@@ -29,11 +29,11 @@ const Login: React.FC = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         let emailValid = false;
         let passwordValid = false;
-        const emailLength = validateLength(email, 1, 30);
-        const passwordLength = validateLength(email, 7, 16);
+        const emailLength = validateLength(email, 1, 255);
+        const passwordLength = validateLength(password, 1, 16);
 
         if (!fieldExists(email)) {
             toast.warning("Email field is required.", { });
@@ -92,7 +92,7 @@ const Login: React.FC = () => {
             tryLogin(loginRequest).then(async (authResponse: IAuthenticatedResponse | undefined) => {
                 if (authResponse) {
                     storeJWT(authResponse.token, authResponse.validTo);
-                    getUserDetails(authResponse.token).then((userResponse: IUser | undefined) => {
+                    getUserDetails().then((userResponse: IUser | undefined) => {
                         if (userResponse) {
                             setUserDetails(userResponse);
                         }

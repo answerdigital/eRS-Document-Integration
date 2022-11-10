@@ -10,11 +10,10 @@ import { getWorklist } from 'services/worklist-service';
 import { debounce } from 'ts-debounce';
 import WorklistFilters from 'components/Worklist/WorklistFilters';
 import { useWorkflowStates } from 'contexts/WorkflowStatesContext';
-import { FaCheckCircle, FaExclamationTriangle, FaQuestionCircle } from 'react-icons/fa';
 import WorklistContext from 'contexts/WorklistContext';
 
 const WorklistPage : React.FC = () => {
-    const { getStatus } = useWorkflowStates();
+    const { getStatusIcon } = useWorkflowStates();
     const [worklist, setWorklist] = useState<IReferralResult>();
     const [selectedRef, setSelectedRef] = useState<IReferral>();
     const [pageNumber, setPageNumber] = useState<number>(1);
@@ -95,14 +94,16 @@ const WorklistPage : React.FC = () => {
                     <thead>
                         <tr>
                             <th scope='col'>UBRN</th>
-                            <th scope='col'>Hospital ID</th>
+                            {/*<th scope='col'>Hospital ID</th>*/}
                             <th scope='col'>NHS No.</th>
                             <th scope='col'>Name</th>
                             <th scope='col'>DOB</th>
                             <th scope='col'>Gender</th>
                             <th scope='col'>Meditech Speciality</th>
+                            {/*
                             <th scope='col'>Referral Details</th>
                             <th scope='col'>Appointment Details</th>
+                            */}
                             <th scope='col'>Referral Status</th>
                             <th scope='col'></th>
                         </tr>
@@ -115,20 +116,19 @@ const WorklistPage : React.FC = () => {
                                 className={`cursor-pointer ${wl.refReqUniqueId === selectedRef?.refReqUniqueId && 'table-primary'}`}
                                 onClick={() => toggleSelect(wl)}>
                                     <td>{wl.refReqUbrn}</td>
-                                    <td>{wl.hospitalId}</td>
+                                    {/*<td>{wl.hospitalId}</td>*/}
                                     <td>{wl.refReqNhsno}</td>
                                     <td>{wl.patient?.patGivenName} {wl.patient?.patFamilyName}</td>
                                     <td>{wl.patient?.patDob && moment(wl.patient.patDob).format('DD-MM-YYYY')}</td>
                                     <td>{wl.patient?.patSex}</td>
                                     <td>{wl.refReqSpecialty}</td>
+                                    {/*
                                     <td>{wl.referralDetails}</td>
                                     <td>{wl.apptDetails}</td>
+                                    */}
                                     <td>{wl.refReqStatus}</td>
                                     <td>
-                                    {
-                                        wl.wfsHistory?.statusCode === undefined ? <FaQuestionCircle /> :
-                                        getStatus(wl.wfsHistory.statusCode)?.errorStatus ? <FaExclamationTriangle /> : <FaCheckCircle />
-                                    }
+                                    {getStatusIcon(wl.wfsHistory?.statusCode)}
                                     </td>
                                 </tr>
                             );

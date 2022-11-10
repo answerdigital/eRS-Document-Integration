@@ -24,7 +24,7 @@ interface WorklistFiltersProps {
 
 const WorklistFilters: React.FC<WorklistFiltersProps> = ({filters, setFilters}) => {
 
-    const updateFilters = (field: keyof IReferralFilters, value: string | string[] | undefined) => {
+    const updateFilters = (field: keyof IReferralFilters, value: string | boolean | undefined) => {
         setFilters({...filters, [field]: value});
     };
 
@@ -36,25 +36,44 @@ const WorklistFilters: React.FC<WorklistFiltersProps> = ({filters, setFilters}) 
                         label={'Only show referrals marked for investigation.'}
                         clickableLabel={true}
                         checked={filters.investigationMode ?? false}
-                        setChecked={(b: boolean) => setFilters({...filters, investigationMode: b})}
+                        setChecked={(b: boolean) => updateFilters('investigationMode', b)}
                         />
                 </div>
             </div>
             <div className='row mb-3'>
                 <div className='col-md-3 mb-3'>
+                    <label className='form-label'>UBRN</label>
+                    <input className='form-control' onChange={(e) => updateFilters('refReqUbrn', e.target.value)}></input>
+                </div>
+                <div className='col-md-3 mb-3'>
                     <label className='form-label'>Pathway</label>
+                    <input className='form-control' onChange={(e) => updateFilters('meditechPathway', e.target.value)}></input>
+
+                    {//These Select components can be restored once we have a list of existing pathways/specialties to populate them
+
+                    /*
                     <Select
                         options={pathwaysOpts}
                         isMulti
                         onChange={opts => updateFilters('meditechPathway', opts.map(opt => opt.value))} />
+                    */}
                 </div>
                 <div className='col-md-3 mb-3'>
                     <label className='form-label'>Speciality</label>
+                    <input className='form-control' onChange={(e) => updateFilters('refReqSpecialty', e.target.value)}></input>
+                    {/*
                     <Select
                         options={specialitiesOpts}
                         isMulti
                         onChange={opts => updateFilters('refReqSpecialty', opts.map(opt => opt.value))} />
+                    */}
                 </div>
+
+
+
+
+
+                {/*
                 <div className='col-md-3 mb-3'>
                     <label className='form-label'>Consultant</label>
                     <input className='form-control' onChange={(e) => updateFilters('consultant', e.target.value)}></input>
@@ -63,6 +82,7 @@ const WorklistFilters: React.FC<WorklistFiltersProps> = ({filters, setFilters}) 
                     <label className='form-label'>eRS Service</label>
                     <input className='form-control' onChange={(e) => updateFilters('ersService', e.target.value)}></input>
                 </div>
+                */}
             </div>
         </FiltersDropdown>
     );

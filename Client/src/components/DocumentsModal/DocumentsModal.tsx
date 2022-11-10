@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { addToWorkflowHistory, getAttachments } from "services/worklist-service";
 import { Document, Page } from 'react-pdf'
 import Pagination from "components/Pagination/Pagination";
-import { FaCheck, FaCheckCircle, FaExclamationCircle, FaExclamationTriangle, FaQuestionCircle } from 'react-icons/fa';
+import { FaCheck, FaExclamationCircle, FaDownload, FaPlus, FaMinus } from 'react-icons/fa';
 
 import { IWorkflowHistory } from "common/interfaces/workflow-history.interface";
 import moment from "moment";
@@ -19,7 +19,7 @@ interface IDocumentsModal {
 
 const DocumentsModal : React.FC<IDocumentsModal> = ({selectedDocUid, resetSelectedDocUid}) => {
     const { selectedReferral: referral, handleReloadWorklist } = useWorklist();
-    const { getStatus } = useWorkflowStates();
+    const { getStatus, getStatusIcon } = useWorkflowStates();
     const { userDetails } = useUserDetails();
     const [attachments, setAttachments] = useState<IAttachment[]>();
     const [selectedAttachment, setSelectedAttachment] = useState<IAttachment>();
@@ -100,15 +100,41 @@ const DocumentsModal : React.FC<IDocumentsModal> = ({selectedDocUid, resetSelect
         });
     };
 
+    const handleDownloadAttachment = (attach: IAttachment) => {
+        const url = attach?.docDownloadUrl;
+        const fileName = attach?.attachTitle;
+        if (!url || !fileName) {
+            return false;
+        }
+
+        fetch(url)
+        .then((response) => response.blob())
+        .then((blob) => {
+            const url = window.URL.createObjectURL(new Blob([blob]));
+            const downloadLink = document.createElement('a');
+            downloadLink.href = url;
+            downloadLink.setAttribute('download', fileName);
+            downloadLink.click();
+            downloadLink.remove();
+        });
+    };
+
+    const handleDownloadAllAttachments = () => {
+
+    };
+
     const patient = referral?.patient;
     const age = moment().diff(patient?.patDob, 'years');
 
+    const statusCode = selectedAttachment?.wfsHistory?.statusCode;
+    const status = getStatus(statusCode);
+    const docHasError = status?.errorStatus;
+
     return (
         <>
-            
             <div className='row'>
                 <div className='col-md-5'>
-                    <div className='row mb-3'>
+                    <div className='row mb-4'>
                         {patient &&
                         <>
                             <h5>Patient Details:</h5>
@@ -119,7 +145,17 @@ const DocumentsModal : React.FC<IDocumentsModal> = ({selectedDocUid, resetSelect
                         </>
                         }
                     </div>
-                    <h5>Attached Documents:</h5>
+                    <div className='d-flex justify-content-between'>
+                        <div><h5>Attached Documents:</h5></div>
+                        <div className='d-flex flex-row align-items-center'>
+                            <div className='me-2'>Download All</div>
+                            <button
+                            className='btn btn-outline-success'
+                            onClick={() => handleDownloadAllAttachments()}>
+                                <FaDownload/>
+                            </button>
+                        </div>
+                    </div>
                     <div className='table-responsive-md'>
                         <table className='table table-hover'>
                             <thead>
@@ -127,6 +163,7 @@ const DocumentsModal : React.FC<IDocumentsModal> = ({selectedDocUid, resetSelect
                                     <th scope='col'>Document Ref</th>
                                     <th scope='col'>Filename</th>
                                     <th scope='col'>Status</th>
+                                    <th></th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -137,14 +174,20 @@ const DocumentsModal : React.FC<IDocumentsModal> = ({selectedDocUid, resetSelect
                                         key={a.attachId}
                                         className={`cursor-pointer ${a.attachId === selectedAttachment?.attachId && 'table-primary'}`}
                                         onClick={() => toggleSelect(a)}>
-                                            <td>{a.attachId}</td>
-                                            <td>{a.attachTitle}</td>
+                                            <td className='align-middle'>{a.attachId}</td>
+                                            <td className='align-middle'>{a.attachTitle}</td>
                                             <td className='align-middle'>
                                                 <div className='d-flex justify-content-center'>
-                                                {
-                                                    a.wfsHistory?.statusCode === undefined ? <FaQuestionCircle /> :
-                                                    getStatus(a.wfsHistory.statusCode)?.errorStatus ? <FaExclamationTriangle /> : <FaCheckCircle />
-                                                }
+                                                    { getStatusIcon(a.wfsHistory?.statusCode) }
+                                                </div>
+                                            </td>
+                                            <td className='align-middle'>
+                                                <div className='d-flex justify-content-center'>
+                                                    <button
+                                                    className='btn btn-outline-success'
+                                                    onClick={() => handleDownloadAttachment(a)}>
+                                                        <FaDownload/>
+                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -159,22 +202,35 @@ const DocumentsModal : React.FC<IDocumentsModal> = ({selectedDocUid, resetSelect
                 {selectedAttachment &&
                 <>
                     <div className='row mb-3'>
-                        <div className='d-flex justify-content-between align-middle'>
-                            <button
-                            className={`btn m-2 ${statusMode ? 'btn-warning' : 'btn-outline-warning'}`}
-                            onClick={() => setStatusMode(!statusMode)}>
-                                Flag Issue <FaExclamationCircle />
-                            </button>
-                            <button
-                            className='btn btn-outline-success m-2'
-                            onClick={handleApproveDocument}>
-                                Approve <FaCheck />
-                            </button>
+                        <div className='d-flex justify-content-between align-items-center'>
+                            <div className='align-middle'>
+                                <button
+                                className={`btn m-2 ${statusMode ? 'btn-warning' : 'btn-outline-warning'}`}
+                                onClick={() => setStatusMode(!statusMode)}>
+                                    {docHasError ? 'Amend Comments' : 'Flag Issue'} <FaExclamationCircle />
+                                </button>
+                            </div>
+                            <div>
+                                {status?.wfsmDisplayValue}
+                            </div>
+                            <div className='align-self-middle'>
+                                {statusCode !== 'D-QCEPR-SUCC' &&
+                                <button
+                                className='btn btn-outline-success m-2'
+                                onClick={handleApproveDocument}>
+                                    {docHasError ? 'Flag Issue as Resolved' : 'Approve'} <FaCheck />
+                                </button>
+                                }
+                            </div>
                         </div>
                     </div>
                     {statusMode &&
                         <div className='row'>
-                            <DocumentStatus docUid={selectedAttachment?.attachId} handleOnAddStatus={handleStatusUpdate} />
+                            <DocumentStatus
+                            docUid={selectedAttachment.attachId}
+                            handleOnAddStatus={handleStatusUpdate}
+                            comments={selectedAttachment.wfsHistory?.statusComments}
+                            />
                         </div>
                     }
                     <div className='d-flex justify-content-between'>
@@ -184,7 +240,7 @@ const DocumentsModal : React.FC<IDocumentsModal> = ({selectedDocUid, resetSelect
                                 <button
                                 onClick={() => setPdfScale(pdfScale - 0.1)}
                                 className='btn btn-outline-secondary mx-2'>
-                                    -
+                                    <FaMinus />
                                 </button>
                             </div>
                             <div className='mx-2'>{(pdfScale * 100).toFixed(0)}%</div>
@@ -192,12 +248,12 @@ const DocumentsModal : React.FC<IDocumentsModal> = ({selectedDocUid, resetSelect
                                 <button
                                 onClick={() => setPdfScale(pdfScale + 0.1)}
                                 className='btn btn-outline-secondary'>
-                                    +
+                                    <FaPlus />
                                 </button>
                                 </div>
                         </div>
                     </div>
-                    <div className='pdf-container'>
+                    <div className='d-flex justify-content-center pdf-container'>
                         <Document
                             file={selectedAttachment?.docDownloadUrl}
                             options={{
@@ -226,11 +282,10 @@ const DocumentsModal : React.FC<IDocumentsModal> = ({selectedDocUid, resetSelect
                             />
                         </div>
                     }
-                </>   
+                </>
                 }
                 </div>
             </div>
-            
         </>
     );
 }

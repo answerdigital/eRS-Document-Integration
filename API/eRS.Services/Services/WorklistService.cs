@@ -3,6 +3,7 @@ using eRS.Data;
 using eRS.Data.Entities;
 using eRS.Models.Dtos;
 using eRS.Models.Models.ersRefRequests;
+using eRS.Models.Models.Files;
 using eRS.Models.Models.Wfs;
 using eRS.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +18,7 @@ public class WorklistService : IWorklistService
     private readonly IMapper mapper;
     private readonly IAuditService auditService;
 
-    public WorklistService(eRSContext context, ILogger<WorklistService> logger, IMapper mapper, IAuditService auditService)
+    public WorklistService(eRSContext context, IMapper mapper, ILogger<WorklistService> logger, IAuditService auditService)
     {
         this.context = context;
         this.mapper = mapper;
@@ -32,19 +33,51 @@ public class WorklistService : IWorklistService
             throw new ArgumentNullException(nameof(request));
         }
 
-        var filters = request.Filters;
+        var worklistQuery = GetWorklistFilteredQuery(request.Filters);
+
+        var pageSize = 10;
+        var result = new PagedResult<ErsRefReqDetailDto> { CurrentPage = request.PageNumber, PageSize = pageSize, RowCount = worklistQuery.Count() };
+
+        var pageCount = (double)result.RowCount / pageSize;
+        result.PageCount = (int)Math.Ceiling(pageCount);
+
+        var skip = (request.PageNumber - 1) * pageSize;
+
+        var resultItems = await worklistQuery.Skip(skip).Take(pageSize).ToListAsync();
+        result.Results = this.mapper.Map<List<ErsRefReqDetailDto>>(resultItems);
+
+        return result;
+    }
+
+    private IQueryable<ErsRefReqDetail> GetWorklistFilteredQuery(WorklistFilter filters)
+    {
         var worklistQuery = this.context.ErsRefReqDetails
             .Where(r => r.RecStatus != "D")
             .Include(r => r.WfsHistoryList)
             .Include(r => r.Patient)
             .Include(r => r.ErsdocAttachments)
             .ThenInclude(a => a.WfsHistoryList)
+            //.Where(r => !r.WfsHistoryList.Any(h => h.StatusCode == "R-ULEPR-SUCC")) //Remove fully uploaded refreqs from the list
             .OrderBy(r => r.RecUpdated)
+            .OrderBy(r => r.WfsHistoryList.Any(h => h.StatusCode == "R-ULEPR-SUCC")) //Fully uploaded refreqs at the end of the list
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(filters.RefReqStatus))
         {
-            worklistQuery = worklistQuery.Where(r => !string.IsNullOrWhiteSpace(r.RefReqStatus) && EF.Functions.Like(r.RefReqStatus, $"%{filters.RefReqStatus}%"));
+            worklistQuery = worklistQuery.Where(r =>
+                !string.IsNullOrWhiteSpace(r.RefReqStatus) && EF.Functions.Like(r.RefReqStatus, $"%{filters.RefReqStatus}%"));
+        }
+
+        if (!string.IsNullOrWhiteSpace(filters.RefReqSpecialty))
+        {
+            worklistQuery = worklistQuery.Where(r =>
+                !string.IsNullOrWhiteSpace(r.RefReqSpecialty) && EF.Functions.Like(r.RefReqSpecialty, $"%{filters.RefReqSpecialty}%"));
+        }
+
+        if (!string.IsNullOrWhiteSpace(filters.RefReqUbrn))
+        {
+            worklistQuery = worklistQuery.Where(r =>
+                !string.IsNullOrWhiteSpace(r.RefReqUbrn) && EF.Functions.Like(r.RefReqUbrn, $"%{filters.RefReqUbrn}%"));
         }
 
         if (filters.InvestigationMode is not null && filters.InvestigationMode == true)
@@ -83,23 +116,7 @@ public class WorklistService : IWorklistService
         }
         */
 
-        if (filters.RefReqSpecialty is not null && filters.RefReqSpecialty.Any())
-        {
-            worklistQuery = worklistQuery.Where(r => r.RefReqSpecialty != null && filters.RefReqSpecialty.Contains(r.RefReqSpecialty));
-        }
-
-        var pageSize = 10;
-        var result = new PagedResult<ErsRefReqDetailDto> { CurrentPage = request.PageNumber, PageSize = pageSize, RowCount = worklistQuery.Count() };
-
-        var pageCount = (double)result.RowCount / pageSize;
-        result.PageCount = (int)Math.Ceiling(pageCount);
-
-        var skip = (request.PageNumber - 1) * pageSize;
-
-        var resultItems = await worklistQuery.Skip(skip).Take(pageSize).ToListAsync();
-        result.Results = this.mapper.Map<List<ErsRefReqDetailDto>>(resultItems);
-
-        return result;
+        return worklistQuery;
     }
 
     public async Task<List<ErsdocAttachmentDto>> GetAttachments(string refUid)
@@ -173,37 +190,37 @@ public class WorklistService : IWorklistService
 
         var history = this.mapper.Map<WfsHistory>(newHistory);
 
-        //Link to ref and/or attachment doc
-        if (history.ErstrnsUid is not null)
+        if (history.ErstrnsUid is null)
         {
-            var refReq = await this.context.ErsRefReqDetails.FirstOrDefaultAsync(r => r.RefReqUniqueId == history.ErstrnsUid);
+            throw new ArgumentNullException(nameof(history.ErstrnsUid));
+        }
+
+        var refReq = await this.context.ErsRefReqDetails.FirstOrDefaultAsync(r => r.RefReqUniqueId == history.ErstrnsUid);
             
-            if (refReq is null)
+        if (refReq is null)
+        {
+            return null;
+        }
+
+        history.RefReqRowId = refReq.RefReqRowId;
+
+        if (history.DoctrnsUid is not null)
+        {
+            var doc = await this.context.ErsdocAttachments
+                .FirstOrDefaultAsync(r => r.AttachId == history.DoctrnsUid && r.RefDocUniqueId == history.ErstrnsUid);
+
+            if (doc is null)
             {
                 return null;
             }
 
-            history.ErsRefReqDetail = refReq;
-            history.RefReqRowId = refReq.RefReqRowId;
-
-            if (history.DoctrnsUid is not null)
-            {
-                var doc = await this.context.ErsdocAttachments
-                    .FirstOrDefaultAsync(r => r.AttachId == history.DoctrnsUid && r.RefDocUniqueId == history.ErstrnsUid);
-
-                if (doc is null)
-                {
-                    return null;
-                }
-
-                history.ErsdocAttachment = doc;
-                history.RefDocRowId = doc.RefDocRowId;
-            }
+            history.RefDocRowId = doc.RefDocRowId;
         }
 
         await this.context.WfsHistories.AddAsync(history);
+        await this.context.SaveChangesAsync();
 
-        var audit = new AuditlogDto
+        var audit = new Auditlog
         {
             ToEventCode = history.StatusCode,
             ToStatusComments = history.StatusComments,
@@ -218,8 +235,6 @@ public class WorklistService : IWorklistService
                 $"Audit failed to log for event transition from No Status to ${audit.ToEventCode} in referral ${audit.ErstrnsUid} or attachment ${audit.DoctrnsUid}"
             );
         }
-
-        await this.context.SaveChangesAsync();
 
         return await GetWorkflowHistory(history.ErstrnsUid, history.DoctrnsUid);
     }
@@ -237,13 +252,7 @@ public class WorklistService : IWorklistService
             return null;
         }
 
-        existingHistory.RecUpdated = DateTime.UtcNow;
-        existingHistory.StatusCode = newHistory.StatusCode;
-        existingHistory.StatusComments = newHistory.StatusComments;
-
-        this.context.WfsHistories.Update(existingHistory);
-
-        var audit = new AuditlogDto
+        var audit = new Auditlog
         {
             FromEventCode = existingHistory.StatusCode,
             FromStatusComments = existingHistory.StatusComments,
@@ -254,6 +263,14 @@ public class WorklistService : IWorklistService
             RecInsertedBy = newHistory.RecInsertedBy
         };
 
+        existingHistory.RecUpdated = DateTime.UtcNow;
+        existingHistory.StatusCode = newHistory.StatusCode;
+        existingHistory.StatusComments = newHistory.StatusComments;
+
+        this.context.WfsHistories.Update(existingHistory);
+
+        await this.context.SaveChangesAsync();
+
         if (!await this.auditService.AddAudit(audit))
         {
             this.logger.LogWarning(
@@ -261,9 +278,21 @@ public class WorklistService : IWorklistService
             );
         }
 
-        await this.context.SaveChangesAsync();
-
         return await GetWorkflowHistory(newHistory.ErstrnsUid, newHistory.DoctrnsUid);
+    }
+
+    public async Task<List<DownloadFile>> GetAttachmentURLs(string refUid)
+    {
+        var attachments = await this.context.ErsdocAttachments
+            .Where(a => a.RefDocUniqueId == refUid)
+            .Select(a => new DownloadFile
+            {
+                AttachDownloadURL = a.DocDownloadUrl,
+                AttachFileName = a.AttachTitle
+            })
+            .ToListAsync();
+
+        return attachments;
     }
 
 }

@@ -25,7 +25,7 @@ const SessionContextProvider: React.FC<ISessionContextProviderProps> = ({childre
         const token = getJWT();
         if (!userDetails) {
             if (token) {
-                getUserDetails(token).then((userResponse: IUser | undefined) => {
+                getUserDetails().then((userResponse: IUser | undefined) => {
                     setUserDetails(userResponse);
                 })
             }
