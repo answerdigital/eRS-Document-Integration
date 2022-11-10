@@ -24,12 +24,9 @@ interface IWorkflowStatesContextProviderProps {
 
 const WorkflowStatesContextProvider: React.FC<IWorkflowStatesContextProviderProps> = ({children}) => {
     const [workflowStates, setWorkflowStates] = useState<IWorkflowStatusResponse>({});
-    const { hasJWT } = useSession();
 
     useEffect(() => {
-        if (hasJWT()) {
-            fetchStatusList();
-        }
+        fetchStatusList();
     }, []);
 
     const fetchStatusList = () => {

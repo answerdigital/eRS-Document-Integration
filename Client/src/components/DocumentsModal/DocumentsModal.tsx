@@ -10,7 +10,7 @@ import moment from "moment";
 import { useWorkflowStates } from "contexts/WorkflowStatesContext";
 import { useWorklist } from "contexts/WorklistContext";
 import DocumentStatus from "./DocumentStatus";
-import { useUserDetails } from "contexts/SessionContext";
+import { msalInstance } from "index";
 
 interface IDocumentsModalProps {
     selectedDocUid: string | undefined;
@@ -20,7 +20,7 @@ interface IDocumentsModalProps {
 const DocumentsModal : React.FC<IDocumentsModalProps> = ({selectedDocUid, resetSelectedDocUid}) => {
     const { selectedReferral: referral, handleReloadWorklist } = useWorklist();
     const { getStatus, getStatusIcon } = useWorkflowStates();
-    const { userDetails } = useUserDetails();
+    const account = msalInstance.getAllAccounts()[0];
     const [attachments, setAttachments] = useState<IAttachment[]>();
     const [selectedAttachment, setSelectedAttachment] = useState<IAttachment>();
     const [statusMode, setStatusMode] = useState<boolean>(false);
@@ -91,7 +91,7 @@ const DocumentsModal : React.FC<IDocumentsModalProps> = ({selectedDocUid, resetS
             doctrnsUid: selectedAttachment?.attachId,
             statusCode: 'D-QCEPR-SUCC',
             statusComments: '',
-            recInsertedBy: userDetails?.userEmail
+            recInsertedBy: account?.name
         };
 
         addToWorkflowHistory(update).then((response : IWorkflowHistory[]) => {

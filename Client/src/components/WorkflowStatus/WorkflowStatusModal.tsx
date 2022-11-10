@@ -1,6 +1,5 @@
 import { IWorkflowHistory } from "common/interfaces/workflow-history.interface";
 import { IWorkflowStatus } from "common/interfaces/workflow-status.interface";
-import { useUserDetails } from "contexts/SessionContext";
 import { useWorkflowStates } from "contexts/WorkflowStatesContext";
 import { useWorklist } from "contexts/WorklistContext";
 import { msalInstance } from "index";
