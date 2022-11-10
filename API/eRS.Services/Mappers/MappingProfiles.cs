@@ -7,7 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Playground.Service.Mappers;
 
 [ExcludeFromCodeCoverage]
-public class MappingProfiles : Profile
+public sealed class MappingProfiles : Profile
 {
     public MappingProfiles()
     {

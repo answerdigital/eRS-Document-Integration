@@ -1,6 +1,6 @@
 ﻿namespace eRS.Models.Dtos;
 
-public partial class UserDto
+public sealed class UserDto
 {
     public Guid? UserReference { get; set; }
     public string UserEmail { get; set; }

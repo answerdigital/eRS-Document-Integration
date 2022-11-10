@@ -1,8 +1,8 @@
 import { IWorkflowHistory } from 'common/interfaces/workflow-history.interface';
 import { IWorkflowStatus } from 'common/interfaces/workflow-status.interface';
-import { useUserDetails } from 'contexts/SessionContext';
 import { useWorkflowStates } from 'contexts/WorkflowStatesContext';
 import { useWorklist } from 'contexts/WorklistContext';
+import { msalInstance } from 'index';
 import React, { useState } from 'react';
 import Select from 'react-select';
 import { addToWorkflowHistory } from 'services/worklist-service';
@@ -15,8 +15,9 @@ interface DocumentStatus {
 
 const DocumentStatus: React.FC<DocumentStatus> = ({docUid, handleOnAddStatus, comments}) => {
     const { selectedReferral } = useWorklist();
+    const account = msalInstance.getAllAccounts()[0];
     const {states: workflowStates, getStatus}= useWorkflowStates();
-    const { userDetails } = useUserDetails();
+
     const [status, setStatus] = useState<string | undefined>('');
     const [comment, setComment] = useState<string>(comments ?? '');
 
@@ -27,7 +28,7 @@ const DocumentStatus: React.FC<DocumentStatus> = ({docUid, handleOnAddStatus, co
             //statusCode: status,
             statusCode: 'D-QCEPR-FAIL',
             statusComments: comment,
-            recInsertedBy: userDetails?.userEmail
+            recInsertedBy: account?.name
         };
 
         addToWorkflowHistory(update).then((response : IWorkflowHistory[]) => {

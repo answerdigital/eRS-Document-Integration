@@ -1,6 +1,6 @@
 ﻿namespace eRS.Data.Entities;
 
-public partial class WfsMaster
+public sealed class WfsMaster
 {
     public int WfsmRowid { get; set; }
     public string? WfsmCode { get; set; }

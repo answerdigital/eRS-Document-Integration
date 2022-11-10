@@ -11,7 +11,7 @@ using System.Globalization;
 
 namespace eRS.Services.Services;
 
-public class AuditService : IAuditService
+public sealed class AuditService : IAuditService
 {
     private readonly eRSContext context;
     private readonly IMapper mapper;
@@ -40,10 +40,8 @@ public class AuditService : IAuditService
 
     public async Task<PagedResult<AuditlogDto>> GetAllFilteredPaged(AuditRequest request)
     {
-        if (request is null)
-        {
-            throw new ArgumentNullException(nameof(request));
-        }
+        ArgumentNullException.ThrowIfNull(request, nameof(request));
+        ArgumentNullException.ThrowIfNull(request.PageNumber, nameof(request.PageNumber));
 
         if (request.PageNumber is null)
         {
@@ -136,6 +134,8 @@ public class AuditService : IAuditService
             var doc = await this.context.ErsdocAttachments.FirstOrDefaultAsync(a => a.AttachId == audit.DoctrnsUid);
             audit.RefDocRowId = doc?.RefDocRowId;
         }
+
+        this.logger.LogInformation("Audit:", audit);
 
         await this.context.Auditlogs.AddAsync(audit);
 

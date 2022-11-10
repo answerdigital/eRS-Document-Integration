@@ -1,6 +1,6 @@
 ﻿namespace eRS.Models.Dtos;
 
-public partial class WfsMasterDto
+public sealed class WfsMasterDto
 {
     public string? WfsmCode { get; set; }
     public string? WfsmDescription { get; set; }

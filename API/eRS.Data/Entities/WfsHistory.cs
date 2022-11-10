@@ -1,6 +1,6 @@
 ﻿namespace eRS.Data.Entities;
 
-public partial class WfsHistory
+public sealed class WfsHistory
 {
     public int ErsdocsRowid { get; set; }
     public int? RefReqRowId { get; set; }

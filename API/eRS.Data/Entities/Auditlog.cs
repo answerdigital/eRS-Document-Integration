@@ -1,6 +1,6 @@
 ﻿namespace eRS.Data.Entities;
 
-public partial class Auditlog
+public sealed class Auditlog
 {
     public int AuditRowId { get; set; }
     public int? RefReqRowId { get; set; }

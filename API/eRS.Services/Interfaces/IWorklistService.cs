@@ -14,7 +14,7 @@ public interface IWorklistService
     public Task<List<WfsHistoryDto>> GetWorkflowHistory(string? refUid, string? docUid);
     public Task<List<WfsHistoryDto>?> AddToWorkflowHistory(WfsHistoryDto newHistory);
     public Task<List<WfsHistoryDto>?> UpdateWorkflowHistory(WfsHistoryDto newHistory, WfsHistory? oldHistory);
-    public Task<List<DownloadFile>> GetAttachmentURLs(string refUid)
+    public Task<List<DownloadFile>> GetAttachmentURLs(string refUid);
 
 
 }

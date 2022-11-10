@@ -1,6 +1,6 @@
 ﻿namespace eRS.Models.Dtos;
 
-public partial class ErsdocAttachmentDto
+public sealed class ErsdocAttachmentDto
 {
     public int? RefrequestRowId { get; set; }
     public int? RefDocSrlno { get; set; }

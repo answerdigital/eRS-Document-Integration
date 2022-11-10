@@ -9,17 +9,31 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Playground.Service.Mappers;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Serilog;
+using Serilog.Filters;
+using eRS.Data.Entities;
+using Serilog.Formatting.Compact;
+
+var builder = WebApplication.CreateBuilder(args);
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Logger(lc => lc
+        .Filter.ByExcluding(Matching.FromSource<Auditlog>())
+        .WriteTo.Console())
+    .WriteTo.Logger(lc => lc
+        .Filter.ByExcluding(Matching.FromSource<Auditlog>())
+        .WriteTo.File("Logs/log-{Date}.log", rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true))
+    .WriteTo.Logger(lc => lc
+        .Filter.ByIncludingOnly(Matching.FromSource<Auditlog>())
+        .WriteTo.File(new CompactJsonFormatter(), "Logs/auditlog-{Date}.json", rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true))
+    .CreateLogger();
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .WriteTo.File("Logs/log.txt", rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true)
     .CreateLogger();
-
-var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
@@ -60,6 +74,7 @@ var jwtSettings = builder.Configuration.GetSection("JwtBearer").Get<JwtBearerCon
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
+        options.Authority = jwtSettings.Authority;
         options.MapInboundClaims = false;
         options.SaveToken = true;
         options.RequireHttpsMetadata = false;
@@ -67,11 +82,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         {
             ValidateIssuer = true,
             ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
             ValidIssuer = jwtSettings.Issuer,
             ValidAudience = jwtSettings.Audience,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key))
         };
     });
 
@@ -99,7 +111,9 @@ builder.Services.AddCors(options =>
     options.AddDefaultPolicy(
         policy =>
         {
-            policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+            policy.AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader();
         });
 });
 

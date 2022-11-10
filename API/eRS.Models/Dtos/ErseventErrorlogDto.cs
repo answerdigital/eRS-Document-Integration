@@ -1,6 +1,6 @@
 ﻿namespace eRS.Models.Dtos;
 
-public partial class ErseventErrorlogDto
+public sealed class ErseventErrorlogDto
 {
     public string? ERsEvent { get; set; }
     public int? RefReqRowId { get; set; }

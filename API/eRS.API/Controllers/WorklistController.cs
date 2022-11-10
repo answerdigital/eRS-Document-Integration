@@ -1,5 +1,4 @@
 using eRS.Models.Dtos;
-using eRS.Models.Models.Audits;
 using eRS.Models.Models.ersRefRequests;
 using eRS.Models.Models.Files;
 using eRS.Services.Interfaces;
@@ -12,7 +11,7 @@ namespace eRS.API.Controllers;
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
-public class WorklistController : ControllerBase
+public sealed class WorklistController : ControllerBase
 {
     private readonly IWorklistService worklistService;
     private readonly ILogger<WorklistController> logger;

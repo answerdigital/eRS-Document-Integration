@@ -1,8 +1,8 @@
+import { AuthenticatedTemplate, UnauthenticatedTemplate, useMsal } from '@azure/msal-react';
+import { loginRequest } from 'authConfig';
 import NavbarLink from 'components/Navbar/NavbarLink/NavbarLink';
-import { useUserDetails } from 'contexts/SessionContext';
-import { useSession } from 'hooks/useSession';
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { msalInstance } from 'index';
+import React, { useEffect, useState } from 'react';
 import { RouterPaths } from 'utility/RouterPaths';
 
 interface NavbarProps {
@@ -11,18 +11,25 @@ interface NavbarProps {
 
 const Navbar : React.FC<NavbarProps> = ({children}) => {
     const [collapsed, setCollapsed] = useState<boolean>(false);
+    const { instance } = useMsal();
+    const account = msalInstance.getAllAccounts()[0];
 
-    const { userDetails, setUserDetails } = useUserDetails();
-    const { hasJWT, clearJWT } = useSession();
-    const navigate = useNavigate();
+    useEffect(() => {
+        console.log(account);
+    }, []);
 
-    const logout = () => {
-        clearJWT();
-        setUserDetails(undefined);
-        navigate(RouterPaths.LoginPath);
+    const login = () => {
+        instance.loginRedirect(loginRequest).catch(e => {
+            console.error(e);
+        });
     };
 
-    const loggedIn = hasJWT();
+    const logout = () => {
+        instance.logoutRedirect()
+        .catch(e => {
+            console.error(e);
+        });
+    };
 
     return (
         <>
@@ -35,22 +42,17 @@ const Navbar : React.FC<NavbarProps> = ({children}) => {
                     </button>
                     <div className={`collapse navbar-collapse ${collapsed && 'show'}`}>
                         <ul className='navbar-nav me-auto mb-2 mb-lg-0'>
-                            {loggedIn ?
-                            <>
-                                <NavbarLink title={'Worklist'} link={RouterPaths.WorklistPath} />
-                                <NavbarLink title={'Audit Log'} link={RouterPaths.AuditsPath} />
-                                <NavbarLink title={'Manage Users'} link={RouterPaths.UsersPath} />
-                            </>
-                            : null}
+                            <NavbarLink title={'Worklist'} link={RouterPaths.WorklistPath} />
+                            <NavbarLink title={'Audit Log'} link={RouterPaths.AuditsPath} />
                         </ul>
                         <div className='d-flex'>
-                            {loggedIn ?
-                            <>
-                                <div className='d-flex m-2'>{userDetails?.userFullName}</div>
+                            <UnauthenticatedTemplate>
+                                <button onClick={() => login()} className='btn btn-outline-success'>Sign in</button>
+                            </UnauthenticatedTemplate>
+                            <AuthenticatedTemplate>
+                                <div className='d-flex m-2'>{account?.name}</div>
                                 <button onClick={() => logout()} className='btn btn-outline-success'>Sign out</button>
-                            </>
-                            : null
-                            }
+                            </AuthenticatedTemplate>
                         </div>
                     </div>
                 </div>
