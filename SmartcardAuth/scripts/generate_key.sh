@@ -1,7 +1,7 @@
 #!/bin/bash
 
-read -p "Enter a key ID for the new key [test-1]: " name
-KID=${name:-test-1}
+read -p "Enter a key ID for the new key [test-1]: " KID
+KID=${KID:-test-1}
 
 openssl genrsa -out ../src/main/resources/keys/$KID.pem 4096
 openssl rsa -in ../src/main/resources/keys/$KID.pem -pubout -outform PEM -out ../src/main/resources/certs/$KID.pem.pub
