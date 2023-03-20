@@ -1,6 +1,6 @@
 package com.answerdigital.ers.controllers;
 
-import com.answerdigital.ers.api.ERSRequests;
+import com.answerdigital.ers.api.*;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 @Controller
@@ -46,20 +49,27 @@ public class MainController {
         return "auth_successful"; //view
     }
 
-    @GetMapping("/hello")
-    public String helloWorldResponse(@RequestParam("accessToken") String accessToken, Model model) throws Exception {
-        model.addAttribute("accessToken", accessToken);
+    @GetMapping("/handover")
+    public String sessionHandoverResponse(@RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient client, @AuthenticationPrincipal OAuth2AuthenticatedPrincipal user, Model model) throws Exception {
 
-        String[] helloWorldResponse = ERSRequests.makeUserRestrictedRequest(ENDPOINT, accessToken);
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME.withZone(ZoneId.of("UTC"));
 
-        String url = helloWorldResponse[0];
-        String responseCode = helloWorldResponse[1];
-        String responseBody = helloWorldResponse[2];
+        AuthenticatedSession session = new AuthenticatedSession();
+        session.setAuthenticationToken(client.getAccessToken().getTokenValue());
+        session.setExpiry(formatter.format(client.getAccessToken().getExpiresAt()));
+        session.setRefreshToken(client.getRefreshToken().getTokenValue());
 
-        model.addAttribute("url", url);
-        model.addAttribute("responseCode", responseCode);
-        model.addAttribute("responseBody", responseBody);
-
-        return "hello_world"; //view
+        ERSService service = new ERSServiceImpl();
+        AuthenticatedSessionResponse response = null;
+        try {
+            response = service.handover(session);
+        } catch (IOException e){
+            model.addAttribute("message", e.getMessage());
+        }
+        if (response != null) {
+            model.addAttribute("responseCode", response.getResponseCode());
+            model.addAttribute("message", response.getMessage());
+        }
+        return "handover_outcome"; //view
     }
 }
