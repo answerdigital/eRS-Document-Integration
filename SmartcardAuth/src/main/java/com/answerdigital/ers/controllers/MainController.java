@@ -43,6 +43,7 @@ public class MainController {
 
 
         model.addAttribute("userName", user.getName());
+        model.addAttribute("userId", user.getAttribute("sub"));
         model.addAttribute("accessToken", accessTokenString);
         model.addAttribute("expiresIn", expiresIn);
 
@@ -56,8 +57,8 @@ public class MainController {
 
         AuthenticatedSession session = new AuthenticatedSession();
         session.setAuthenticationToken(client.getAccessToken().getTokenValue());
-        session.setExpiry(formatter.format(client.getAccessToken().getExpiresAt()));
-        session.setRefreshToken(client.getRefreshToken().getTokenValue());
+        session.setName(user.getName());
+        session.setUserId(user.getAttribute("sub"));
 
         ERSService service = new ERSServiceImpl();
         AuthenticatedSessionResponse response = null;
