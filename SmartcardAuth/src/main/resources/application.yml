@@ -20,3 +20,6 @@ spring:
             token-uri: ${OAUTH_ENDPOINT}/token
             user-info-uri: ${OAUTH_ENDPOINT}/userinfo
             userNameAttribute: name
+logging.level:
+  com.answerdigital.ers: DEBUG
+  root: INFO
