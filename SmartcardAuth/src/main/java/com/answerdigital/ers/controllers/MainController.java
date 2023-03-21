@@ -41,7 +41,6 @@ public class MainController {
         String accessTokenString = accessToken.getTokenValue();
         String expiresIn = accessToken.getExpiresAt().toString();
 
-
         model.addAttribute("userName", user.getName());
         model.addAttribute("userId", user.getAttribute("sub"));
         model.addAttribute("accessToken", accessTokenString);
@@ -65,9 +64,11 @@ public class MainController {
         try {
             response = service.handover(session);
         } catch (IOException e){
+            model.addAttribute("success", false);
             model.addAttribute("message", e.getMessage());
         }
         if (response != null) {
+            model.addAttribute("success", true);
             model.addAttribute("responseCode", response.getResponseCode());
             model.addAttribute("message", response.getMessage());
         }
