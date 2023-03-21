@@ -53,9 +53,12 @@ public class RefreshTokenServiceImpl {
 
 
             if (reauthorizedClient != null){
-                logger.info("Reauthorized client {}" + key);
+                logger.info("Reauthorized client {}", key);
+                logger.debug("new access token: {}", reauthorizedClient.getAccessToken().getTokenValue());
+                logger.debug("new refresh token: {}", reauthorizedClient.getRefreshToken().getTokenValue());
                 AuthenticatedSession session = new AuthenticatedSession(reauthorizedClient.getAccessToken().getTokenValue(), key, reauthorizedClient.getPrincipalName());
                 AuthenticatedSessionResponse response = null;
+                clientService.saveAuthorizedClient(reauthorizedClient, value);
                 try {
                     response = ersService.handover(session);
                 } catch (IOException e){
