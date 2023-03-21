@@ -54,8 +54,18 @@
 
     <h1>eRS Document Download</h1>
     <h2>Document Download Requested</h2>
-    <div th:if="${customer.anonymous}">
-      <div>Welcome, Guest</div>
+    <div  th:if="${!success}" class="nhsuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1">
+      <h2 class="nhsuk-error-summary__title" id="error-summary-title">
+        There is a problem
+      </h2>
+      <div class="nhsuk-error-summary__body">
+        <p>
+          The server returned a problem while initiating session handover.
+        </p>
+        <ul class="nhsuk-list nhsuk-error-summary__list" role="list">
+          <li><pre th:text="${message}"/></li>
+        </ul>
+      </div>
     </div>
     <p>Document download will now continue for the next 12 hours or until you remove your smartcard.</p>
     <p>Any errors will be sent to the email address example@nhs.net.</p>
