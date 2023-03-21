@@ -37,7 +37,7 @@ public class RefreshTokenServiceImpl {
         clientService.saveAuthorizedClient(client, principal);
     }
 
-    @Scheduled(cron = "* 0/5 * * * *") //every 1 min
+    @Scheduled(cron = "0 0/5 * * * ?") //every 5 min
     public void reauthorizeCurrentClients() {
         logger.debug("Reauthorizing {} clients", currentClients.size());
         for (Map.Entry<String, Authentication> entry : currentClients.entrySet()) {
@@ -70,20 +70,4 @@ public class RefreshTokenServiceImpl {
             }
         }
     }
-
-
-
-
-//    //@Bean
-//    public ClientRegistrationRepository clientRegistrationRepository() {
-//        return new InMemoryClientRegistrationRepository(ClientRegistration.withRegistrationId(DEFAULT_CLIENT_REGISTRATION_ID)
-//                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-//                .clientId(DEFAULT_CLIENT_ID)
-//                .clientSecret("clientSecret")
-//                .tokenUri("oauth2Uri")
-//                .scope(List.of("scope1", "scope2"))
-//                .build());
-//    }
-
-
 }
