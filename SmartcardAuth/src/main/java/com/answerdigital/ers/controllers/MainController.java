@@ -2,7 +2,11 @@ package com.answerdigital.ers.controllers;
 
 import com.answerdigital.ers.api.*;
 
+import com.answerdigital.ers.auth.RefreshTokenServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
@@ -22,6 +26,9 @@ import java.util.Map;
 @Controller
 public class MainController {
     private final String ENDPOINT = System.getenv("ENDPOINT");
+
+    @Autowired
+    private RefreshTokenServiceImpl refreshService;
 
     @GetMapping("/error")
     public String error(HttpServletResponse response) {
@@ -72,6 +79,9 @@ public class MainController {
             model.addAttribute("responseCode", response.getResponseCode());
             model.addAttribute("message", response.getMessage());
         }
+
+        refreshService.put(client, SecurityContextHolder.getContext().getAuthentication());
+
         return "handover_outcome"; //view
     }
 }

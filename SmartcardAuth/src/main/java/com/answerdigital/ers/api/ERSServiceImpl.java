@@ -1,5 +1,6 @@
 package com.answerdigital.ers.api;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;

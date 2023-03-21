@@ -7,6 +7,16 @@ public class AuthenticatedSession {
     private String userId;
     private String name;
 
+    public AuthenticatedSession(String authenticationToken, String userId, String name) {
+        this.authenticationToken = authenticationToken;
+        this.userId = userId;
+        this.name = name;
+    }
+
+    public AuthenticatedSession() {
+        super();
+    }
+
     @JsonProperty("nhsid_useruid")
     public String getUserId() {
         return userId;
