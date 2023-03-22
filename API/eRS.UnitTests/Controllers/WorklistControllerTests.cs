@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using Xunit;
 
 namespace eRS.UnitTests.Controllers
@@ -15,6 +16,7 @@ namespace eRS.UnitTests.Controllers
     {
         private Mock<ILogger<WorklistController>> mockLogger = new Mock<ILogger<WorklistController>>();
         private Mock<IWorklistService> mockWorklistService = new Mock<IWorklistService>();
+        private Mock<IHttpClientFactory> mockHttpClientFactory = new Mock<IHttpClientFactory>();
 
         [Fact]
         public async void RequestWorklist_NoReferrals_ReturnsNotFound()
@@ -122,7 +124,7 @@ namespace eRS.UnitTests.Controllers
             mockWorklistService.Verify(x => x.GetAttachments(It.IsAny<string>()), Times.Once);
         }
 
-        private WorklistController BuildSut() => new(this.mockWorklistService.Object, this.mockLogger.Object);
+        private WorklistController BuildSut() => new(this.mockWorklistService.Object, this.mockLogger.Object, this.mockHttpClientFactory.Object);
 
     }
 }
