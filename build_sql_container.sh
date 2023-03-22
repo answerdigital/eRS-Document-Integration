@@ -1,0 +1,1 @@
+docker build -f Docker/SQL/Dockerfile -t ers-sql:latest .

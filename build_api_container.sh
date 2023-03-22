@@ -1,0 +1,1 @@
+docker build -f Docker/API/Dockerfile -t ers-api:latest .
