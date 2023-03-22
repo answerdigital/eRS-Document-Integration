@@ -1,0 +1,40 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=HL7-stub-database
+    ports:
+      - '5432:5432'
+  api:
+    image: hl7
+    restart: unless-stopped
+    depends_on: 
+      - 'db'
+    ports:
+      - '5000:80'
+    environment:
+      - ENVIRONMENT=development
+  iris:
+    image: containers.intersystems.com/intersystems/irishealth-community:2023.1.0.218.0-linux-amd64
+    ports:
+      - '9091:1972'
+      - '9093:52773'
+      - '9980:9980'
+    volumes:
+      - /data/durable:/dur
+    cap_add:
+      - IPC_LOCK
+    environment:
+      - ISC_DATA_DIRECTORY=/dur/iris_conf.d
+      - ISC_CPF_MERGE_FILE=/dur/merge/merge.cpf
+  sql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    ports: 
+      - '1433:1433'
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=password123!
