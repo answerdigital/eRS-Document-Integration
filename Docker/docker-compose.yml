@@ -9,7 +9,7 @@ services:
       - POSTGRES_DB=HL7-stub-database
     ports:
       - '5432:5432'
-  api:
+  hl7-api:
     image: hl7
     restart: unless-stopped
     depends_on: 
@@ -32,9 +32,17 @@ services:
       - ISC_DATA_DIRECTORY=/dur/iris_conf.d
       - ISC_CPF_MERGE_FILE=/dur/merge/merge.cpf
   sql:
-    image: mcr.microsoft.com/mssql/server:2022-latest
+    image: ers-sql:latest
     ports: 
       - '1433:1433'
     environment:
       - ACCEPT_EULA=Y
       - MSSQL_SA_PASSWORD=password123!
+  ui:
+    image: ers-ui:latest
+    ports: 
+      - '3000:3000'
+  api:
+    image: ers-api:latest
+    ports:
+      - '7204:7204'
