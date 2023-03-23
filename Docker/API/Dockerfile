@@ -8,7 +8,7 @@ RUN dotnet restore
 # Build and publish a release
 RUN dotnet publish -c Release -o out
 
-ENV ASPNETCORE_ENVIRONMENT Production
+# ENV ASPNETCORE_ENVIRONMENT Production
 
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:6.0

@@ -45,4 +45,4 @@ services:
   api:
     image: ers-api:latest
     ports:
-      - '7204:7204'
+      - '7204:80'
