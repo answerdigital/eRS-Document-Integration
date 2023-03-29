@@ -3,7 +3,6 @@ package com.answerdigital.ers.auth;
 import com.answerdigital.ers.api.AuthenticatedSession;
 import com.answerdigital.ers.api.AuthenticatedSessionResponse;
 import com.answerdigital.ers.api.ERSService;
-import com.answerdigital.ers.api.ERSServiceImpl;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +18,7 @@ import org.slf4j.Logger;
 
 @Configuration
 @EnableScheduling
-public class RefreshTokenServiceImpl {
+public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     Logger logger = LoggerFactory.getLogger(RefreshTokenServiceImpl.class);
 
@@ -30,8 +29,10 @@ public class RefreshTokenServiceImpl {
 
     private static final String DEFAULT_CLIENT_REGISTRATION_ID = "cis2";
 
-    private ERSService ersService = new ERSServiceImpl(); //TODO: inject this
+    @Autowired
+    private ERSService ersService;
 
+    @Override
     public void put(OAuth2AuthorizedClient client, Authentication principal){
         currentClients.put(principal.getName(), principal);
         clientService.saveAuthorizedClient(client, principal);
