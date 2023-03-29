@@ -37,7 +37,7 @@ public class WebSecurityConfig {
         http
                 .authorizeHttpRequests((requests) -> requests
                         .antMatchers("/", "/home", "/error", "/oauth2/authorization/**", "/webjars/**", "/assets/**", "/js/**", "/css/**").permitAll()
-                        .antMatchers("/handover").hasRole("ROLE_ERS_ADMIN_USER")
+                        .antMatchers("/handover").hasRole("ERS_ADMIN_USER")
                         .anyRequest().authenticated()
                 )
                 .oauth2Login().userInfoEndpoint().userService(this.oAuth2UserService());
@@ -74,7 +74,7 @@ public class WebSecurityConfig {
                                     cis2RbacRole.getRoleCode().split(":")[cis2RbacRole.getRoleCode().split(":").length-1]
                             )
             )){
-                mappedAuthorities.add(new SimpleGrantedAuthority("ERS_ADMIN_USER"));
+                mappedAuthorities.add(new SimpleGrantedAuthority("ROLE_ERS_ADMIN_USER"));
             };
 
             user = new DefaultOAuth2User(mappedAuthorities, user.getAttributes(), "name");
