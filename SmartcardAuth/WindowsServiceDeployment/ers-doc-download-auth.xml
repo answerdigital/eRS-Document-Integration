@@ -1,0 +1,181 @@
+<!--
+  MIT License
+
+  Copyright (c) 2008-2020 Kohsuke Kawaguchi, Sun Microsystems, Inc., CloudBees,
+  Inc., Oleg Nenashev and other contributors
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+-->
+
+<!--
+ This is a sample configuration of the Windows Service Wrapper.
+ This configuration file should be placed near the WinSW executable, the name should be the same.
+ E.g. for myapp.exe the configuration file name should be myapp.xml
+
+ You can find more information about configuration options here: https://github.com/winsw/winsw/blob/master/docs/xml-config-file.md
+-->
+<service>
+
+<!--
+SECTION: Mandatory options
+All options in other sections are optional
+-->
+
+  <!-- ID of the service. It should be unique accross the Windows system. -->
+  <id>ers-document-download-auth</id>
+
+  <!-- Path to the executable, which should be started. -->
+  <executable>java</executable>
+
+  <!-- Display name of the service. -->
+  <name>eRS Document Download Smartcard Authentication</name>
+
+  <!-- Service description. -->
+  <description>eRS Document Download Smartcard Authentication</description>
+
+<!--
+SECTION: Installation
+These options are being used during the installation only.
+Their modification will not take affect without the service re-installation.
+-->
+
+  <!--
+    OPTION: serviceaccount
+    Defines account, under which the service should run.
+  -->
+  <!--
+  <serviceaccount>
+    <username>YOURDOMAIN\useraccount</username>
+    <password>Pa55w0rd</password>
+    <allowservicelogon>true</allowservicelogon>
+  </serviceaccount>
+  -->
+
+  <!--
+    OPTION: onfailure
+    Defines a sequence of actions, which should be performed if the managed executable fails.
+    Supported actions: restart, reboot, none
+  -->
+  <!--
+  <onfailure action="restart" delay="10 sec"/>
+  <onfailure action="restart" delay="20 sec"/>
+  <onfailure action="reboot" />
+  -->
+
+  <!--
+    OPTION: resetfailure
+    Time, after which the Windows service resets the failure status.
+    Default value: 1 day
+  -->
+  <!--
+  <resetfailure>1 hour</resetfailure>
+  -->
+
+  <!--
+    OPTION: securityDescriptor
+    The security descriptor string for the service in SDDL form.
+    For more information, see https://docs.microsoft.com/windows/win32/secauthz/security-descriptor-definition-language.
+  -->
+
+  <!--<securityDescriptor></securityDescriptor>-->
+
+<!--
+SECTION: Executable management
+-->
+
+  <!--
+    OPTION: arguments
+    Arguments, which should be passed to the executable.
+  -->
+  <arguments>-jar %BASE%\ers-document-download-auth.jar</arguments>
+
+  <!--
+    OPTION: priority
+    Desired process priority.
+    Possible values: Normal, Idle, High, RealTime, BelowNormal, AboveNormal
+    Default value: Normal
+  -->
+  <priority>Normal</priority>
+
+  <!--
+    OPTION: stoptimeout
+    Time to wait for the service to gracefully shutdown the executable before we forcibly kill it.
+    Default value: 15 seconds
+  -->
+  <stoptimeout>15 sec</stoptimeout>
+
+<!--
+SECTION: Service management
+-->
+    <!--
+      OPTION: startmode
+      Defines start mode of the service.
+      Supported modes: Automatic, Manual, Boot, System (latter ones are supported for driver services only)
+      Default mode: Automatic
+    -->
+    <startmode>Automatic</startmode>
+
+    <!--
+      OPTION: delayedAutoStart
+      Enables the Delayed Automatic Start if 'Automatic' is specified in the 'startmode' field.
+      See the WinSW documentation to get info about supported platform versions and limitations.
+    -->
+    <!--<delayedAutoStart>true</delayedAutoStart>-->
+
+<!--
+SECTION:Logging
+-->
+
+  <!--
+    OPTION: logpath
+    Sets a custom logging directory for all logs being produced by the service wrapper.
+    Default value: Directory, which contains the executor.
+  -->
+    <logpath>%BASE%\logs</logpath>
+
+
+  <!--
+    OPTION: log
+    Defines logging mode for logs produced by the executable.
+  -->
+  <log mode="roll">
+
+  </log>
+
+<!--
+SECTION: Environment setup
+-->
+  <!--
+    OPTION: env
+    Sets or overrides environment variables.
+    There may be multiple entries configured on the top level.
+  -->
+  <env name="HTTPS_PORT" value="8443" />
+  <env name="SERVER_SSL_CERTIFICATE" value="" />
+  <env name="SERVER_SSL_CERTIFICATE-PRIVATE-KEY" value="" />
+  <env name="CLIENT_ID" value="OXNNxo6x0fjKkWFgWGHunFD0ZjQ7rAnl" />
+  <env name="CLIENT_SECRET" value="" />
+  <env name="REDIRECT_URI" value="https://localhost:8443/login/oauth2/code/cis2" />
+  <env name="OAUTH_ENDPOINT" value="https://int.api.service.nhs.uk/oauth2" />
+  <env name="SERVER_HTTP-PORT" value="8080" />
+  <env name="SERVER_ENABLE-TLS" value="true" />
+  <env name="ODS_CODE" value="B9J4U" />
+  <env name="ENDPOINT" value="https://49faed90-208f-4680-9e39-0542957b62d6.mock.pstmn.io:443" />
+  <env name="TRUSTED_CERTS" value="" />
+</service>
