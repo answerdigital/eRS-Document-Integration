@@ -682,7 +682,7 @@
     set httpReq.EntityBody= stream
     set httpReq.Authorization = "Bearer "_^LastToken("auth_token")
     
-    set tsc = httpReq.SetHeader("NHSD-End-User-Organisation-ODS","B9J4U")
+    set tsc = httpReq.SetHeader("NHSD-End-User-Organisation-ODS",..ODSCode)
     set tsc = httpReq.SetHeader("NHSD-eRS-Business-Function","SERVICE_PROVIDER_CLINICIAN")
     set tsc = httpReq.SetHeader("Content-Type","application/fhir+json")
 
