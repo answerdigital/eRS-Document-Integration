@@ -3,20 +3,16 @@ package com.answerdigital.ers;
 import com.answerdigital.ers.api.AuthenticatedSession;
 import com.answerdigital.ers.api.AuthenticatedSessionResponse;
 import com.answerdigital.ers.api.ERSServiceImpl;
-import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
-import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.event.annotation.BeforeTestClass;
 
 import java.io.IOException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -26,12 +22,12 @@ public class ERSServiceImplTest {
 
     @RegisterExtension
     static WireMockExtension knownCertificateServer = WireMockExtension.newInstance()
-            .options(wireMockConfig().dynamicPort().dynamicHttpsPort().keystorePath("classpath:/known.jks"))
+            .options(wireMockConfig().dynamicPort().dynamicHttpsPort().keystorePath("known_ca.jks").keystorePassword("changeit"))
             .build();
 
     @RegisterExtension
     static WireMockExtension unknownCertificateServer = WireMockExtension.newInstance()
-            .options(wireMockConfig().dynamicPort().dynamicHttpsPort().keystorePath("classpath:/unknown.jks"))
+            .options(wireMockConfig().dynamicPort().dynamicHttpsPort().keystorePath("unknown_ca.jks").keystorePassword("changeit"))
             .build();
 
     @Autowired
@@ -39,19 +35,19 @@ public class ERSServiceImplTest {
 
     @Test
     public void whenKnownCertificate_thenConnects() throws Exception {
-        unknownCertificateServer.stubFor(post("/session").willReturn(
+        unknownCertificateServer.stubFor(post("/userToken").willReturn(
                 aResponse()
                         .withBody("{\"code\":\"200\",\"message\":\"OK\"}")
                         .withHeader("Content-Type", "application/json")
                         .withStatus(200)
                 )
         );
-        String endpoint = unknownCertificateServer.getRuntimeInfo().getHttpsBaseUrl();
+        String endpoint = unknownCertificateServer.getRuntimeInfo().getHttpsBaseUrl() + "/userToken";
         AuthenticatedSession session = new AuthenticatedSession();
         session.setUserId("test");
         session.setName("test");
         session.setAuthenticationToken("test");
-        AuthenticatedSessionResponse response = service.handover(session)
+        AuthenticatedSessionResponse response = service.handover(session);
         assertEquals(200, response.getResponseCode());
     }
 
