@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="IRIS" version="26" zv="IRIS for Windows (x86-64) 2022.3 (Build 606U)" ts="2023-04-13 12:47:05">
+<Document name="ERS.ContentTypeToExtension.LUT">
+<lookupTable>
+<entry table="ERS.ContentTypeToExtension" key="application/msword">doc</entry>
+<entry table="ERS.ContentTypeToExtension" key="application/pdf">pdf</entry>
+<entry table="ERS.ContentTypeToExtension" key="application/vnd.openxmlformats-officedocument.wordprocessingml.document">docx</entry>
+<entry table="ERS.ContentTypeToExtension" key="image/gif">gif</entry>
+<entry table="ERS.ContentTypeToExtension" key="image/jpeg">jpeg</entry>
+<entry table="ERS.ContentTypeToExtension" key="image/png">png</entry>
+<entry table="ERS.ContentTypeToExtension" key="image/tif">tiff</entry>
+<entry table="ERS.ContentTypeToExtension" key="image/tiff">tiff</entry>
+<entry table="ERS.ContentTypeToExtension" key="text/html">html</entry>
+<entry table="ERS.ContentTypeToExtension" key="text/plain">txt</entry>
+<entry table="ERS.ContentTypeToExtension" key="text/rtf">rtf</entry>
+</lookupTable>
+</Document></Export>
