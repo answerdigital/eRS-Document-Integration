@@ -41,6 +41,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 10.x
+      - run: npm run --prefix Client install
       - run: npm run --prefix Client build --if-present
       - uses: actions/upload-artifact@v3
         with:
