@@ -41,13 +41,13 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 10.x
-      - run: npm ci
       - run: npm run --prefix Client build --if-present
       - uses: actions/upload-artifact@v3
         with:
           name: Client-Build
           path: Client/build/*
   package-release:
+    needs: [build-java, build-ui, build-api]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
