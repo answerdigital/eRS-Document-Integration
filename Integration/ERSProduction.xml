@@ -1019,7 +1019,7 @@ END
     set tURL=..Adapter.URL_"/referrals/FHIR/STU3/ReferralRequest/"_ubrn_"/$ers.generateCRI"
     
     set StatusCode = 999
-    Set Count = ##class(Ens.Director).GetItemSettingValue("DocumentDownloadProcess","Host","AttachmentRetryCount",.status)
+    Set Count = ##class(Ens.Director).GetItemSettingValue("DocumentDownloadProcess","Host","AttachmentRetryCount",.tsc)
     
     Try {
         while $FIND("200,404,422", StatusCode)=0 && (Count > 0)
@@ -1032,6 +1032,8 @@ END
             Set StatusCode = tHttpResponse.StatusCode
             Set Count = Count - 1
         }
+	Set retryCount = ##class(Ens.Director).GetItemSettingValue("DocumentDownloadProcess","Host","AttachmentRetryCount",.tsc) - Count
+
     }
     Catch ex {
         set alert=##class(Ens.AlertRequest).%New()
@@ -1083,7 +1085,7 @@ END
         set InsertQry = InsertQry_$ZDATE($PIECE($H,",",1))_", "
         set InsertQry = InsertQry_"'"_fileName_"', "
         set InsertQry = InsertQry_"1"_", "
-        set InsertQry = InsertQry_Count_", "
+        set InsertQry = InsertQry_retryCount_", "
         set InsertQry = InsertQry_"'"_stream.SizeGet()_"', "
         set InsertQry = InsertQry_"'"_respTitle_"', "
         set InsertQry = InsertQry_"'"_ubrn_"')"
