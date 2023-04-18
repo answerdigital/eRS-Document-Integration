@@ -1,4 +1,4 @@
-name: Java CI
+name: Build & Package
 
 on: [push]
 
@@ -40,7 +40,7 @@ jobs:
       - name: Use Node.js 10
         uses: actions/setup-node@v3
         with:
-          node-version: 10.x
+          node-version: 18.15.0
       - run: npm --prefix Client install
       - run: npm run --prefix Client build --if-present
       - uses: actions/upload-artifact@v3
