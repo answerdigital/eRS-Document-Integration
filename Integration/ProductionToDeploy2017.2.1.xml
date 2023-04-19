@@ -2213,6 +2213,9 @@ END
 	set AuthJsonObj = ##class(%DynamicAbstractObject).%FromJSON(AuthJson)
 	$$$LOGINFO("AuthJsonObj : "_AuthJsonObj.%Get("auth_token"))
 	set ^LastToken("auth_token") = AuthJsonObj.%Get("auth_token")
+	set ^LastToken("nhsid_useruid") = AuthJsonObj.%Get("nhsid_useruid")
+	set ^LastToken("name") = AuthJsonObj.%Get("name")
+	set ^LastToken("token_time") = $zdatetime($horolog,3)
 	set TokenReceived = 1
 
     //make sure Read when OK
