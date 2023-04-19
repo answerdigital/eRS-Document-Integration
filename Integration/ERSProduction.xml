@@ -99,7 +99,7 @@
 </Class>
 
 
-<Class name="RFT.ERS.Classes.Attachment">
+Class name="RFT.ERS.Classes.Attachment">
 <Super>Ens.Response</Super>
 <TimeChanged>66557,36787.5683272</TimeChanged>
 <TimeCreated>66459,55434.7401439</TimeCreated>
@@ -623,7 +623,7 @@
 
 <Class name="RFT.ERS.Operation.ERS">
 <Super>Ens.BusinessOperation</Super>
-<TimeChanged>66575,64296.3905775</TimeChanged>
+<TimeChanged>66583,41559.1243457</TimeChanged>
 <TimeCreated>66390,42548.6576226</TimeCreated>
 
 <Parameter name="ADAPTER">
@@ -686,7 +686,7 @@
     set tsc = httpReq.SetHeader("NHSD-eRS-Business-Function","SERVICE_PROVIDER_CLINICIAN")
     set tsc = httpReq.SetHeader("Content-Type","application/fhir+json")
 
-    set tURL=..Adapter.URL_"/referrals/FHIR/STU3/ReferralRequest/$ers.fetchworklist"
+    set tURL=..Adapter.HTTPServer_"/referrals/FHIR/STU3/ReferralRequest/$ers.fetchworklist"
     SET tsc=..Adapter.SendFormDataURL(tURL, .tHttpResponse, "POST", httpReq)
 
    
@@ -706,74 +706,54 @@
         
     }   
     
-   
-    //Grab values from fhir response 
-    
+    //Extract values from fhir response 
     set data=tHttpResponse.Data
        
     IF $ISOBJECT(data)
     {
-        
-      set obj=[].%FromJSON(data)
-      set resp=##class(RFT.ERS.Classes.WorklistResponse).%New()
-      set entry=obj.entry
-    
-    
+        set obj=[].%FromJSON(data)
+        set resp=##class(RFT.ERS.Classes.WorklistResponse).%New()
+        set entry=obj.entry
+    }
     
     IF $ISOBJECT(entry)
-  
     {
-	     
-	      
-	     set entryIterator=entry.%GetIterator()
+	    set entryIterator=entry.%GetIterator()
         while entryIterator.%GetNext(.key,.entryItem)
-        
         {
-	   	 set ref=##class(RFT.ERS.Classes.WorklistItem).%New()
-	      set ubrn=entryItem.item.reference
-	      set ref.ubrn=$PIECE(ubrn,"/",2)
-	      set outerExtensionArray=entryItem.extension
-	  
-	      set extensionObject=outerExtensionArray.extension
-	      
-	        
-	       set innerExtensionArray=extensionObject.extension
-	       set innerExtensionIterator=innerExtensionArray.%GetIterator()
-	       while innerExtensionIterator.%GetNext(.key,.extensionItem)
-	       {
-		      
-		       if extensionItem.url="priority" 
-			    	 
-			  {
-				  set code=##class(RFT.Utility.CodeableConcept).RetriveCode(extensionItem)
-				  set ref.priority=code
-			  }
-			  if extensionItem.url="specialty"
-			  
-			  {		
-				  set code=##class(RFT.Utility.CodeableConcept).RetriveCode(extensionItem)
-				  set ref.specialty=code
-				  
-				  
-			  }  
-			 
-			  
-			  if extensionItem.url="clinicalInfoPrinted" set ref.clinicalInfoPrinted=extensionItem.valueBoolean
-              if extensionItem.url="clinicalInfoLastUpdated" set ref.clinicalInfoLastUpdate=extensionItem.valueDateTime
-              if extensionItem.url="patient" set ref.patientID=extensionItem.valueReference.identifier.value
-			 
-			  
-	       } 
-	   
+	   	    set ref=##class(RFT.ERS.Classes.WorklistItem).%New()
+	        set ubrn=entryItem.item.reference
+	        set ref.ubrn=$PIECE(ubrn,"/",2)
+	        set outerExtensionArray=entryItem.extension
+    
+	        set extensionObject=outerExtensionArray.extension
+    
+    
+	        set innerExtensionArray=extensionObject.extension
+	        set innerExtensionIterator=innerExtensionArray.%GetIterator()
+	        while innerExtensionIterator.%GetNext(.key,.extensionItem)
+	        {
+		        if extensionItem.url="priority" 
+		    	{
+		    		set code=##class(RFT.Utility.CodeableConcept).RetriveCode(extensionItem)
+		    		set ref.priority=code
+		    	}
+		    	if extensionItem.url="specialty"
+		    	{		
+		    		set code=##class(RFT.Utility.CodeableConcept).RetriveCode(extensionItem)
+		    		set ref.specialty=code
+		    	}  
+    
+		    	if extensionItem.url="clinicalInfoPrinted" set ref.clinicalInfoPrinted=extensionItem.valueBoolean
+                if extensionItem.url="clinicalInfoLastUpdated" set ref.clinicalInfoLastUpdate=extensionItem.valueDateTime
+                if extensionItem.url="patient" set ref.patientID=extensionItem.valueReference.identifier.value    
+	        } 
+    
             do resp.Item.Insert(ref)
         }   
         
     }   
-
-    
     set pResponse=resp
-}
-    
 END 
     quit tsc
 ]]></Implementation>
@@ -790,7 +770,7 @@ END
     set tsc = httpReq.SetHeader("Accept","application/fhir+json")
     set tsc = httpReq.SetHeader("NHSD-End-User-Organisation-ODS",..ODSCode)
     
-    set tURL=..Adapter.URL_"/referrals/FHIR/STU3/ReferralRequest/"_pInput.ubrn    
+    set tURL=..Adapter.HTTPServer_"/referrals/FHIR/STU3/ReferralRequest/"_pInput.ubrn    
     
     SET tsc=..Adapter.SendFormDataURL(tURL, .httpResp, "GET", httpReq)
     #DIM httpResp as %Net.HttpResponse
@@ -864,8 +844,7 @@ END
                     set attachment.size=contentItem.attachment.size
                     set attachment.title=contentItem.attachment.title
                     set attachment.createdDateTime=contentItem.attachment.creation
-                    
-                    
+
                     do resp.Attachment.Insert(attachment)
                         
                 }
@@ -914,7 +893,7 @@ END
     do httpReq.SetHeader("NHSD-End-User-Organisation-ODS",..ODSCode)
     set httpReq.Authorization = "Bearer "_^LastToken("auth_token")
     
-    set tURL=..Adapter.URL_"/referrals/FHIR/STU3/Binary/"_pInput.url    
+    set tURL=..Adapter.HTTPServer_"/referrals/FHIR/STU3/Binary/"_pInput.url    
     SET sc=..Adapter.SendFormDataURL(tURL, .httpResp, "GET", httpReq)
     #DIM httpResp as %Net.HttpResponse
     
@@ -997,7 +976,6 @@ END
     
     set pResponse=response
     
-    
     quit t
 ]]></Implementation>
 </Method>
@@ -1016,7 +994,7 @@ END
     set tsc = httpReq.SetHeader("Content-Type","application/fhir+json")
 
     set ubrn = pInput.ubrn
-    set tURL=..Adapter.URL_"/referrals/FHIR/STU3/ReferralRequest/"_ubrn_"/$ers.generateCRI"
+    set tURL=..Adapter.HTTPServer_"/referrals/FHIR/STU3/ReferralRequest/"_ubrn_"/$ers.generateCRI"
     
     set StatusCode = 999
     Set Count = ##class(Ens.Director).GetItemSettingValue("DocumentDownloadProcess","Host","AttachmentRetryCount",.tsc)
@@ -1032,8 +1010,7 @@ END
             Set StatusCode = tHttpResponse.StatusCode
             Set Count = Count - 1
         }
-	Set retryCount = ##class(Ens.Director).GetItemSettingValue("DocumentDownloadProcess","Host","AttachmentRetryCount",.tsc) - Count
-
+        Set retryCount = ##class(Ens.Director).GetItemSettingValue("DocumentDownloadProcess","Host","AttachmentRetryCount",.tsc) - Count
     }
     Catch ex {
         set alert=##class(Ens.AlertRequest).%New()
@@ -1041,12 +1018,11 @@ END
         set alertText=alertText_" There has been an error in etrieving clinical information (A007). ubrn: "_ubrn
         set alert.AlertText=alertText
         set alert.AlertDestination="Ens.Alert"
-        set t=..SendAlert(alert)
+        set tsc=..SendAlert(alert)
         $$$ThrowStatus(tsc)
-        Set tSC=ex.AsStatus()
+        Set tsc=ex.AsStatus()
     }
 
-     
     if StatusCode = 200
     {
         set response=##class(RFT.ERS.Classes.AttachmentResponse).%New()
@@ -1072,13 +1048,10 @@ END
         set response.FilePath=fileName
         set response.FileType="pdf"
 
-
-
-	    set t=stream.LinkToFile(fileName)
-	    set t=stream.CopyFromAndSave(data)
+	    set tsc=stream.LinkToFile(fileName)
+	    set tsc=stream.CopyFromAndSave(data)
 
         // update DB with clincal summary path
-        ;set InsertQry = "INSERT INTO RFT_ERS_Tables.Attachments (ID, attachmentID, contentType, createdDateTime, docStatus, filePath, insertedBy, isDownloaded, "
         set InsertQry = "INSERT INTO RFT_ERS_Tables.Attachments (createdDateTime, filePath, isDownloaded, "
         set InsertQry = InsertQry_"retryCount, size, title, ubrn)" ;, url)"
         set InsertQry = InsertQry_" VALUES ("
@@ -1089,7 +1062,6 @@ END
         set InsertQry = InsertQry_"'"_stream.SizeGet()_"', "
         set InsertQry = InsertQry_"'"_respTitle_"', "
         set InsertQry = InsertQry_"'"_ubrn_"')"
-        ;set InsertQry = InsertQry_ubrn_"/$ers.generateCRI"
 
         $$$TRACE(InsertQry)
 
@@ -1098,8 +1070,6 @@ END
         if $$$ISERR(tsc) {write "%Prepare failed:" do $SYSTEM.Status.DisplayError(tsc) quit} 
         set rset = ST.%Execute()
         if $$$ISERR(tsc) {write "%Prepare failed:" do $SYSTEM.Status.DisplayError(tsc) quit}
-
-
     }
 
     if response
@@ -2280,7 +2250,7 @@ END
 
 <Class name="RFT.ERS.Service.InvokeWorklistProcessor">
 <Super>Ens.BusinessService</Super>
-<TimeChanged>66575,58454.5777735</TimeChanged>
+<TimeChanged>66583,41448.1849977</TimeChanged>
 <TimeCreated>66465,34944.3712696</TimeCreated>
 
 <UDLText name="T">
@@ -2336,7 +2306,7 @@ END
 
 <Class name="RFT.ERS.Tables.Attachments">
 <Super>%Persistent</Super>
-<TimeChanged>66575,63840.8135372</TimeChanged>
+<TimeChanged>66577,59536.449788</TimeChanged>
 <TimeCreated>66459,53686.1725355</TimeCreated>
 
 <Property name="attachmentID">
@@ -2404,6 +2374,8 @@ END
 <StreamLocation>^RFT.ERS.Tables.AttachmentsS</StreamLocation>
 <ExtentSize>1</ExtentSize>
 <Data name="AttachmentsDefaultData">
+<Structure>listnode</Structure>
+<Subscript/>
 <Value name="1">
 <Value>%%CLASSNAME</Value>
 </Value>
@@ -2432,87 +2404,22 @@ END
 <Value>docStatus</Value>
 </Value>
 <Value name="10">
-<Value>statusFlag</Value>
+<Value>isDownloaded</Value>
 </Value>
 <Value name="11">
-<Value>isDownloaded</Value>
+<Value>retryCount</Value>
 </Value>
 <Value name="12">
 <Value>filePath</Value>
 </Value>
-<Value name="13">
-<Value>badDocFlag</Value>
-</Value>
-<Value name="14">
-<Value>retryCount</Value>
-</Value>
 </Data>
-<Property name="%%CLASSNAME">
-<Selectivity>100.0000%</Selectivity>
-<AverageFieldSize>2</AverageFieldSize>
-</Property>
-<Property name="%%ID">
-<Selectivity>1</Selectivity>
-<AverageFieldSize>5</AverageFieldSize>
-</Property>
-<Property name="attachmentID">
-<Selectivity>1</Selectivity>
-<AverageFieldSize>5</AverageFieldSize>
-</Property>
-<Property name="contentType">
-<Selectivity>100.0000%</Selectivity>
-<AverageFieldSize>17</AverageFieldSize>
-</Property>
-<Property name="createdDateTime">
-<Selectivity>100.0000%</Selectivity>
-<AverageFieldSize>12</AverageFieldSize>
-</Property>
-<Property name="docStatus">
-<Selectivity>100.0000%</Selectivity>
-<AverageFieldSize>2</AverageFieldSize>
-</Property>
-<Property name="filePath">
-<Selectivity>100.0000%</Selectivity>
-<AverageFieldSize>2</AverageFieldSize>
-</Property>
-<Property name="insertedBy">
-<Selectivity>100.0000%</Selectivity>
-<AverageFieldSize>14</AverageFieldSize>
-</Property>
-<Property name="isDownloaded">
-<Selectivity>100.0000%</Selectivity>
-<AverageFieldSize>2</AverageFieldSize>
-</Property>
-<Property name="size">
-<Selectivity>100.0000%</Selectivity>
-<AverageFieldSize>3</AverageFieldSize>
-</Property>
-<Property name="statusFlag">
-<Selectivity>100.0000%</Selectivity>
-<AverageFieldSize>2</AverageFieldSize>
-</Property>
-<Property name="title">
-<Selectivity>100.0000%</Selectivity>
-<AverageFieldSize>20</AverageFieldSize>
-</Property>
-<Property name="ubrn">
-<Selectivity>100.0000%</Selectivity>
-<AverageFieldSize>14</AverageFieldSize>
-</Property>
-<Property name="url">
-<Selectivity>100.0000%</Selectivity>
-<AverageFieldSize>17</AverageFieldSize>
-</Property>
-<SQLMap name="urlIndex">
-<BlockCount>-4</BlockCount>
-</SQLMap>
 </Storage>
 </Class>
 
 
 <Class name="RFT.ERS.Tables.Referrals">
 <Super>%Persistent</Super>
-<TimeChanged>66459,56885.84812</TimeChanged>
+<TimeChanged>66577,59623.7338584</TimeChanged>
 <TimeCreated>66459,53715.0271427</TimeCreated>
 
 <Property name="ubrn">
@@ -2808,7 +2715,7 @@ END
 
 <Class name="RFT.Utility.CodeableConcept">
 <Super>%RegisteredObject</Super>
-<TimeChanged>66557,45680.5989872</TimeChanged>
+<TimeChanged>66577,59815.0042032</TimeChanged>
 <TimeCreated>66555,74073.5065373</TimeCreated>
 
 <Method name="RetriveCode">
@@ -2822,12 +2729,10 @@ END
 		set iter=coding.%GetIterator()
 		while iter.%GetNext(.key,.value)
 		{
-				set code=value.code
-					    
-					    	
+				set code=value.code			    	
 		}
 				    	
-			quit code
+		quit code
 ]]></Implementation>
 </Method>
 </Class>
