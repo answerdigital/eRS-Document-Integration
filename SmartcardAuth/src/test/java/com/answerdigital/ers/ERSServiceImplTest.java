@@ -2,12 +2,15 @@ package com.answerdigital.ers;
 
 import com.answerdigital.ers.api.AuthenticatedSession;
 import com.answerdigital.ers.api.AuthenticatedSessionResponse;
+import com.answerdigital.ers.api.ERSService;
 import com.answerdigital.ers.api.ERSServiceImpl;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 
 import java.io.IOException;
 
@@ -30,19 +33,26 @@ public class ERSServiceImplTest {
             .options(wireMockConfig().dynamicPort().dynamicHttpsPort().keystorePath("unknown_ca.jks").keystorePassword("changeit"))
             .build();
 
-    @Autowired
-    private ERSServiceImpl service;
+    @DynamicPropertySource
+    static void endpointProperties(DynamicPropertyRegistry registry) {
+        registry.add("ers.session-handover-endpoint", () ->
+                knownCertificateServer.getRuntimeInfo().getHttpsBaseUrl() + "/session"
+        );
+    }
 
     @Test
     public void whenKnownCertificate_thenConnects() throws Exception {
-        unknownCertificateServer.stubFor(post("/userToken").willReturn(
+
+        unknownCertificateServer.stubFor(post("/session").willReturn(
                 aResponse()
                         .withBody("{\"code\":\"200\",\"message\":\"OK\"}")
                         .withHeader("Content-Type", "application/json")
                         .withStatus(200)
                 )
         );
-        String endpoint = unknownCertificateServer.getRuntimeInfo().getHttpsBaseUrl() + "/userToken";
+        String endpoint = unknownCertificateServer.getRuntimeInfo().getHttpsBaseUrl() + "/session";
+        ERSService service = new ERSServiceImpl(endpoint);
+
         AuthenticatedSession session = new AuthenticatedSession();
         session.setUserId("test");
         session.setName("test");
@@ -60,7 +70,9 @@ public class ERSServiceImplTest {
                                 .withStatus(200)
                 )
         );
-        String endpoint = unknownCertificateServer.getRuntimeInfo().getHttpsBaseUrl();
+        String endpoint = unknownCertificateServer.getRuntimeInfo().getHttpsBaseUrl() + "/session";
+        ERSService service = new ERSServiceImpl(endpoint);
+
         AuthenticatedSession session = new AuthenticatedSession();
         session.setUserId("test");
         session.setName("test");

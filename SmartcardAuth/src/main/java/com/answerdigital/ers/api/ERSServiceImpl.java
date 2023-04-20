@@ -14,8 +14,12 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 @Component
 public class ERSServiceImpl implements ERSService{
-    @Value("${ers.session-handover-endpoint}")
+
     private String endpoint;
+
+    public ERSServiceImpl( @Value("${ers.session-handover-endpoint}") String endpoint){
+        this.endpoint = endpoint;
+    }
     @Override
     public AuthenticatedSessionResponse handover(AuthenticatedSession authenticatedSession) throws IOException {
         RestTemplate restTemplate = new RestTemplate();
