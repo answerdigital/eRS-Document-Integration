@@ -62,5 +62,30 @@ jobs:
         shell: bash
       - uses: actions/upload-artifact@v3
         with:
-          name: Release Package
-          path: target
+          name: ers-document-integration
+          path: target/*.zip
+          path: target/*.jar
+          path: target/*.txt
+          path: target/LICENSE
+  release:
+    if: startsWith(github.event.ref, 'refs/tags/v')
+    needs: [package-release]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: ers-document-integration
+      - name: Display structure of downloaded files
+        run: ls -R
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            Release.txt
+            LICENSE
+            *.zip
+            *.jar
+            *.txt
+          body_path: Release.txt
+          draft: true
+

@@ -1,8 +1,8 @@
-#!/bin/sh
+#!/bin/bash
 
 set -x
 
-RELEASE_TAG=v0.0.2
+RELEASE_TAG=${1:-vSNAPSHOT}
 
 rm -rf target
 
@@ -35,3 +35,6 @@ cd -
 cd SQL
 zip -r ../target/SQL-$RELEASE_TAG.zip *
 cd -
+
+cp Release.txt target
+cp LICENSE target
