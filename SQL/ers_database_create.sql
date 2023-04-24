@@ -133,7 +133,7 @@ CREATE INDEX Indx_Event_Dttm ON auditlog (Event_Dttm);
 CREATE TABLE patients(
 pat_rowID           integer IDENTITY(1,1) PRIMARY KEY,
 pat_ubrn            Varchar(35),
-pat_mrn             Varchar(10),
+pat_mrn             Varchar(15),
 pat_nhs             Varchar(15),
 pat_familyName      Varchar(30),
 pat_givenName       Varchar(30),
