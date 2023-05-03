@@ -34,7 +34,7 @@ Method OnRequest(pInput As RFT.ERS.Classes.RequestAttachment, Output pResponse A
 		$$$TRACE("filePath / fileType: "_filePath_"/"_fileType)
 		
         // create/check PDFs directory "MM-YYYY"
-		Set TargetDir = ..PDFsFolder_"\"_$E($ZDT($H,8),5,6)_"-"_$E($ZDT($H,8),1,4)
+		Set TargetDir = ..PDFsFolder_"\"_$E($ZDT($H,8),1,4)_"-"_$E($ZDT($H,8),5,6)
 		Set TargetDirExists=##class(%File).DirectoryExists(TargetDir)
 		If ('TargetDirExists) {set tsc=##class(%File).CreateDirectory(TargetDir)}
 
