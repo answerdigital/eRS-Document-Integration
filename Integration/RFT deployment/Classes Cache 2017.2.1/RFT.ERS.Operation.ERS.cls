@@ -297,7 +297,7 @@ Method RetrieveAttachment(pInput As RFT.ERS.Classes.RequestAttachment, Output pR
         Set tsc = ..LookUpPatient(sqlArgument, .PatientDetails)
 
         // create/check download directory "MM-YYYY"
-        Set OutputDir = ##class(Ens.Director).GetItemSettingValue("DocumentDownloadProcess","Host","OutputDir",.status)_"\"_$E($ZDT($H,8),5,6)_"-"_$E($ZDT($H,8),1,4)
+        Set OutputDir = ##class(Ens.Director).GetItemSettingValue("DocumentDownloadProcess","Host","OutputDir",.status)_"\"_$E($ZDT($H,8),1,4)_"-"_$E($ZDT($H,8),5,6)
 		Set OutputDirExists=##class(%File).DirectoryExists(OutputDir)
 		If ('OutputDirExists) {set tsc=##class(%File).CreateDirectory(OutputDir)}
 
@@ -399,7 +399,7 @@ Method RetrieveClincalInformation(pInput As RFT.ERS.Classes.RequestClinicalInfor
         $$$LOGINFO("returned to RetrieveClincalInformation")
 
         // create/check download directory "MM-YYYY"
-        Set OutputDir = ##class(Ens.Director).GetItemSettingValue("DocumentDownloadProcess","Host","OutputDir",.status)_"\"_$E($ZDT($H,8),5,6)_"-"_$E($ZDT($H,8),1,4)
+        Set OutputDir = ##class(Ens.Director).GetItemSettingValue("DocumentDownloadProcess","Host","OutputDir",.status)_"\"_$E($ZDT($H,8),1,4)_"-"_$E($ZDT($H,8),5,6)
 		Set OutputDirExists=##class(%File).DirectoryExists(OutputDir)
 		If ('OutputDirExists) {set tsc=##class(%File).CreateDirectory(OutputDir)}
 
@@ -407,7 +407,7 @@ Method RetrieveClincalInformation(pInput As RFT.ERS.Classes.RequestClinicalInfor
         set fileName=fileName_"_"_$zstrip($zdatetime($horolog,3), "*P")_".pdf"
         set response.FilePath=fileName
 		// Copy into PDFs Folder
-        Set TargetDir = ##class(Ens.Director).GetItemSettingValue("DocumentDownloadProcess","Host","PDFsFolder",.status)_"\"_$E($ZDT($H,8),5,6)_"-"_$E($ZDT($H,8),1,4)
+        Set TargetDir = ##class(Ens.Director).GetItemSettingValue("DocumentDownloadProcess","Host","PDFsFolder",.status)_"\"_$E($ZDT($H,8),1,4)_"-"_$E($ZDT($H,8),5,6)
         Set TargetDirExists=##class(%File).DirectoryExists(TargetDir)
         If ('TargetDirExists) {set tsc=##class(%File).CreateDirectory(TargetDir)}
 
