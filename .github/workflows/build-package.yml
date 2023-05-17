@@ -63,10 +63,11 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: ers-document-integration
-          path: target/*.zip
-          path: target/*.jar
-          path: target/*.txt
-          path: target/LICENSE
+          path: |
+            target/*.zip
+            target/*.jar
+            target/*.txt
+            target/LICENSE
   release:
     if: startsWith(github.event.ref, 'refs/tags/v')
     needs: [package-release]
