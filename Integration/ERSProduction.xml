@@ -1,107 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="IRIS" version="26" zv="IRIS for Windows (x86-64) 2022.3 (Build 606U)" ts="2023-04-11 17:57:45">
-<Project name="EnsExportProduction_2023-04-11 17-53-26_140+1" LastModified="2023-04-11 17:57:45.7338345">
-  <ProjectDescription>Studio Project generated from Production 'Productions.ERSProduction' at 2023-04-11 16:53:26.140 UTC</ProjectDescription>
-  <Items>
-    <ProjectItem name="Productions.ERSProduction" type="CLS"></ProjectItem>
-    <ProjectItem name="RFT.ERS.Classes.Attachment" type="CLS"></ProjectItem>
-    <ProjectItem name="RFT.ERS.Classes.AttachmentResponse" type="CLS"></ProjectItem>
-    <ProjectItem name="RFT.ERS.Classes.HttpResponse" type="CLS"></ProjectItem>
-    <ProjectItem name="RFT.ERS.Classes.RefToDB" type="CLS"></ProjectItem>
-    <ProjectItem name="RFT.ERS.Classes.ReferralDetails" type="CLS"></ProjectItem>
-    <ProjectItem name="RFT.ERS.Classes.ReferralDetailsResponse" type="CLS"></ProjectItem>
-    <ProjectItem name="RFT.ERS.Classes.RequestAttachment" type="CLS"></ProjectItem>
-    <ProjectItem name="RFT.ERS.Classes.RequestClinicalInformation" type="CLS"></ProjectItem>
-    <ProjectItem name="RFT.ERS.Classes.RequestReferralDetails" type="CLS"></ProjectItem>
-    <ProjectItem name="RFT.ERS.Classes.RequestWorklist" type="CLS"></ProjectItem>
-    <ProjectItem name="RFT.ERS.Classes.WorklistItem" type="CLS"></ProjectItem>
-    <ProjectItem name="RFT.ERS.Classes.WorklistResponse" type="CLS"></ProjectItem>
-    <ProjectItem name="RFT.ERS.Operation.ERS" type="CLS"></ProjectItem>
-    <ProjectItem name="RFT.ERS.Operation.ExecuteQuery" type="CLS"></ProjectItem>
-    <ProjectItem name="RFT.ERS.Process.ClinicalInformationProcessor" type="CLS"></ProjectItem>
-    <ProjectItem name="RFT.ERS.Process.DocumentProcessor" type="CLS"></ProjectItem>
-    <ProjectItem name="RFT.ERS.Process.HL7Process" type="CLS"></ProjectItem>
-    <ProjectItem name="RFT.ERS.Process.RefToDB" type="CLS"></ProjectItem>
-    <ProjectItem name="RFT.ERS.Process.ReferralProcessor" type="CLS"></ProjectItem>
-    <ProjectItem name="RFT.ERS.Process.WorklistProcessor" type="CLS"></ProjectItem>
-    <ProjectItem name="RFT.ERS.Service.InvokeDocumentDownloader" type="CLS"></ProjectItem>
-    <ProjectItem name="RFT.ERS.Service.InvokeRefToDB" type="CLS"></ProjectItem>
-    <ProjectItem name="RFT.ERS.Service.InvokeReferralProcessor" type="CLS"></ProjectItem>
-    <ProjectItem name="RFT.ERS.Service.InvokeWorklistProcessor" type="CLS"></ProjectItem>
-    <ProjectItem name="RFT.ERS.Tables.Attachments" type="CLS"></ProjectItem>
-    <ProjectItem name="RFT.ERS.Tables.Referrals" type="CLS"></ProjectItem>
-    <ProjectItem name="RFT.ERS.Tables.Worklist" type="CLS"></ProjectItem>
-    <ProjectItem name="RFT.Utility.CodeableConcept" type="CLS"></ProjectItem>
-    <ProjectItem name="ERS.ContentTypeToExtension.LUT" type="LUT"></ProjectItem>
-    <ProjectItem name="EnsExportNotes.EnsExportProduction_2023-04-11 17-53-26_140+1.PTD" type="PTD"></ProjectItem>
-  </Items>
-</Project>
-
-
-<Class name="Productions.ERSProduction">
-<Super>Ens.Production</Super>
-<TimeChanged>66575,64335.3541884</TimeChanged>
-<TimeCreated>66390,40685.3592447</TimeCreated>
-
-<XData name="ProductionDefinition">
-<Data><![CDATA[
-<Production Name="Productions.ERSProduction" TestingEnabled="true" LogGeneralTraceEvents="true">
-  <Description></Description>
-  <ActorPoolSize>2</ActorPoolSize>
-  <Item Name="HttpOut_ERS" Category="ERS" ClassName="RFT.ERS.Operation.ERS" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
-    <Setting Target="Adapter" Name="SSLConfig">TEST</Setting>
-    <Setting Target="Adapter" Name="URL">https://int.api.service.nhs.uk</Setting>
-  </Item>
-  <Item Name="WorklistProcessor" Category="ERS" ClassName="RFT.ERS.Process.WorklistProcessor" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
-  </Item>
-  <Item Name="Sch_InvokeReferralProcessor" Category="ERS" ClassName="RFT.ERS.Service.InvokeReferralProcessor" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
-    <Setting Target="Adapter" Name="CallInterval">1800</Setting>
-  </Item>
-  <Item Name="ReferralProcessor" Category="ERS" ClassName="RFT.ERS.Process.ReferralProcessor" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
-  </Item>
-  <Item Name="DocumentDownloadProcess" Category="ERS" ClassName="RFT.ERS.Process.DocumentProcessor" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
-    <Setting Target="Host" Name="OutputDir">C:\Users\Imtech\Desktop\eRS\Ouput</Setting>
-    <Setting Target="Host" Name="AllowedFiles">docx,doc,txt,rtf,tif,jpeg,png,tiff</Setting>
-  </Item>
-  <Item Name="Invoke_RefToDB" Category="ERS" ClassName="RFT.ERS.Service.InvokeRefToDB" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
-    <Setting Target="Adapter" Name="CallInterval">1800</Setting>
-  </Item>
-  <Item Name="ReferralToDB" Category="ERS" ClassName="RFT.ERS.Process.RefToDB" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
-  </Item>
-  <Item Name="HL7In" Category="HL7" ClassName="EnsLib.HL7.Service.HTTPService" PoolSize="1" Enabled="false" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
-    <Setting Target="Host" Name="TargetConfigNames">HL7Processor</Setting>
-    <Setting Target="Host" Name="MessageSchemaCategory">2.4</Setting>
-  </Item>
-  <Item Name="HL7Processor" Category="HL7" ClassName="RFT.ERS.Process.HL7Process" PoolSize="1" Enabled="false" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
-  </Item>
-  <Item Name="Ens.Alert" Category="ERS" ClassName="EnsLib.EMail.AlertOperation" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
-    <Setting Target="Adapter" Name="Recipient">kyle.donnelly@answerdigital.com</Setting>
-    <Setting Target="Adapter" Name="From">tie@nhs.uk</Setting>
-    <Setting Target="Adapter" Name="SMTPServer">test</Setting>
-  </Item>
-  <Item Name="Invoke_DocumentDownloader" Category="ERS" ClassName="RFT.ERS.Service.InvokeDocumentDownloader" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
-    <Setting Target="Adapter" Name="CallInterval">1800</Setting>
-  </Item>
-  <Item Name="Sch_InvokeWorklistProcessor" Category="ERS" ClassName="RFT.ERS.Service.InvokeWorklistProcessor" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
-    <Setting Target="Adapter" Name="CallInterval">5</Setting>
-    <Setting Target="Host" Name="Port">7777</Setting>
-    <Setting Target="Adapter" Name="Port">9880</Setting>
-  </Item>
-  <Item Name="ClinicalInformationDownloadProcessor" Category="ERS" ClassName="RFT.ERS.Process.ClinicalInformationProcessor" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
-  </Item>
-  <Item Name="ERS_DB_UPDATE" Category="ERS" ClassName="RFT.ERS.Operation.ExecuteQuery" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
-    <Setting Target="Adapter" Name="Credentials">ERSPROD</Setting>
-    <Setting Target="Adapter" Name="DSN">ERSPROD</Setting>
-  </Item>
-</Production>
-]]></Data>
-</XData>
-</Class>
-
-
+<Export generator="IRIS" version="26">
 <Class name="RFT.ERS.Classes.Attachment">
 <Super>Ens.Response</Super>
-<TimeChanged>66557,36787.5683272</TimeChanged>
 <TimeCreated>66459,55434.7401439</TimeCreated>
 
 <Property name="attachmentID">
@@ -174,7 +74,6 @@
 
 <Class name="RFT.ERS.Classes.AttachmentResponse">
 <Super>Ens.Response</Super>
-<TimeChanged>66557,37058.7701063</TimeChanged>
 <TimeCreated>66457,59109.6946383</TimeCreated>
 
 <Property name="StatusCode">
@@ -212,7 +111,6 @@
 
 <Class name="RFT.ERS.Classes.HttpResponse">
 <Super>Ens.Response</Super>
-<TimeChanged>66563,34213.4587039</TimeChanged>
 <TimeCreated>66562,64273.6424113</TimeCreated>
 
 <Property name="StatusCode">
@@ -228,7 +126,6 @@
 <Type>%Storage.Persistent</Type>
 <DefaultData>HttpResponseDefaultData</DefaultData>
 <Data name="HttpResponseDefaultData">
-<Structure>listnode</Structure>
 <Subscript>"HttpResponse"</Subscript>
 <Value name="1">
 <Value>StatusCode</Value>
@@ -243,7 +140,6 @@
 
 <Class name="RFT.ERS.Classes.RefToDB">
 <Super>Ens.Request</Super>
-<TimeChanged>66401,46623.7951318</TimeChanged>
 <TimeCreated>66401,46623.5076291</TimeCreated>
 
 <Property name="ubrn">
@@ -262,7 +158,6 @@
 <Type>%Storage.Persistent</Type>
 <DefaultData>RefToDBDefaultData</DefaultData>
 <Data name="RefToDBDefaultData">
-<Structure>listnode</Structure>
 <Subscript>"RefToDB"</Subscript>
 <Value name="1">
 <Value>ubrn</Value>
@@ -280,7 +175,6 @@
 
 <Class name="RFT.ERS.Classes.ReferralDetails">
 <Super>Ens.Response</Super>
-<TimeChanged>66459,55391.9154409</TimeChanged>
 <TimeCreated>66459,55391.7281766</TimeCreated>
 
 <Property name="ubrn">
@@ -323,7 +217,6 @@
 <Type>%Storage.Persistent</Type>
 <DefaultData>ReferralDetailsDefaultData</DefaultData>
 <Data name="ReferralDetailsDefaultData">
-<Structure>listnode</Structure>
 <Subscript>"ReferralDetails"</Subscript>
 <Value name="1">
 <Value>ubrn</Value>
@@ -359,7 +252,6 @@
 
 <Class name="RFT.ERS.Classes.ReferralDetailsResponse">
 <Super>Ens.Response</Super>
-<TimeChanged>66463,54949.3075396</TimeChanged>
 <TimeCreated>66459,55479.9214156</TimeCreated>
 
 <Property name="Referral">
@@ -403,7 +295,6 @@
 
 <Class name="RFT.ERS.Classes.RequestAttachment">
 <Super>Ens.Request</Super>
-<TimeChanged>66400,58609.2591084</TimeChanged>
 <TimeCreated>66400,47050.3016343</TimeCreated>
 
 <Property name="attachmentID">
@@ -432,7 +323,6 @@
 
 <Class name="RFT.ERS.Classes.RequestClinicalInformation">
 <Super>Ens.Request</Super>
-<TimeChanged>66562,48534.897267</TimeChanged>
 <TimeCreated>66561,37551.4064774</TimeCreated>
 
 <Property name="ubrn">
@@ -454,7 +344,6 @@
 
 <Class name="RFT.ERS.Classes.RequestReferralDetails">
 <Super>Ens.Request</Super>
-<TimeChanged>66392,62800.1467794</TimeChanged>
 <TimeCreated>66392,61212.0495265</TimeCreated>
 
 <Property name="ubrn">
@@ -476,7 +365,6 @@
 
 <Class name="RFT.ERS.Classes.RequestWorklist">
 <Super>Ens.Request</Super>
-<TimeChanged>66390,41870.8004464</TimeChanged>
 <TimeCreated>66390,41870.665875</TimeCreated>
 
 <Property name="sessionID">
@@ -487,7 +375,6 @@
 <Type>%Storage.Persistent</Type>
 <DefaultData>RequestWorklistDefaultData</DefaultData>
 <Data name="RequestWorklistDefaultData">
-<Structure>listnode</Structure>
 <Subscript>"RequestWorklist"</Subscript>
 <Value name="1">
 <Value>sessionID</Value>
@@ -499,7 +386,6 @@
 
 <Class name="RFT.ERS.Classes.WorklistItem">
 <Super>Ens.Response</Super>
-<TimeChanged>66459,54024.0515321</TimeChanged>
 <TimeCreated>66459,54023.8708575</TimeCreated>
 
 <Property name="specialty">
@@ -554,7 +440,6 @@
 <Type>%Storage.Persistent</Type>
 <DefaultData>WorklistItemDefaultData</DefaultData>
 <Data name="WorklistItemDefaultData">
-<Structure>listnode</Structure>
 <Subscript>"WorklistItem"</Subscript>
 <Value name="1">
 <Value>specialty</Value>
@@ -599,7 +484,6 @@
 
 <Class name="RFT.ERS.Classes.WorklistResponse">
 <Super>Ens.Response</Super>
-<TimeChanged>66459,54028.8397107</TimeChanged>
 <TimeCreated>66459,54028.7000646</TimeCreated>
 
 <Property name="Item">
@@ -611,7 +495,6 @@
 <Type>%Storage.Persistent</Type>
 <DefaultData>WorklistResponseDefaultData</DefaultData>
 <Data name="WorklistResponseDefaultData">
-<Structure>listnode</Structure>
 <Subscript>"WorklistResponse"</Subscript>
 <Value name="1">
 <Value>Item</Value>
@@ -623,7 +506,6 @@
 
 <Class name="RFT.ERS.Operation.ERS">
 <Super>Ens.BusinessOperation</Super>
-<TimeChanged>66575,64296.3905775</TimeChanged>
 <TimeCreated>66390,42548.6576226</TimeCreated>
 
 <Parameter name="ADAPTER">
@@ -686,7 +568,7 @@
     set tsc = httpReq.SetHeader("NHSD-eRS-Business-Function","SERVICE_PROVIDER_CLINICIAN")
     set tsc = httpReq.SetHeader("Content-Type","application/fhir+json")
 
-    set tURL=..Adapter.URL_"/referrals/FHIR/STU3/ReferralRequest/$ers.fetchworklist"
+    set tURL=..Adapter.HTTPServer_"/referrals/FHIR/STU3/ReferralRequest/$ers.fetchworklist"
     SET tsc=..Adapter.SendFormDataURL(tURL, .tHttpResponse, "POST", httpReq)
 
    
@@ -706,74 +588,55 @@
         
     }   
     
-   
-    //Grab values from fhir response 
-    
+    //Extract values from fhir response 
     set data=tHttpResponse.Data
        
     IF $ISOBJECT(data)
     {
-        
-      set obj=[].%FromJSON(data)
-      set resp=##class(RFT.ERS.Classes.WorklistResponse).%New()
-      set entry=obj.entry
-    
-    
+        set obj=[].%FromJSON(data)
+        set resp=##class(RFT.ERS.Classes.WorklistResponse).%New()
+        set entry=obj.entry
+    }
     
     IF $ISOBJECT(entry)
-  
     {
-	     
-	      
-	     set entryIterator=entry.%GetIterator()
+	    set entryIterator=entry.%GetIterator()
         while entryIterator.%GetNext(.key,.entryItem)
-        
         {
-	   	 set ref=##class(RFT.ERS.Classes.WorklistItem).%New()
-	      set ubrn=entryItem.item.reference
-	      set ref.ubrn=$PIECE(ubrn,"/",2)
-	      set outerExtensionArray=entryItem.extension
-	  
-	      set extensionObject=outerExtensionArray.extension
-	      
-	        
-	       set innerExtensionArray=extensionObject.extension
-	       set innerExtensionIterator=innerExtensionArray.%GetIterator()
-	       while innerExtensionIterator.%GetNext(.key,.extensionItem)
-	       {
-		      
-		       if extensionItem.url="priority" 
-			    	 
-			  {
-				  set code=##class(RFT.Utility.CodeableConcept).RetriveCode(extensionItem)
-				  set ref.priority=code
-			  }
-			  if extensionItem.url="specialty"
-			  
-			  {		
-				  set code=##class(RFT.Utility.CodeableConcept).RetriveCode(extensionItem)
-				  set ref.specialty=code
-				  
-				  
-			  }  
-			 
-			  
-			  if extensionItem.url="clinicalInfoPrinted" set ref.clinicalInfoPrinted=extensionItem.valueBoolean
-              if extensionItem.url="clinicalInfoLastUpdated" set ref.clinicalInfoLastUpdate=extensionItem.valueDateTime
-              if extensionItem.url="patient" set ref.patientID=extensionItem.valueReference.identifier.value
-			 
-			  
-	       } 
-	   
+            $$$TRACE("ubrn:"_entryItem.item.reference)
+	   	    set ref=##class(RFT.ERS.Classes.WorklistItem).%New()
+	        set ubrn=entryItem.item.reference
+	        set ref.ubrn=$PIECE(ubrn,"/",2)
+	        set outerExtensionArray=entryItem.extension
+    
+	        set extensionObject=outerExtensionArray.extension
+    
+    
+	        set innerExtensionArray=extensionObject.extension
+	        set innerExtensionIterator=innerExtensionArray.%GetIterator()
+	        while innerExtensionIterator.%GetNext(.key,.extensionItem)
+	        {
+		        if extensionItem.url="priority" 
+		    	{
+		    		set code=##class(RFT.Utility.CodeableConcept).RetriveCode(extensionItem)
+		    		set ref.priority=code
+		    	}
+		    	if extensionItem.url="specialty"
+		    	{		
+		    		set code=##class(RFT.Utility.CodeableConcept).RetriveCode(extensionItem)
+		    		set ref.specialty=code
+		    	}  
+    
+		    	if extensionItem.url="clinicalInfoPrinted" set ref.clinicalInfoPrinted=extensionItem.valueBoolean
+                if extensionItem.url="clinicalInfoLastUpdated" set ref.clinicalInfoLastUpdate=extensionItem.valueDateTime
+                if extensionItem.url="patient" set ref.patientID=extensionItem.valueReference.identifier.value    
+	        } 
+    
             do resp.Item.Insert(ref)
         }   
         
     }   
-
-    
     set pResponse=resp
-}
-    
 END 
     quit tsc
 ]]></Implementation>
@@ -790,7 +653,7 @@ END
     set tsc = httpReq.SetHeader("Accept","application/fhir+json")
     set tsc = httpReq.SetHeader("NHSD-End-User-Organisation-ODS",..ODSCode)
     
-    set tURL=..Adapter.URL_"/referrals/FHIR/STU3/ReferralRequest/"_pInput.ubrn    
+    set tURL=..Adapter.HTTPServer_"/referrals/FHIR/STU3/ReferralRequest/"_pInput.ubrn    
     
     SET tsc=..Adapter.SendFormDataURL(tURL, .httpResp, "GET", httpReq)
     #DIM httpResp as %Net.HttpResponse
@@ -864,8 +727,7 @@ END
                     set attachment.size=contentItem.attachment.size
                     set attachment.title=contentItem.attachment.title
                     set attachment.createdDateTime=contentItem.attachment.creation
-                    
-                    
+
                     do resp.Attachment.Insert(attachment)
                         
                 }
@@ -914,7 +776,7 @@ END
     do httpReq.SetHeader("NHSD-End-User-Organisation-ODS",..ODSCode)
     set httpReq.Authorization = "Bearer "_^LastToken("auth_token")
     
-    set tURL=..Adapter.URL_"/referrals/FHIR/STU3/Binary/"_pInput.url    
+    set tURL=..Adapter.HTTPServer_"/referrals/FHIR/STU3/Binary/"_pInput.url    
     SET sc=..Adapter.SendFormDataURL(tURL, .httpResp, "GET", httpReq)
     #DIM httpResp as %Net.HttpResponse
     
@@ -952,19 +814,21 @@ END
             quit
         }
 
-        
         // File Extension
         set fileType=httpResp.GetHeader("Content-Type")
         set fileExt=##class(Ens.Util.FunctionSet).Lookup("ERS.ContentTypeToExtension",fileType)
-        
 
         // Naming file
         Set PatientDetails = ##class(%DynamicObject).%New()
         Set tsc = ..LookUpPatient(sqlArgument, .PatientDetails)
-        set fileName=##class(Ens.Director).GetItemSettingValue("DocumentDownloadProcess","Host","OutputDir",.status)_"\"
-        set fileName=fileName_PatientDetails.MPI_"_"_PatientDetails.NHSnumber_"_"_PatientDetails.FamilyName _"_"_PatientDetails.GivenName_"_"_TrimmedTitle_"."_fileExt
-        
+
+        // create/check download directory "MM-YYYY"
+        Set OutputDir = ##class(Ens.Director).GetItemSettingValue("DocumentDownloadProcess","Host","OutputDir",.status)_"\"_$E($ZDT($H,8),5,6)_"-"_$E($ZDT($H,8),1,4)
+		Set OutputDirExists=##class(%File).DirectoryExists(OutputDir)
+		If ('OutputDirExists) {set tsc=##class(%File).CreateDirectory(OutputDir)}
+
         // Save file
+        set fileName=OutputDir_"\"_PatientDetails.MPI_"_"_PatientDetails.NHSnumber_"_"_PatientDetails.FamilyName _"_"_PatientDetails.GivenName_"_"_TrimmedTitle_"."_fileExt
         set stream=##class(%Stream.FileBinary).%New()
         set t=stream.LinkToFile(fileName)
         set t=stream.CopyFromAndSave(httpResp.Data)
@@ -981,8 +845,6 @@ END
             set response.FileType=fileExt
         }
 
-        //update patients DB
-
     }
     elseif httpResp.StatusCode = 401
     {
@@ -995,8 +857,8 @@ END
         quit t
     }
     
+    $$$TRACE(response.StatusCode)
     set pResponse=response
-    
     
     quit t
 ]]></Implementation>
@@ -1016,10 +878,10 @@ END
     set tsc = httpReq.SetHeader("Content-Type","application/fhir+json")
 
     set ubrn = pInput.ubrn
-    set tURL=..Adapter.URL_"/referrals/FHIR/STU3/ReferralRequest/"_ubrn_"/$ers.generateCRI"
+    set tURL=..Adapter.HTTPServer_"/referrals/FHIR/STU3/ReferralRequest/"_ubrn_"/$ers.generateCRI"
     
     set StatusCode = 999
-    Set Count = ##class(Ens.Director).GetItemSettingValue("DocumentDownloadProcess","Host","AttachmentRetryCount",.status)
+    Set Count = ##class(Ens.Director).GetItemSettingValue("DocumentDownloadProcess","Host","AttachmentRetryCount",.tsc)
     
     Try {
         while $FIND("200,404,422", StatusCode)=0 && (Count > 0)
@@ -1032,6 +894,7 @@ END
             Set StatusCode = tHttpResponse.StatusCode
             Set Count = Count - 1
         }
+        Set retryCount = ##class(Ens.Director).GetItemSettingValue("DocumentDownloadProcess","Host","AttachmentRetryCount",.tsc) - Count
     }
     Catch ex {
         set alert=##class(Ens.AlertRequest).%New()
@@ -1039,12 +902,11 @@ END
         set alertText=alertText_" There has been an error in etrieving clinical information (A007). ubrn: "_ubrn
         set alert.AlertText=alertText
         set alert.AlertDestination="Ens.Alert"
-        set t=..SendAlert(alert)
+        set tsc=..SendAlert(alert)
         $$$ThrowStatus(tsc)
-        Set tSC=ex.AsStatus()
+        Set tsc=ex.AsStatus()
     }
 
-     
     if StatusCode = 200
     {
         set response=##class(RFT.ERS.Classes.AttachmentResponse).%New()
@@ -1064,30 +926,41 @@ END
         Set tsc = ..LookUpPatient(sqlArgument, .PatientDetails)
         $$$LOGINFO("returned to RetrieveClincalInformation")
 
-	    set fileName=##class(Ens.Director).GetItemSettingValue("DocumentDownloadProcess","Host","OutputDir",.status)_"\"
-        set fileName=fileName_PatientDetails.MPI_"_"_PatientDetails.NHSnumber_"_"_PatientDetails.FamilyName _"_"_PatientDetails.GivenName_"_ClinicalSummary"
+        // create/check download directory "MM-YYYY"
+        Set OutputDir = ##class(Ens.Director).GetItemSettingValue("DocumentDownloadProcess","Host","OutputDir",.status)_"\"_$E($ZDT($H,8),5,6)_"-"_$E($ZDT($H,8),1,4)
+		Set OutputDirExists=##class(%File).DirectoryExists(OutputDir)
+		If ('OutputDirExists) {set tsc=##class(%File).CreateDirectory(OutputDir)}
+
+	    set fileName=OutputDir_"\"_PatientDetails.MPI_"_"_PatientDetails.NHSnumber_"_"_PatientDetails.FamilyName _"_"_PatientDetails.GivenName_"_ClinicalSummary"
         set fileName=fileName_"_"_$zstrip($zdatetime($horolog,3), "*P")_".pdf"
         set response.FilePath=fileName
+		// Copy into PDFs Folder
+        Set TargetDir = ##class(Ens.Director).GetItemSettingValue("DocumentDownloadProcess","Host","PDFsFolder",.status)_"\"_$E($ZDT($H,8),5,6)_"-"_$E($ZDT($H,8),1,4)
+        Set TargetDirExists=##class(%File).DirectoryExists(TargetDir)
+        If ('TargetDirExists) {set tsc=##class(%File).CreateDirectory(TargetDir)}
+
+
+        set tsc=stream.LinkToFile(fileName)
+        set tsc=stream.CopyFromAndSave(data)
         set response.FileType="pdf"
 
+	    set tsc=stream.LinkToFile(fileName)
+	    set tsc=stream.CopyFromAndSave(data)
 
-
-	    set t=stream.LinkToFile(fileName)
-	    set t=stream.CopyFromAndSave(data)
+        set cmd= "xcopy "_fileName_" "_TargetDir
+        SET runCmd=$ZF(-1,cmd)
 
         // update DB with clincal summary path
-        ;set InsertQry = "INSERT INTO RFT_ERS_Tables.Attachments (ID, attachmentID, contentType, createdDateTime, docStatus, filePath, insertedBy, isDownloaded, "
         set InsertQry = "INSERT INTO RFT_ERS_Tables.Attachments (createdDateTime, filePath, isDownloaded, "
         set InsertQry = InsertQry_"retryCount, size, title, ubrn)" ;, url)"
         set InsertQry = InsertQry_" VALUES ("
         set InsertQry = InsertQry_$ZDATE($PIECE($H,",",1))_", "
         set InsertQry = InsertQry_"'"_fileName_"', "
         set InsertQry = InsertQry_"1"_", "
-        set InsertQry = InsertQry_Count_", "
+        set InsertQry = InsertQry_retryCount_", "
         set InsertQry = InsertQry_"'"_stream.SizeGet()_"', "
         set InsertQry = InsertQry_"'"_respTitle_"', "
         set InsertQry = InsertQry_"'"_ubrn_"')"
-        ;set InsertQry = InsertQry_ubrn_"/$ers.generateCRI"
 
         $$$TRACE(InsertQry)
 
@@ -1096,8 +969,6 @@ END
         if $$$ISERR(tsc) {write "%Prepare failed:" do $SYSTEM.Status.DisplayError(tsc) quit} 
         set rset = ST.%Execute()
         if $$$ISERR(tsc) {write "%Prepare failed:" do $SYSTEM.Status.DisplayError(tsc) quit}
-
-
     }
 
     if response
@@ -1371,7 +1242,6 @@ END
 
 <Class name="RFT.ERS.Operation.ExecuteQuery">
 <Super>Ens.BusinessOperation</Super>
-<TimeChanged>66423,53824.2126999</TimeChanged>
 <TimeCreated>66423,53824.2126999</TimeCreated>
 
 <Parameter name="ADAPTER">
@@ -1421,7 +1291,6 @@ END
 <Class name="RFT.ERS.Process.ClinicalInformationProcessor">
 <ClassType>persistent</ClassType>
 <Super>Ens.BusinessProcess</Super>
-<TimeChanged>66574,45067.8402821</TimeChanged>
 <TimeCreated>66562,44716.4545335</TimeCreated>
 
 <Method name="OnRequest">
@@ -1464,7 +1333,6 @@ END
 <Class name="RFT.ERS.Process.DocumentProcessor">
 <ClassType>persistent</ClassType>
 <Super>Ens.BusinessProcess</Super>
-<TimeChanged>66575,61204.2590237</TimeChanged>
 <TimeCreated>66400,47160.7938364</TimeCreated>
 
 <Property name="LibreOffice">
@@ -1483,13 +1351,19 @@ END
 <Parameter name="MAXLEN" value="200"/>
 </Property>
 
+<Property name="PDFsFolder">
+<Type>%String</Type>
+<InitialExpression>"C:\"</InitialExpression>
+<Parameter name="MAXLEN" value="200"/>
+</Property>
+
 <Property name="AttachmentRetryCount">
 <Type>%Integer</Type>
 <InitialExpression>"5"</InitialExpression>
 </Property>
 
 <Parameter name="SETTINGS">
-<Default>LibreOffice,OutputDir,AttachmentRetryCount,AllowedFiles</Default>
+<Default>LibreOffice,OutputDir,PDFsFolder,AttachmentRetryCount,AllowedFiles</Default>
 </Parameter>
 
 <Method name="OnRequest">
@@ -1514,13 +1388,21 @@ END
 
 		$$$TRACE("filePath / fileType: "_filePath_"/"_fileType)
 		
-		//set filePath="C:\Users\KyleDonnelly\eRS\TempFolder\att-70002-80000.docx"
-		IF fileType'="pdf"
+        // create/check PDFs directory "MM-YYYY"
+		Set TargetDir = ..PDFsFolder_"\"_$E($ZDT($H,8),5,6)_"-"_$E($ZDT($H,8),1,4)
+		Set TargetDirExists=##class(%File).DirectoryExists(TargetDir)
+		If ('TargetDirExists) {set tsc=##class(%File).CreateDirectory(TargetDir)}
+
+		if fileType = "pdf"
 		{
-			set cmd=""""_..LibreOffice_""""_" --headless --writer --convert-to pdf "_filePath_" --outdir "_..OutputDir
+			set cmd= "copy "_filePath_" "_TargetDir
 			SET runCmd=$ZF(-1,cmd)
-			set cmdDel = "del "_filePath
-			SET runCmd=$ZF(-1,cmdDel)
+		}
+
+		elseif fileType'="pdf"
+		{
+			set cmd=""""_..LibreOffice_""""_" --headless --writer --convert-to pdf "_filePath_" --outdir "_TargetDir
+			SET runCmd=$ZF(-1,cmd)
 		}
 			
 		IF ##class(%File).Exists(filePath) ;_".pdf")
@@ -1562,21 +1444,18 @@ END
 <Data name="DocumentProcessorDefaultData">
 <Subscript>"DocumentProcessor"</Subscript>
 <Value name="1">
-<Value>TempFileConverterFolder</Value>
-</Value>
-<Value name="2">
-<Value>Wkhtmltopdf</Value>
-</Value>
-<Value name="3">
 <Value>LibreOffice</Value>
 </Value>
-<Value name="4">
+<Value name="2">
 <Value>AllowedFiles</Value>
 </Value>
-<Value name="5">
+<Value name="3">
 <Value>OutputDir</Value>
 </Value>
-<Value name="6">
+<Value name="4">
+<Value>PDFsFolder</Value>
+</Value>
+<Value name="5">
 <Value>AttachmentRetryCount</Value>
 </Value>
 </Data>
@@ -1587,7 +1466,6 @@ END
 <Class name="RFT.ERS.Process.HL7Process">
 <ClassType>persistent</ClassType>
 <Super>Ens.BusinessProcess</Super>
-<TimeChanged>66574,45358.4679201</TimeChanged>
 <TimeCreated>66416,40401.5233933</TimeCreated>
 
 <Method name="OnRequest">
@@ -1690,7 +1568,6 @@ END
 <Class name="RFT.ERS.Process.RefToDB">
 <ClassType>persistent</ClassType>
 <Super>Ens.BusinessProcess</Super>
-<TimeChanged>66575,60125.0748976</TimeChanged>
 <TimeCreated>66415,47877.1382215</TimeCreated>
 
 <UDLText name="T">
@@ -1743,7 +1620,7 @@ END
 			//We will use embedded sql and doc cursor to ensure we grab all records
 			&sql(DECLARE DocCursor CURSOR FOR SELECT attachmentID, contentType, createdDateTime, insertedBy, size, title, url,filePath
 			into :attachmentID,:contentType,:createdDateTime,:insertedBy,:size,:title,:url,:filePath FROM RFT_ERS_Tables.Attachments
-			WHERE isDownloaded=1 AND statusFlag=0)
+			WHERE isDownloaded=1 )
 
 			&sql(OPEN DocCursor)			
 
@@ -1784,8 +1661,9 @@ END
 		//Check if nhs number and DOB exist
     	Set Qry = "SELECT COUNT(*) FROM ers_database.dbo.patients WHERE pat_nhs = '"_PatientDetails.NHSnumber_"' and pat_dob = '"_PatientDetails.dob_"';"
     	//update if nhs number exists
-    	Set Qry = Qry_"UPDATE ers_database.dbo.patients "
-    	Set Qry = Qry_"SET pat_familyName = '"_PatientDetails.FamilyName_"', pat_givenName = '"_PatientDetails.GivenName_"', pat_sex = '"_PatientDetails.Gender
+    	$$$TRACE("MPI:"_PatientDetails.MPI)
+    	Set Qry = Qry_"UPDATE ers_database.dbo.patients SET pat_mrn = '"_PatientDetails.MPI
+    	Set Qry = Qry_"', pat_familyName = '"_PatientDetails.FamilyName_"', pat_givenName = '"_PatientDetails.GivenName_"', pat_sex = '"_PatientDetails.Gender
     	Set Qry = Qry_"', pat_addressOne = '"_PatientDetails.Address1_"', pat_addressTwo = '"_PatientDetails.Address2_"', pat_addressThree = '"_PatientDetails.Address3
     	Set Qry = Qry_"', pat_PostCode = '"_PatientDetails.postalCode
 		Set Qry = Qry_"', pat_contactNumber = '"_PatientDetails.phone
@@ -1793,7 +1671,7 @@ END
     	//Insert if nhs number is new
     	Set Qry = Qry_"INSERT INTO ers_database.dbo.patients (pat_mrn, pat_nhs, pat_familyName, pat_givenName, pat_sex, pat_dob, pat_addressOne, pat_addressTwo, pat_addressThree, "
     	Set Qry = Qry_"pat_PostCode, pat_contactNumber, rec_UpdatedBy) "
-    	Set Qry = Qry_"SELECT '"_PatientDetails.MRI_"', '"_PatientDetails.NHSnumber_"', '"_PatientDetails.FamilyName_"', '"_PatientDetails.GivenName_"', '"_PatientDetails.Gender
+    	Set Qry = Qry_"SELECT '"_PatientDetails.MPI_"', '"_PatientDetails.NHSnumber_"', '"_PatientDetails.FamilyName_"', '"_PatientDetails.GivenName_"', '"_PatientDetails.Gender
     	Set Qry = Qry_"', '"_PatientDetails.dob_"', '"_PatientDetails.Address1_"', '"_PatientDetails.Address2_"', '"_PatientDetails.Address3_"', '"_PatientDetails.postalCode
     	Set Qry = Qry_"', '"_PatientDetails.phone_"', 'TIE'"
     	Set Qry = Qry_" WHERE NOT EXISTS (SELECT * FROM ers_database.dbo.patients WHERE pat_nhs = '"_PatientDetails.NHSnumber_"' and pat_dob = '"_PatientDetails.dob_"');"
@@ -1854,7 +1732,6 @@ END
 <Class name="RFT.ERS.Process.ReferralProcessor">
 <ClassType>persistent</ClassType>
 <Super>Ens.BusinessProcess</Super>
-<TimeChanged>66574,45993.8953395</TimeChanged>
 <TimeCreated>66392,61033.5955004</TimeCreated>
 
 <Method name="OnRequest">
@@ -1997,11 +1874,10 @@ END
 <Class name="RFT.ERS.Process.WorklistProcessor">
 <ClassType>persistent</ClassType>
 <Super>Ens.BusinessProcess</Super>
-<TimeChanged>66575,59130.2365416</TimeChanged>
 <TimeCreated>66392,43790.9226508</TimeCreated>
 
 <Method name="OnRequest">
-<FormalSpec>pRequest:Ens.Request,*pResponse:Ens.Response</FormalSpec>
+<FormalSpec>pRequest:Ens.Request,*pResponse:Ens.StringContainer</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 
@@ -2021,78 +1897,80 @@ END
 	
 	//Loop through response
 	//add worklist to local list
-	for i=1:1:worklistResponse.Item.Count()
-	{
-		set item=worklistResponse.Item.GetAt(i)
-		set ubrn=item.ubrn
-		//First check if ubrn exists in local list
-		set workList=##class(RFT.ERS.Tables.Worklist).%OpenId(ubrn)
-				
-		IF $ISOBJECT(workList)
-		{	 //We need to check if there is an update been made on ERS thats not been updated locally
-			
-			$$$TRACE("UBRN "_ubrn_" exists on local list")
-			set localLastUpdated=workList.clinicalInfoLastUpdate
-			
-			
-			if $ISOBJECT(item.clinicalInfoLastUpdate) 
-			{
-				set ersLastUpdate=item.clincicalInfoLastUpdate
-			}else
-			{
-				set ersLastUpdate=item.clinicalInfoFirstSubmitted
+		for i=1:1:worklistResponse.Item.Count()
+		{
+			set item=worklistResponse.Item.GetAt(i)
+			set ubrn=item.ubrn
+			//First check if ubrn exists in local list
+			set workList=##class(RFT.ERS.Tables.Worklist).%OpenId(ubrn)
+
+			IF $ISOBJECT(workList)
+			{	 //We need to check if there is an update been made on ERS thats not been updated locally
+
+				$$$TRACE("UBRN "_ubrn_" exists on local list")
+				set localLastUpdated=workList.clinicalInfoLastUpdate
+
+
+				if $ISOBJECT(item.clinicalInfoLastUpdate) 
+				{
+					set ersLastUpdate=item.clincicalInfoLastUpdate
+				}else
+				{
+					set ersLastUpdate=item.clinicalInfoFirstSubmitted
+				}
+
+				set dateDiff=##class(%SYSTEM.SQL).DATEDIFF("ss",localLastUpdated,ersLastUpdate)		
+
+				if $G(dateDiff)>0
+				{
+					$$$TRACE("Update to local list required. UBRN: "_ubrn)
+					set workList.specialty=item.specialty
+					set workList.apptStart=item.apptStart
+					set workList.clinicalInfoLastUpdate=item.clinicalInfoLastUpdate
+					set workList.priority=item.priority
+					set workList.refType=item.refType
+					set workList.clinician=item.clinician
+					set workList.apptStart=item.apptStart
+					set workList.statusFlag=0 //We will poll A005 to grab ref details again
+					set workList.UpdatePatientDB=0
+
+					set t=workList.%Save()
+
+					//delete from attachments table as we will redownload
+					&sql(DELETE FROM RFT_ERS_Tables.Attachments where ubrn=:ubrn)
+
+				}
+				else 
+				{
+					$$$TRACE("No update required for ubrn: "_ubrn)
+				}	
 			}
-			
-			set dateDiff=##class(%SYSTEM.SQL.Functions).DATEDIFF("ss",localLastUpdated,ersLastUpdate)		
-			
-			if $G(dateDiff)>0
-			{
-				$$$TRACE("Update to local list required. UBRN: "_ubrn)
+			else 
+			{	
+				$$$TRACE("Adding new record on local list for: "_ubrn)
+				set workList=##class(RFT.ERS.Tables.Worklist).%New()
 				set workList.specialty=item.specialty
-				set workList.apptStart=item.apptStart
-				set workList.clinicalInfoLastUpdate=item.clinicalInfoLastUpdate
+				set workList.requestContextStatus=item.requestContextStatus
+				set workList.clinicalInfoPrinted=item.clinicalInfoPrinted
+				set workList.clinicalInfoFirstSubmitted=item.clinicalInfoFirstSubmitted
+				set workList.eRefPathwayStart=item.eRefPathwayStart
 				set workList.priority=item.priority
 				set workList.refType=item.refType
 				set workList.clinician=item.clinician
 				set workList.apptStart=item.apptStart
-				set workList.statusFlag=0 //We will poll A005 to grab ref details again
+				set workList.statusFlag=0 
+				set workList.ubrn=item.ubrn
+				set workList.patientID=item.patientID
 				set workList.UpdatePatientDB=0
 
 				set t=workList.%Save()
-				
-				//delete from attachments table as we will redownload
-				&sql(DELETE FROM RFT_ERS_Tables.Attachments where ubrn=:ubrn)
-				
-			}
-			else 
-			{
-				$$$TRACE("No update required for ubrn: "_ubrn)
-			}	
+
+			}		
+
+
 		}
-		else 
-		{	
-			$$$TRACE("Adding new record on local list for: "_ubrn)
-			set workList=##class(RFT.ERS.Tables.Worklist).%New()
-			set workList.specialty=item.specialty
-			set workList.requestContextStatus=item.requestContextStatus
-			set workList.clinicalInfoPrinted=item.clinicalInfoPrinted
-			set workList.clinicalInfoFirstSubmitted=item.clinicalInfoFirstSubmitted
-			set workList.eRefPathwayStart=item.eRefPathwayStart
-			set workList.priority=item.priority
-			set workList.refType=item.refType
-			set workList.clinician=item.clinician
-			set workList.apptStart=item.apptStart
-			set workList.statusFlag=0 
-			set workList.ubrn=item.ubrn
-			set workList.patientID=item.patientID
-			set workList.UpdatePatientDB=0
-			
-			set t=workList.%Save()
-			
-		}		
-		
-		
-	}	
+		Set pResponse = ##class(Ens.StringContainer).%New()
+		set pResponse.StringValue = "{"_$c(34)_"responseCode"_$c(34)_":200,"_$c(34)_"message"_$c(34)_":"_$c(34)_"OK"_$c(34)_"}"
 	}
 	
 	quit t
@@ -2105,9 +1983,60 @@ END
 </Class>
 
 
+<Class name="RFT.ERS.Production">
+<Super>Ens.Production</Super>
+<TimeCreated>66588,42504.7992486</TimeCreated>
+
+<XData name="ProductionDefinition">
+<Data><![CDATA[
+<Production Name="RFT.ERS.Production" LogGeneralTraceEvents="false">
+  <Description></Description>
+  <ActorPoolSize>2</ActorPoolSize>
+  <Item Name="Invoke_DocumentDownloader" Category="ERS" ClassName="RFT.ERS.Service.InvokeDocumentDownloader" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Adapter" Name="CallInterval">1800</Setting>
+  </Item>
+  <Item Name="Invoke_RefToDB" Category="ERS" ClassName="RFT.ERS.Service.InvokeRefToDB" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
+    <Setting Target="Adapter" Name="CallInterval">1800</Setting>
+  </Item>
+  <Item Name="Sch_InvokeReferralProcessor" Category="ERS" ClassName="RFT.ERS.Service.InvokeReferralProcessor" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Adapter" Name="CallInterval">1800</Setting>
+  </Item>
+  <Item Name="Sch_InvokeWorklistProcessor" Category="ERS" ClassName="RFT.ERS.Service.InvokeWorklistProcessor" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
+    <Setting Target="Adapter" Name="Port">9985</Setting>
+    <Setting Target="Adapter" Name="SSLConfig">ERS Smartcard Certificate</Setting>
+  </Item>
+  <Item Name="ClinicalInformationDownloadProcessor" Category="ERS" ClassName="RFT.ERS.Process.ClinicalInformationProcessor" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+  </Item>
+  <Item Name="DocumentDownloadProcess" Category="ERS" ClassName="RFT.ERS.Process.DocumentProcessor" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
+    <Setting Target="Host" Name="OutputDir">e:\libreoffice</Setting>
+    <Setting Target="Host" Name="PDFsFolder">e:\erspdf</Setting>
+  </Item>
+  <Item Name="ReferralProcessor" Category="ERS" ClassName="RFT.ERS.Process.ReferralProcessor" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+  </Item>
+  <Item Name="ReferralToDB" Category="ERS" ClassName="RFT.ERS.Process.RefToDB" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+  </Item>
+  <Item Name="WorklistProcessor" Category="ERS" ClassName="RFT.ERS.Process.WorklistProcessor" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
+  </Item>
+  <Item Name="HttpOut_ERS" Category="ERS" ClassName="RFT.ERS.Operation.ERS" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
+    <Setting Target="Adapter" Name="HTTPServer">https://int.api.service.nhs.uk</Setting>
+    <Setting Target="Adapter" Name="SSLConfig">Simple</Setting>
+    <Setting Target="Host" Name="FhirServer">http://localhost:57772/sandpit/fhir/stu3/internal</Setting>
+  </Item>
+  <Item Name="ERS_DB_UPDATE" Category="ERS" ClassName="RFT.ERS.Operation.ExecuteQuery" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Adapter" Name="DSN">ERS_DATABASE</Setting>
+    <Setting Target="Adapter" Name="StayConnected">30</Setting>
+    <Setting Target="Adapter" Name="Credentials">ERS</Setting>
+  </Item>
+  <Item Name="Ens.Alert" Category="" ClassName="EnsLib.EMail.AlertOperation" PoolSize="1" Enabled="false" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+  </Item>
+</Production>
+]]></Data>
+</XData>
+</Class>
+
+
 <Class name="RFT.ERS.Service.InvokeDocumentDownloader">
 <Super>Ens.BusinessService</Super>
-<TimeChanged>66575,58957.912265</TimeChanged>
 <TimeCreated>66464,54206.1358879</TimeCreated>
 
 <Parameter name="ADAPTER">
@@ -2148,7 +2077,6 @@ END
 
 <Class name="RFT.ERS.Service.InvokeRefToDB">
 <Super>Ens.BusinessService</Super>
-<TimeChanged>66575,58929.6694482</TimeChanged>
 <TimeCreated>66401,46711.7959016</TimeCreated>
 
 <Parameter name="ADAPTER">
@@ -2224,7 +2152,6 @@ END
 
 <Class name="RFT.ERS.Service.InvokeReferralProcessor">
 <Super>Ens.BusinessService</Super>
-<TimeChanged>66562,45739.4770823</TimeChanged>
 <TimeCreated>66392,60925.5088428</TimeCreated>
 
 <Parameter name="ADAPTER">
@@ -2278,7 +2205,6 @@ END
 
 <Class name="RFT.ERS.Service.InvokeWorklistProcessor">
 <Super>Ens.BusinessService</Super>
-<TimeChanged>66575,58454.5777735</TimeChanged>
 <TimeCreated>66465,34944.3712696</TimeCreated>
 
 <UDLText name="T">
@@ -2301,7 +2227,7 @@ END
 </Parameter>
 
 <Method name="OnProcessInput">
-<FormalSpec>pInput:%Stream.GlobalCharacter,*pResponse:%RegisteredObject</FormalSpec>
+<FormalSpec>pInput:%Stream.GlobalCharacter,*pResponse:Ens.Response</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
     // Token ingest
@@ -2312,6 +2238,9 @@ END
 	set AuthJsonObj = ##class(%DynamicAbstractObject).%FromJSON(AuthJson)
 	$$$LOGINFO("AuthJsonObj : "_AuthJsonObj.%Get("auth_token"))
 	set ^LastToken("auth_token") = AuthJsonObj.%Get("auth_token")
+	set ^LastToken("nhsid_useruid") = AuthJsonObj.%Get("nhsid_useruid")
+	set ^LastToken("name") = AuthJsonObj.%Get("name")
+	set ^LastToken("token_time") = $zdatetime($horolog,3)
 	set TokenReceived = 1
 
     //make sure Read when OK
@@ -2319,7 +2248,9 @@ END
 	{
 		set tsc=..SendRequestSync("WorklistProcessor",TokenReceived)
 		// if send with success return {"responseCode":200,"message":"OK"}
-		Set pResponse = "{"_$c(34)_"responseCode"_$c(34)_":200,"_$c(34)_"message"_$c(34)_":"_$c(34)_"OK"_$c(34)_"}"
+		Set pResponse=##class(%GlobalBinaryStream).%New()
+		Do pResponse.SetAttribute("Content-Type","application/json") 
+    	Do pResponse.Write("{"_$c(34)_"responseCode"_$c(34)_":200,"_$c(34)_"message"_$c(34)_":"_$c(34)_"OK"_$c(34)_"}")
 	}
 	else {If $$$ISERR(tsc) do $System.Status.DisplayError(tsc)}
 	
@@ -2331,7 +2262,6 @@ END
 
 <Class name="RFT.ERS.Tables.Attachments">
 <Super>%Persistent</Super>
-<TimeChanged>66575,63840.8135372</TimeChanged>
 <TimeCreated>66459,53686.1725355</TimeCreated>
 
 <Property name="attachmentID">
@@ -2397,7 +2327,6 @@ END
 <IdLocation>^RFT.ERS.Tables.AttachmentsD</IdLocation>
 <IndexLocation>^RFT.ERS.Tables.AttachmentsI</IndexLocation>
 <StreamLocation>^RFT.ERS.Tables.AttachmentsS</StreamLocation>
-<ExtentSize>1</ExtentSize>
 <Data name="AttachmentsDefaultData">
 <Value name="1">
 <Value>%%CLASSNAME</Value>
@@ -2427,87 +2356,21 @@ END
 <Value>docStatus</Value>
 </Value>
 <Value name="10">
-<Value>statusFlag</Value>
+<Value>isDownloaded</Value>
 </Value>
 <Value name="11">
-<Value>isDownloaded</Value>
+<Value>retryCount</Value>
 </Value>
 <Value name="12">
 <Value>filePath</Value>
 </Value>
-<Value name="13">
-<Value>badDocFlag</Value>
-</Value>
-<Value name="14">
-<Value>retryCount</Value>
-</Value>
 </Data>
-<Property name="%%CLASSNAME">
-<Selectivity>100.0000%</Selectivity>
-<AverageFieldSize>2</AverageFieldSize>
-</Property>
-<Property name="%%ID">
-<Selectivity>1</Selectivity>
-<AverageFieldSize>5</AverageFieldSize>
-</Property>
-<Property name="attachmentID">
-<Selectivity>1</Selectivity>
-<AverageFieldSize>5</AverageFieldSize>
-</Property>
-<Property name="contentType">
-<Selectivity>100.0000%</Selectivity>
-<AverageFieldSize>17</AverageFieldSize>
-</Property>
-<Property name="createdDateTime">
-<Selectivity>100.0000%</Selectivity>
-<AverageFieldSize>12</AverageFieldSize>
-</Property>
-<Property name="docStatus">
-<Selectivity>100.0000%</Selectivity>
-<AverageFieldSize>2</AverageFieldSize>
-</Property>
-<Property name="filePath">
-<Selectivity>100.0000%</Selectivity>
-<AverageFieldSize>2</AverageFieldSize>
-</Property>
-<Property name="insertedBy">
-<Selectivity>100.0000%</Selectivity>
-<AverageFieldSize>14</AverageFieldSize>
-</Property>
-<Property name="isDownloaded">
-<Selectivity>100.0000%</Selectivity>
-<AverageFieldSize>2</AverageFieldSize>
-</Property>
-<Property name="size">
-<Selectivity>100.0000%</Selectivity>
-<AverageFieldSize>3</AverageFieldSize>
-</Property>
-<Property name="statusFlag">
-<Selectivity>100.0000%</Selectivity>
-<AverageFieldSize>2</AverageFieldSize>
-</Property>
-<Property name="title">
-<Selectivity>100.0000%</Selectivity>
-<AverageFieldSize>20</AverageFieldSize>
-</Property>
-<Property name="ubrn">
-<Selectivity>100.0000%</Selectivity>
-<AverageFieldSize>14</AverageFieldSize>
-</Property>
-<Property name="url">
-<Selectivity>100.0000%</Selectivity>
-<AverageFieldSize>17</AverageFieldSize>
-</Property>
-<SQLMap name="urlIndex">
-<BlockCount>-4</BlockCount>
-</SQLMap>
 </Storage>
 </Class>
 
 
 <Class name="RFT.ERS.Tables.Referrals">
 <Super>%Persistent</Super>
-<TimeChanged>66459,56885.84812</TimeChanged>
 <TimeCreated>66459,53715.0271427</TimeCreated>
 
 <Property name="ubrn">
@@ -2567,10 +2430,7 @@ END
 <IdLocation>^RFT.ERS.Tables.ReferralsD</IdLocation>
 <IndexLocation>^RFT.ERS.Tables.ReferralsI</IndexLocation>
 <StreamLocation>^RFT.ERS.Tables.ReferralsS</StreamLocation>
-<ExtentSize>0</ExtentSize>
 <Data name="ReferralsDefaultData">
-<Structure>listnode</Structure>
-<Subscript/>
 <Value name="1">
 <Value>%%CLASSNAME</Value>
 </Value>
@@ -2611,7 +2471,6 @@ END
 
 <Class name="RFT.ERS.Tables.Worklist">
 <Super>%Persistent</Super>
-<TimeChanged>66569,52888.6254167</TimeChanged>
 <TimeCreated>66459,53581.7145723</TimeCreated>
 
 <Property name="ubrn">
@@ -2685,8 +2544,6 @@ END
 <StreamLocation>^RFT.ERS.Tables.WorklistS</StreamLocation>
 <ExtentSize>1</ExtentSize>
 <Data name="WorklistDefaultData">
-<Structure>listnode</Structure>
-<Subscript/>
 <Value name="1">
 <Value>%%CLASSNAME</Value>
 </Value>
@@ -2803,7 +2660,6 @@ END
 
 <Class name="RFT.Utility.CodeableConcept">
 <Super>%RegisteredObject</Super>
-<TimeChanged>66557,45680.5989872</TimeChanged>
 <TimeCreated>66555,74073.5065373</TimeCreated>
 
 <Method name="RetriveCode">
@@ -2817,12 +2673,10 @@ END
 		set iter=coding.%GetIterator()
 		while iter.%GetNext(.key,.value)
 		{
-				set code=value.code
-					    
-					    	
+				set code=value.code			    	
 		}
 				    	
-			quit code
+		quit code
 ]]></Implementation>
 </Method>
 </Class>
