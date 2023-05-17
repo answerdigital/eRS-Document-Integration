@@ -9,7 +9,7 @@ rm -rf target
 mkdir target
 
 cd Integration
-zip ../target/Integration-$RELEASE_TAG.zip *
+zip -r ../target/Integration-$RELEASE_TAG.zip *
 cd -
 
 cp SmartcardAuth-Build/ers-user-auth-app-*.jar target/ers-user-auth-app-$RELEASE_TAG.jar
