@@ -1,5 +1,3 @@
-0.0.3 Release including:
+0.0.4 Release including:
 
-- Changing file output folder format to YYYY-MM to allow better sorting
-- Removing DB name prefix to allow flexibility of schema naming
-- Github actions-based release process
+- Corrected Github actions-based release process
