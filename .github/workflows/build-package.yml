@@ -58,7 +58,7 @@ jobs:
       - name: Display structure of downloaded files
         run: ls -R
       - name: package release
-        run: ./release.sh
+        run: ./release.sh $GITHUB_REF_NAME
         shell: bash
       - uses: actions/upload-artifact@v3
         with:
