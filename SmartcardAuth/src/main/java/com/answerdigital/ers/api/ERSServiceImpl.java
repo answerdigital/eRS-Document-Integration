@@ -1,5 +1,6 @@
 package com.answerdigital.ers.api;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -13,11 +14,16 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 @Component
 public class ERSServiceImpl implements ERSService{
-    private static final String ENDPOINT = System.getenv("ENDPOINT");
+
+    private String endpoint;
+
+    public ERSServiceImpl( @Value("${ers.session-handover-endpoint}") String endpoint){
+        this.endpoint = endpoint;
+    }
     @Override
     public AuthenticatedSessionResponse handover(AuthenticatedSession authenticatedSession) throws IOException {
         RestTemplate restTemplate = new RestTemplate();
-        String sessionHandoverUrl = ENDPOINT;
+        String sessionHandoverUrl = endpoint;
 
         HttpEntity<AuthenticatedSession> request = new HttpEntity<>(authenticatedSession);
         ResponseEntity<AuthenticatedSessionResponse> response = null;

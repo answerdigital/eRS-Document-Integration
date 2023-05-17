@@ -1,7 +1,3 @@
-server:
-  http-port: ${HTTP_PORT}
-  port: ${HTTPS_PORT}
-  enable-tls: false
 spring:
   security:
     oauth2:
