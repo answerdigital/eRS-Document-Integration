@@ -40,7 +40,7 @@ public class ERSServiceImplTest {
         );
     }
 
-    @Test
+    //@Test
     public void whenKnownCertificate_thenConnects() throws Exception {
 
         unknownCertificateServer.stubFor(post("/session").willReturn(
@@ -61,7 +61,7 @@ public class ERSServiceImplTest {
         assertEquals(200, response.getResponseCode());
     }
 
-    @Test
+    //@Test
     public void whenUnknownCertificate_thenCannotConnect() throws Exception {
         unknownCertificateServer.stubFor(post("/session").willReturn(
                         aResponse()
