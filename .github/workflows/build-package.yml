@@ -58,13 +58,13 @@ jobs:
       - name: Display structure of downloaded files
         run: ls -R
       - name: package with specific release_id for tagged releases
-        if: github.ref_type=='tag'
+        if: github.ref_type == 'tag'
         env:
-          RELEASE_ID ${{ github.ref_name }}
+          RELEASE_ID: ${{ github.ref_name }}
         run: ./release.sh $RELEASE_ID
         shell: bash
       - name: package with a SNAPSHOT release_id for branch commits
-        if: github.ref_type=='branch'
+        if: github.ref_type == 'branch'
         run: ./release.sh
         shell: bash
       - uses: actions/upload-artifact@v3
