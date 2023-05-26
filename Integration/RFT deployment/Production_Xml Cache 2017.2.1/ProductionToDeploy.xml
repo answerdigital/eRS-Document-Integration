@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25" zv="IRIS for Windows (x86-64) 2023.1 (Build 229U)" ts="2023-05-26 10:10:48">
+<Export generator="Cache" version="25" zv="IRIS for Windows (x86-64) 2023.1 (Build 229U)" ts="2023-05-26 10:48:46">
 <Class name="RFT.ERS.Classes.Attachment">
 <Super>Ens.Response</Super>
 <TimeChanged>66612,48381.7532859</TimeChanged>
@@ -2825,4 +2825,20 @@ END
 ]]></Implementation>
 </Method>
 </Class>
-</Export>
+
+
+<Document name="ERS.ContentTypeToExtension.LUT">
+<lookupTable>
+<entry table="ERS.ContentTypeToExtension" key="application/msword">doc</entry>
+<entry table="ERS.ContentTypeToExtension" key="application/pdf">pdf</entry>
+<entry table="ERS.ContentTypeToExtension" key="application/vnd.openxmlformats-officedocument.wordprocessingml.document">docx</entry>
+<entry table="ERS.ContentTypeToExtension" key="image/gif">gif</entry>
+<entry table="ERS.ContentTypeToExtension" key="image/jpeg">jpeg</entry>
+<entry table="ERS.ContentTypeToExtension" key="image/png">png</entry>
+<entry table="ERS.ContentTypeToExtension" key="image/tif">tiff</entry>
+<entry table="ERS.ContentTypeToExtension" key="image/tiff">tiff</entry>
+<entry table="ERS.ContentTypeToExtension" key="text/html">html</entry>
+<entry table="ERS.ContentTypeToExtension" key="text/plain">txt</entry>
+<entry table="ERS.ContentTypeToExtension" key="text/rtf">rtf</entry>
+</lookupTable>
+</Document></Export>
