@@ -12,7 +12,7 @@ Storage Default
 </Value>
 </Data>
 <DefaultData>RequestWorklistDefaultData</DefaultData>
-<Type>%Library.CacheStorage</Type>
+<Type>%Storage.Persistent</Type>
 }
 
 }

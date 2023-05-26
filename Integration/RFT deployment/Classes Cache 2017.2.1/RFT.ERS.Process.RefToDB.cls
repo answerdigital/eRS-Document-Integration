@@ -148,7 +148,8 @@ Method OnRequest(pInput As Ens.Request, Output pResponse As Ens.Response) As %St
 
 Storage Default
 {
-<Type>%Library.CacheStorage</Type>
+<Type>%Storage.Persistent</Type>
 }
 
 }
+

@@ -12,7 +12,7 @@ Storage Default
 </Value>
 </Data>
 <DefaultData>RequestReferralDetailsDefaultData</DefaultData>
-<Type>%Library.CacheStorage</Type>
+<Type>%Storage.Persistent</Type>
 }
 
 }

@@ -69,10 +69,70 @@ Storage Default
 </Data>
 <DataLocation>^RFT.ERS.Tables.AttachmentsD</DataLocation>
 <DefaultData>AttachmentsDefaultData</DefaultData>
+<ExtentSize>1</ExtentSize>
 <IdLocation>^RFT.ERS.Tables.AttachmentsD</IdLocation>
 <IndexLocation>^RFT.ERS.Tables.AttachmentsI</IndexLocation>
+<Property name="%%CLASSNAME">
+<AverageFieldSize>2</AverageFieldSize>
+<Selectivity>100.0000%</Selectivity>
+</Property>
+<Property name="%%ID">
+<AverageFieldSize>4</AverageFieldSize>
+<Selectivity>1</Selectivity>
+</Property>
+<Property name="attachmentID">
+<AverageFieldSize>4</AverageFieldSize>
+<Selectivity>1</Selectivity>
+</Property>
+<Property name="contentType">
+<AverageFieldSize>2</AverageFieldSize>
+<Selectivity>100.0000%</Selectivity>
+</Property>
+<Property name="createdDateTime">
+<AverageFieldSize>12</AverageFieldSize>
+<Selectivity>100.0000%</Selectivity>
+</Property>
+<Property name="docStatus">
+<AverageFieldSize>2</AverageFieldSize>
+<Selectivity>100.0000%</Selectivity>
+</Property>
+<Property name="filePath">
+<AverageFieldSize>2</AverageFieldSize>
+<Selectivity>100.0000%</Selectivity>
+</Property>
+<Property name="insertedBy">
+<AverageFieldSize>14</AverageFieldSize>
+<Selectivity>100.0000%</Selectivity>
+</Property>
+<Property name="isDownloaded">
+<AverageFieldSize>2</AverageFieldSize>
+<Selectivity>100.0000%</Selectivity>
+</Property>
+<Property name="retryCount">
+<AverageFieldSize>2</AverageFieldSize>
+<Selectivity>100.0000%</Selectivity>
+</Property>
+<Property name="size">
+<AverageFieldSize>5</AverageFieldSize>
+<Selectivity>100.0000%</Selectivity>
+</Property>
+<Property name="title">
+<AverageFieldSize>27</AverageFieldSize>
+<Selectivity>100.0000%</Selectivity>
+</Property>
+<Property name="ubrn">
+<AverageFieldSize>14</AverageFieldSize>
+<Selectivity>100.0000%</Selectivity>
+</Property>
+<Property name="url">
+<AverageFieldSize>19</AverageFieldSize>
+<Selectivity>100.0000%</Selectivity>
+</Property>
+<SQLMap name="Index">
+<BlockCount>-4</BlockCount>
+</SQLMap>
 <StreamLocation>^RFT.ERS.Tables.AttachmentsS</StreamLocation>
-<Type>%Library.CacheStorage</Type>
+<Type>%Storage.Persistent</Type>
 }
 
 }

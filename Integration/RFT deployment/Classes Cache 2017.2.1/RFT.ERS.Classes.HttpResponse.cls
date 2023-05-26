@@ -17,7 +17,7 @@ Storage Default
 </Value>
 </Data>
 <DefaultData>HttpResponseDefaultData</DefaultData>
-<Type>%Library.CacheStorage</Type>
+<Type>%Storage.Persistent</Type>
 }
 
 }

@@ -12,7 +12,7 @@ Storage Default
 </Value>
 </Data>
 <DefaultData>ClinicalInformationDefaultData</DefaultData>
-<Type>%Library.CacheStorage</Type>
+<Type>%Storage.Persistent</Type>
 }
 
 }

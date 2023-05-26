@@ -22,7 +22,7 @@ Storage Default
 </Value>
 </Data>
 <DefaultData>RefToDBDefaultData</DefaultData>
-<Type>%Library.CacheStorage</Type>
+<Type>%Storage.Persistent</Type>
 }
 
 }

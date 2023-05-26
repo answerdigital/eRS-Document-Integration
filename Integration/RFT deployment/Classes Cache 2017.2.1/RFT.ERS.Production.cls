@@ -12,18 +12,20 @@ XData ProductionDefinition
   <Item Name="Invoke_RefToDB" Category="ERS" ClassName="RFT.ERS.Service.InvokeRefToDB" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
     <Setting Target="Adapter" Name="CallInterval">1800</Setting>
   </Item>
-  <Item Name="Sch_InvokeReferralProcessor" Category="ERS" ClassName="RFT.ERS.Service.InvokeReferralProcessor" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+  <Item Name="Sch_InvokeReferralProcessor" Category="ERS" ClassName="RFT.ERS.Service.InvokeReferralProcessor" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
     <Setting Target="Adapter" Name="CallInterval">1800</Setting>
   </Item>
   <Item Name="Sch_InvokeWorklistProcessor" Category="ERS" ClassName="RFT.ERS.Service.InvokeWorklistProcessor" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
     <Setting Target="Adapter" Name="Port">9985</Setting>
-    <Setting Target="Adapter" Name="SSLConfig">ERS Smartcard Certificate</Setting>
+    <Setting Target="Adapter" Name="SSLConfig"></Setting>
+    <Setting Target="Host" Name="ArchiveIO">1</Setting>
   </Item>
   <Item Name="ClinicalInformationDownloadProcessor" Category="ERS" ClassName="RFT.ERS.Process.ClinicalInformationProcessor" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
   </Item>
   <Item Name="DocumentDownloadProcess" Category="ERS" ClassName="RFT.ERS.Process.DocumentProcessor" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
-    <Setting Target="Host" Name="OutputDir">e:\libreoffice</Setting>
-    <Setting Target="Host" Name="PDFsFolder">e:\erspdf</Setting>
+    <Setting Target="Host" Name="OutputDir">C:\Users\HaitemElAaouani\Documents\eRS\OuPut\raw</Setting>
+    <Setting Target="Host" Name="PDFsFolder">C:\Users\HaitemElAaouani\Documents\eRS\OuPut\pdf</Setting>
+    <Setting Target="Host" Name="DocumentStorageMode">MOUNTHLY</Setting>
   </Item>
   <Item Name="ReferralProcessor" Category="ERS" ClassName="RFT.ERS.Process.ReferralProcessor" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
   </Item>
@@ -34,7 +36,9 @@ XData ProductionDefinition
   <Item Name="HttpOut_ERS" Category="ERS" ClassName="RFT.ERS.Operation.ERS" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
     <Setting Target="Adapter" Name="HTTPServer">https://int.api.service.nhs.uk</Setting>
     <Setting Target="Adapter" Name="SSLConfig">Simple</Setting>
-    <Setting Target="Host" Name="FhirServer">http://localhost:57772/sandpit/fhir/stu3/internal</Setting>
+    <Setting Target="Host" Name="FhirServer">https://server.fire.ly/r3</Setting>
+    <Setting Target="Host" Name="WorkListSizeLimitKB">10000</Setting>
+    <Setting Target="Host" Name="WorkListSizeLimitMB">0.1</Setting>
   </Item>
   <Item Name="ERS_DB_UPDATE" Category="ERS" ClassName="RFT.ERS.Operation.ExecuteQuery" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
     <Setting Target="Adapter" Name="DSN">ERS_DATABASE</Setting>

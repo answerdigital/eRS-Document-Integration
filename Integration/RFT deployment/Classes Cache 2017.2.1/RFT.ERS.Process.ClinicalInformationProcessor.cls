@@ -29,7 +29,7 @@ Method GenerateAlert(AlertText As %String)
 
 Storage Default
 {
-<Type>%Library.CacheStorage</Type>
+<Type>%Storage.Persistent</Type>
 }
 
 }

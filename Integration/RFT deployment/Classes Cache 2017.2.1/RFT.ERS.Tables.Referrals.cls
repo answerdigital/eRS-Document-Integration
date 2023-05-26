@@ -67,7 +67,7 @@ Storage Default
 <IdLocation>^RFT.ERS.Tables.ReferralsD</IdLocation>
 <IndexLocation>^RFT.ERS.Tables.ReferralsI</IndexLocation>
 <StreamLocation>^RFT.ERS.Tables.ReferralsS</StreamLocation>
-<Type>%Library.CacheStorage</Type>
+<Type>%Storage.Persistent</Type>
 }
 
 }

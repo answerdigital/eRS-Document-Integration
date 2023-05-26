@@ -67,7 +67,7 @@ Storage Default
 </Value>
 </Data>
 <DefaultData>WorklistItemDefaultData</DefaultData>
-<Type>%Library.CacheStorage</Type>
+<Type>%Storage.Persistent</Type>
 }
 
 }

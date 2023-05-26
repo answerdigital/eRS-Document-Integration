@@ -12,6 +12,17 @@ Method OnRequest(pRequest As Ens.Request, Output pResponse As Ens.StringContaine
 	set req.sessionID=1
 	
 	set t=..SendRequestSync("HttpOut_ERS",req,.worklistResponse)
+
+	Set ClassType = $CLASSNAME(worklistResponse)
+	$$$LOGINFO("ClassType : "_ClassType)
+
+	if ClassType= "Ens.StringContainer"
+	{
+		Set pResponse = ##class(Ens.StringContainer).%New()
+		;set pResponse.StringValue = "{"_worklistResponse.StringValue_"}"
+		set pResponse.StringValue = "{"_$c(34)_"responseCode"_$c(34)_":200,"_$c(34)_"message"_$c(34)_":"_$c(34)_"OK"_$c(34)_"}"
+		GOTO END
+	}
 	
 	IF '$$$ISERR(t)
 	{
@@ -61,7 +72,6 @@ Method OnRequest(pRequest As Ens.Request, Output pResponse As Ens.StringContaine
 
 					//delete from attachments table as we will redownload
 					&sql(DELETE FROM RFT_ERS_Tables.Attachments where ubrn=:ubrn)
-
 				}
 				else 
 				{
@@ -85,9 +95,7 @@ Method OnRequest(pRequest As Ens.Request, Output pResponse As Ens.StringContaine
 				set workList.ubrn=item.ubrn
 				set workList.patientID=item.patientID
 				set workList.UpdatePatientDB=0
-
 				set t=workList.%Save()
-
 			}		
 
 
@@ -95,13 +103,13 @@ Method OnRequest(pRequest As Ens.Request, Output pResponse As Ens.StringContaine
 		Set pResponse = ##class(Ens.StringContainer).%New()
 		set pResponse.StringValue = "{"_$c(34)_"responseCode"_$c(34)_":200,"_$c(34)_"message"_$c(34)_":"_$c(34)_"OK"_$c(34)_"}"
 	}
-	
+END
 	quit t
 }
 
 Storage Default
 {
-<Type>%Library.CacheStorage</Type>
+<Type>%Storage.Persistent</Type>
 }
 
 }

@@ -18,7 +18,6 @@ Method OnRequest(pInput As RFT.ERS.Classes.RequestReferralDetails, Output pRespo
 		{
 			$$$TRACE("Adding new entry to local list")
 			set ref=##class(RFT.ERS.Tables.Referrals).%New()
-
 		}
 		
 		set ref.patientID=refResp.Referral.patientID
@@ -56,7 +55,6 @@ Method OnRequest(pInput As RFT.ERS.Classes.RequestReferralDetails, Output pRespo
 			GOTO END
 			
 			}
-			
 		
 			set attach.size=attchItem.size
 			
@@ -83,11 +81,9 @@ Method OnRequest(pInput As RFT.ERS.Classes.RequestReferralDetails, Output pRespo
 			set t=..SendRequestSync("DocumentDownloadProcess",req,.resp)
 				
 END					
-				
-				
 			}	
 			
-		$$$LOGINFO(numbDocs)
+		$$$LOGINFO("numbDocs :"_numbDocs)
 		set ref.NumDocs=numbDocs
 		set t=ref.%Save()
 		IF '$$$ISERR(t) $$$TRACE("Referral saved to local list")
@@ -129,7 +125,7 @@ Method GenerateAlert(AlertText As %String)
 
 Storage Default
 {
-<Type>%Library.CacheStorage</Type>
+<Type>%Storage.Persistent</Type>
 }
 
 }

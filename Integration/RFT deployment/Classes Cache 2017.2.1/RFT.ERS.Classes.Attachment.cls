@@ -47,7 +47,7 @@ Storage Default
 </Value>
 </Data>
 <DefaultData>AttachmentDefaultData</DefaultData>
-<Type>%Library.CacheStorage</Type>
+<Type>%Storage.Persistent</Type>
 }
 
 }

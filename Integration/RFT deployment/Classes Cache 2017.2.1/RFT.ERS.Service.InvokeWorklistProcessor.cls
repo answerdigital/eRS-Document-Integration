@@ -30,7 +30,7 @@ Method OnProcessInput(pInput As %Stream.GlobalCharacter, Output pResponse As Ens
 		set tsc=..SendRequestSync("WorklistProcessor",TokenReceived)
 		// if send with success return {"responseCode":200,"message":"OK"}
 		Set pResponse=##class(%GlobalBinaryStream).%New()
-		Do pResponse.SetAttribute("Content-Type","application/json") 
+		Do pResponse.SetAttribute("Content-Type","application/json")
     	Do pResponse.Write("{"_$c(34)_"responseCode"_$c(34)_":200,"_$c(34)_"message"_$c(34)_":"_$c(34)_"OK"_$c(34)_"}")
 	}
 	else {If $$$ISERR(tsc) do $System.Status.DisplayError(tsc)}

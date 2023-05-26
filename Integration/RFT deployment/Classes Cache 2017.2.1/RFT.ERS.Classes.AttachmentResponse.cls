@@ -22,7 +22,7 @@ Storage Default
 </Value>
 </Data>
 <DefaultData>AttachmentResponseDefaultData</DefaultData>
-<Type>%Library.CacheStorage</Type>
+<Type>%Storage.Persistent</Type>
 }
 
 }

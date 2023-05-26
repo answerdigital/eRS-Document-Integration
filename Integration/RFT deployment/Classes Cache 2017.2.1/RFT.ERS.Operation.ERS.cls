@@ -11,7 +11,9 @@ Property FhirServer As %String [ InitialExpression = "https://server.fire.ly/r3"
 
 Property ODSCode As %String [ InitialExpression = "B9J4U" ];
 
-Parameter SETTINGS = "FhirServer,ODSCode";
+Property WorkListSizeLimitMB As %Float [ InitialExpression = 1 ];
+
+Parameter SETTINGS = "FhirServer,ODSCode,WorkListSizeLimitMB";
 
 Method RetrieveWorklist(pInput As RFT.ERS.Classes.RequestWorklist, Output pResponse As Ens.Response)
 {
@@ -47,28 +49,46 @@ Method RetrieveWorklist(pInput As RFT.ERS.Classes.RequestWorklist, Output pRespo
     set tsc = httpReq.SetHeader("Content-Type","application/fhir+json")
 
     set tURL=..Adapter.HTTPServer_"/referrals/FHIR/STU3/ReferralRequest/$ers.fetchworklist"
+    $$$TRACE("Endpoint: "_tURL)
     SET tsc=..Adapter.SendFormDataURL(tURL, .tHttpResponse, "POST", httpReq)
-
    
     #DIM tHttpResponse As %Net.HttpResponse
     
     $$$TRACE("Status Code: "_ tHttpResponse.StatusLine)
+    $$$TRACE("tHttpResponse.Data.SizeGet() :"_tHttpResponse.Data.SizeGet())
+
+    // Worklist size
+    Set wkListSize = tHttpResponse.Data.SizeGet() / 1000000
+    Set wkListSize = $JUSTIFY(wkListSize,0,4)
+    Set wkListSizeLimit = $JUSTIFY(..WorkListSizeLimitMB,0,4)
+
     IF tHttpResponse.StatusCode'=200
     {
-   
         set alert=##class(Ens.AlertRequest).%New()
         set alertText="Error Code: "_tHttpResponse.StatusCode
-        set alertText=alertText_" There has been an error in sending the latest FHIR bundle to the UI"
+        set alertText=alertText_" There has been an error in fetching the worklist"
         set alert.AlertText=alertText
         set alert.AlertDestination="Ens.Alert"
-        set t=..SendAlert(alert)
+        set tsc=..SendAlert(alert)
         $$$ThrowStatus(tsc)
-        
-    }   
+        GOTO END
+    }
+    
+    elseif (tHttpResponse.StatusCode=200) && (wkListSize > wkListSizeLimit)
+    {
+        set alert=##class(Ens.AlertRequest).%New()
+        set alertText="The worklist size "_ wkListSize _"(MB) exceeds the limit "_wkListSizeLimit_"(MB)."
+        set alert.AlertText=alertText
+        set alert.AlertDestination="Ens.Alert"
+        set tsc=..SendAlert(alert)
+        Set pResponse = ##class("Ens.StringContainer").%New()
+        set pResponse.StringValue = alertText
+        ;$$$ThrowStatus(tsc)
+        GOTO END
+    }
     
     //Extract values from fhir response 
     set data=tHttpResponse.Data
-       
     IF $ISOBJECT(data)
     {
         set obj=[].%FromJSON(data)
@@ -88,8 +108,7 @@ Method RetrieveWorklist(pInput As RFT.ERS.Classes.RequestWorklist, Output pRespo
 	        set outerExtensionArray=entryItem.extension
     
 	        set extensionObject=outerExtensionArray.extension
-    
-    
+
 	        set innerExtensionArray=extensionObject.extension
 	        set innerExtensionIterator=innerExtensionArray.%GetIterator()
 	        while innerExtensionIterator.%GetNext(.key,.extensionItem)
@@ -108,11 +127,9 @@ Method RetrieveWorklist(pInput As RFT.ERS.Classes.RequestWorklist, Output pRespo
 		    	if extensionItem.url="clinicalInfoPrinted" set ref.clinicalInfoPrinted=extensionItem.valueBoolean
                 if extensionItem.url="clinicalInfoLastUpdated" set ref.clinicalInfoLastUpdate=extensionItem.valueDateTime
                 if extensionItem.url="patient" set ref.patientID=extensionItem.valueReference.identifier.value    
-	        } 
-    
+	        }
             do resp.Item.Insert(ref)
-        }   
-        
+        }
     }   
     set pResponse=resp
 END 
@@ -167,18 +184,15 @@ Method RetrieveReferralDetails(pInput As RFT.ERS.Classes.RequestReferralDetails,
             if containedItem.resourceType="Appointment"
             {
                 set refDetails.status=containedItem.status
-                
                 IF containedItem.status="booked"
                 {
 	                set refDetails.apptStart=containedItem.start
                		 set refDetails.apptEnd=containedItem.end	                
-                }  
-                
+                }
             }
             
             if containedItem.resourceType="DocumentReference"
             {
-                
                 //grab attachment details
                 //may be multiple attch objects inside content array
                 set content=containedItem.content
@@ -186,12 +200,8 @@ Method RetrieveReferralDetails(pInput As RFT.ERS.Classes.RequestReferralDetails,
                	while contentIter.%GetNext(.key,.contentItem)
                 {   
                     set attachment=##class(RFT.ERS.Classes.Attachment).%New()
-                    
                     $$$TRACE("Found attachment id: "_contentItem.attachment.id)
-                   
                     set attachment.attachmentID=contentItem.attachment.id
-                    
-        
                     set attachmentExt=contentItem.attachment.extension
                   
                     if attachmentExt.%Get(0).url="https://fhir.nhs.uk/STU3/StructureDefinition/Extension-eRS-AttachedBy-1"
@@ -207,11 +217,8 @@ Method RetrieveReferralDetails(pInput As RFT.ERS.Classes.RequestReferralDetails,
                     do resp.Attachment.Insert(attachment)
                         
                 }
-                
                 set refDetails.docStatus=containedItem.status
-                
-            }      
-            
+            }
         }
         
         set refDetails.intent=obj.intent
@@ -221,16 +228,11 @@ Method RetrieveReferralDetails(pInput As RFT.ERS.Classes.RequestReferralDetails,
   		while codingIterator.%GetNext(.key,.item)
   		{
 	  		set refDetails.specialty=item.code
-	  		
   		}	
 		//set refDetails.specialty=obj.specialty.coding
-        set refDetails.patientID=obj.subject.identifier.value   
-        
+        set refDetails.patientID=obj.subject.identifier.value 
         set resp.Referral=refDetails
-        
         set pResponse=resp
-        
-    
     }   
         
 END
@@ -244,7 +246,6 @@ Method RetrieveAttachment(pInput As RFT.ERS.Classes.RequestAttachment, Output pR
     
     set httpReq=##class(%Net.HttpRequest).%New()
     
-
     do httpReq.SetHeader("NHSD-eRS-Business-Function","SERVICE_PROVIDER_CLINICIAN")
     do httpReq.SetHeader("X-Correlation-ID","11C46F5F-CDEF-4865-94B2-0EE0EDCC26DA")
     do httpReq.SetHeader("NHSD-End-User-Organisation-ODS",..ODSCode)
@@ -257,8 +258,7 @@ Method RetrieveAttachment(pInput As RFT.ERS.Classes.RequestAttachment, Output pR
     set response=##class(RFT.ERS.Classes.AttachmentResponse).%New()
     set response.StatusCode=httpResp.StatusCode
     
-    
-   $$$LOGINFO("StatusCode: "_httpResp.StatusCode)
+    $$$LOGINFO("StatusCode: "_httpResp.StatusCode)
     
     IF httpResp.StatusCode=200
     {
@@ -268,7 +268,7 @@ Method RetrieveAttachment(pInput As RFT.ERS.Classes.RequestAttachment, Output pR
         Set sqlArgument.type = "attachmentLogicalID"
 
         // Get extension
-        Set Qry = "SELECT REPLACE(title,' ', '') as TrimmedTitle FROM RFT_ERS_Tables.Attachments WHERE url ='"_pInput.url_"'"
+        Set Qry = "SELECT REPLACE(title,' ', '') as TrimmedTitle, ubrn as ubrnQry FROM RFT_ERS_Tables.Attachments WHERE url ='"_pInput.url_"'"
 
         Set ST=##class(%SQL.Statement).%New()   
         set tsc = ST.%Prepare(Qry)
@@ -277,10 +277,19 @@ Method RetrieveAttachment(pInput As RFT.ERS.Classes.RequestAttachment, Output pR
         if $$$ISERR(tsc) {write "%Prepare failed:" do $SYSTEM.Status.DisplayError(tsc) quit}
 
         Set TrimmedTitle = ""
-        while (rset.%Next()) && (TrimmedTitle = "")
+        Set ubrnQry = ""
+
+        $$$TRACE("OutSide While")
+
+        while (rset.%Next()) && (TrimmedTitle = "") && (ubrnQry = "")
         {
+            $$$TRACE("Inside While")
+
             set TrimmedTitle = $PIECE(rset.%Get("TrimmedTitle"),".",1)
             set TrimmedTitle = TrimmedTitle_"_"_$zstrip($zdatetime($horolog,3), "*P")
+            Set ubrn = rset.%Get("ubrnQry")
+
+            $$$TRACE("ubrn: "_ubrn)
         }
         if TrimmedTitle = ""
         {
@@ -296,8 +305,11 @@ Method RetrieveAttachment(pInput As RFT.ERS.Classes.RequestAttachment, Output pR
         Set PatientDetails = ##class(%DynamicObject).%New()
         Set tsc = ..LookUpPatient(sqlArgument, .PatientDetails)
 
-        // create/check download directory "MM-YYYY"
-        Set OutputDir = ##class(Ens.Director).GetItemSettingValue("DocumentDownloadProcess","Host","OutputDir",.status)_"\"_$E($ZDT($H,8),1,4)_"-"_$E($ZDT($H,8),5,6)
+        // create/check download directory
+        if ##class(Ens.Director).GetItemSettingValue("DocumentDownloadProcess","Host","DocumentStorageMode",.tsc) = "MOUNTHLY" {set FolderName = $E($ZDT($H,8),1,4)_"-"_$E($ZDT($H,8),5,6)}
+		elseif ##class(Ens.Director).GetItemSettingValue("DocumentDownloadProcess","Host","DocumentStorageMode",.tsc) = "UBRN" {set FolderName = ubrn}
+        Set OutputDir = ##class(Ens.Director).GetItemSettingValue("DocumentDownloadProcess","Host","OutputDir",.status)_"\"_FolderName
+        $$$TRACE("FolderName: "_FolderName)
 		Set OutputDirExists=##class(%File).DirectoryExists(OutputDir)
 		If ('OutputDirExists) {set tsc=##class(%File).CreateDirectory(OutputDir)}
 
@@ -398,8 +410,13 @@ Method RetrieveClincalInformation(pInput As RFT.ERS.Classes.RequestClinicalInfor
         Set tsc = ..LookUpPatient(sqlArgument, .PatientDetails)
         $$$LOGINFO("returned to RetrieveClincalInformation")
 
-        // create/check download directory "MM-YYYY"
-        Set OutputDir = ##class(Ens.Director).GetItemSettingValue("DocumentDownloadProcess","Host","OutputDir",.status)_"\"_$E($ZDT($H,8),1,4)_"-"_$E($ZDT($H,8),5,6)
+        // create/check download directory
+        if ##class(Ens.Director).GetItemSettingValue("DocumentDownloadProcess","Host","DocumentStorageMode",.tsc) = "MOUNTHLY" {set FolderName = $E($ZDT($H,8),1,4)_"-"_$E($ZDT($H,8),5,6)}
+		elseif ##class(Ens.Director).GetItemSettingValue("DocumentDownloadProcess","Host","DocumentStorageMode",.tsc) = "UBRN" {set FolderName = ubrn}
+
+        $$$TRACE("Folder Name: "_FolderName)
+
+        Set OutputDir = ##class(Ens.Director).GetItemSettingValue("DocumentDownloadProcess","Host","OutputDir",.tsc)_"\"_FolderName
 		Set OutputDirExists=##class(%File).DirectoryExists(OutputDir)
 		If ('OutputDirExists) {set tsc=##class(%File).CreateDirectory(OutputDir)}
 
@@ -407,14 +424,20 @@ Method RetrieveClincalInformation(pInput As RFT.ERS.Classes.RequestClinicalInfor
         set fileName=fileName_"_"_$zstrip($zdatetime($horolog,3), "*P")_".pdf"
         set response.FilePath=fileName
 		// Copy into PDFs Folder
-        Set TargetDir = ##class(Ens.Director).GetItemSettingValue("DocumentDownloadProcess","Host","PDFsFolder",.status)_"\"_$E($ZDT($H,8),1,4)_"-"_$E($ZDT($H,8),5,6)
+        Set TargetDir = ##class(Ens.Director).GetItemSettingValue("DocumentDownloadProcess","Host","PDFsFolder",.tsc)_"\"_FolderName
         Set TargetDirExists=##class(%File).DirectoryExists(TargetDir)
         If ('TargetDirExists) {set tsc=##class(%File).CreateDirectory(TargetDir)}
-
 
         set tsc=stream.LinkToFile(fileName)
         set tsc=stream.CopyFromAndSave(data)
         set response.FileType="pdf"
+
+        // Virus Scan
+        /*
+		set ScanCmd = ##class(Ens.Director).GetItemSettingValue("DocumentDownloadProcess","Host","VirusScanCommand",.tsc)_" "_fileName
+		$$$TRACE("ScanCmd : "_ScanCmd)
+		set runScan = $zf(-1, ScanCmd)
+        */
 
 	    set tsc=stream.LinkToFile(fileName)
 	    set tsc=stream.CopyFromAndSave(data)
@@ -652,7 +675,7 @@ Method LookUpPatient(pInupt As %DynamicObject, Output PatientDetails As %Dynamic
             else {set PatientDetails.phone = ""}
 	    }
 
-        $$$TRACE("LOOKUP OK")
+        $$$TRACE("LOOKUP PATIENT OK")
 
     }
 

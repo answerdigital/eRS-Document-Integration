@@ -150,7 +150,7 @@ Storage Default
 <BlockCount>-4</BlockCount>
 </SQLMap>
 <StreamLocation>^RFT.ERS.Tables.WorklistS</StreamLocation>
-<Type>%Library.CacheStorage</Type>
+<Type>%Storage.Persistent</Type>
 }
 
 }
