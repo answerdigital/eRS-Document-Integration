@@ -244,7 +244,7 @@
     ;set httpReq.Authorization = "Bearer m0Zvv1B5RvpWsAeQX2ECAGSDyAz5"
     
     set tsc = httpReq.SetHeader("NHSD-End-User-Organisation-ODS","B9J4U")
-    set tsc = httpReq.SetHeader("NHSD-eRS-Business-Function","SERVICE_PROVIDER_CLINICIAN")
+    set tsc = httpReq.SetHeader("NHSD-eRS-Business-Function","SERVICE_PROVIDER_CLINICIAN_ADMIN")
     set tsc = httpReq.SetHeader("Content-Type","application/fhir+json")
     $$$LOGINFO("Return Header : "_httpReq.ReturnHeaders())
     ;set tURL="https://int.api.service.nhs.uk/referrals/FHIR/STU3/ReferralRequest/$ers.fetchworklist"
@@ -361,7 +361,7 @@ END
     set httpReq=##class(%Net.HttpRequest).%New()
     ;do httpReq.Authorization("Bearer "_^LastToken("auth_token"))
     set httpReq.Authorization = "Bearer "_^LastToken("auth_token")
-     set tsc = httpReq.SetHeader("NHSD-eRS-Business-Function","SERVICE_PROVIDER_CLINICIAN")
+     set tsc = httpReq.SetHeader("NHSD-eRS-Business-Function","SERVICE_PROVIDER_CLINICIAN_ADMIN")
      set tsc = httpReq.SetHeader("Accept","application/fhir+json")
      set tsc = httpReq.SetHeader("NHSD-End-User-Organisation-ODS","B9J4U")
 
@@ -524,7 +524,7 @@ END
     set httpReq=##class(%Net.HttpRequest).%New()
     
 
-    do httpReq.SetHeader("NHSD-eRS-Business-Function","SERVICE_PROVIDER_CLINICIAN")
+    do httpReq.SetHeader("NHSD-eRS-Business-Function","SERVICE_PROVIDER_CLINICIAN_ADMIN")
     do httpReq.SetHeader("X-Correlation-ID","11C46F5F-CDEF-4865-94B2-0EE0EDCC26DA")
     do httpReq.SetHeader("NHSD-End-User-Organisation-ODS","B9J4U")
     set httpReq.Authorization = "Bearer "_^LastToken("auth_token")
