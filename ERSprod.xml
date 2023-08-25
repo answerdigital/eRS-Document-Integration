@@ -622,7 +622,7 @@
     
     set httpReq=##class(%Net.HttpRequest).%New()
     set httpReq.EntityBody= stream
-  //  set httpReq.Authorization = "Bearer "_^LastToken("auth_token")
+    set httpReq.Authorization = "Bearer "_^LastToken("auth_token")
     
     set tsc = httpReq.SetHeader("NHSD-End-User-Organisation-ODS",..ODSCode)
     set tsc = httpReq.SetHeader("NHSD-eRS-Business-Function","SERVICE_PROVIDER_CLINICIAN_ADMIN")
@@ -723,7 +723,7 @@ END
     set tsc=$$$OK
     
     set httpReq=##class(%Net.HttpRequest).%New()
-   // set httpReq.Authorization = "Bearer "_^LastToken("auth_token")
+    set httpReq.Authorization = "Bearer "_^LastToken("auth_token")
     set tsc = httpReq.SetHeader("NHSD-eRS-Business-Function","SERVICE_PROVIDER_CLINICIAN_ADMIN")
     set tsc = httpReq.SetHeader("Accept","application/fhir+json")
     set tsc = httpReq.SetHeader("NHSD-End-User-Organisation-ODS",..ODSCode)
@@ -833,7 +833,7 @@ END
     do httpReq.SetHeader("NHSD-eRS-Business-Function","SERVICE_PROVIDER_CLINICIAN_ADMIN")
     do httpReq.SetHeader("X-Correlation-ID","11C46F5F-CDEF-4865-94B2-0EE0EDCC26DA")
     do httpReq.SetHeader("NHSD-End-User-Organisation-ODS",..ODSCode)
-   // set httpReq.Authorization = "Bearer "_^LastToken("auth_token")
+    set httpReq.Authorization = "Bearer "_^LastToken("auth_token")
     
     set tURL=..Adapter.HTTPServer_"/referrals/FHIR/STU3/Binary/"_pInput.url    
     SET sc=..Adapter.SendFormDataURL(tURL, .httpResp, "GET", httpReq)
@@ -940,7 +940,7 @@ END
     set tsc=$$$OK
     
     set httpReq=##class(%Net.HttpRequest).%New()
-   // set httpReq.Authorization = "Bearer "_^LastToken("auth_token")
+    set httpReq.Authorization = "Bearer "_^LastToken("auth_token")
 
     set tsc = httpReq.SetHeader("Accept","application/pdf")
     set tsc = httpReq.SetHeader("NHSD-eRS-Business-Function", "SERVICE_PROVIDER_CLINICIAN_ADMIN")
