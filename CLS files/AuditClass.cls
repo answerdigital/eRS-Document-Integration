@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="IRIS" version="26" zv="IRIS for Windows (x86-64) 2023.1.1 (Build 380U)" ts="2023-08-25 15:44:58">
+<Class name="RFT.ERS.Classes.AuditClass">
+<Super>%Persistent</Super>
+<TimeChanged>66711,37768.3681761</TimeChanged>
+<TimeCreated>66703,36549.0995479</TimeCreated>
+
+<Method name="PerformAction">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>userID:%String,action:%String,details:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+        // Construct the audit event data
+        Set eventSource = "NHS ERS API"
+        Set eventType = "WorkList Retrieval"
+        Set event = action
+        Set DateTime = $zts
+        Set HumanDateTime = $zdatetime(DateTime, 5)
+        Set eventData = details_". User: "_userID_"."_" Performed Action: "_action_". DateTime: "_HumanDateTime_"."
+        Set description = "User '" _ userID _ "' Performed action: " _ action _"DateTime: " _HumanDateTime
+
+        // Call the $SYSTEM.Security.Audit() command
+        Do $SYSTEM.Security.Audit(userID, eventType, action, eventData, description)
+
+        Quit $$$OK
+]]></Implementation>
+</Method>
+
+<Storage name="Default">
+<Type>%Storage.Persistent</Type>
+<DataLocation>^RFT.ERS.Classes.AuditClassD</DataLocation>
+<DefaultData>AuditClassDefaultData</DefaultData>
+<IdLocation>^RFT.ERS.Classes.AuditClassD</IdLocation>
+<IndexLocation>^RFT.ERS.Classes.AuditClassI</IndexLocation>
+<StreamLocation>^RFT.ERS.Classes.AuditClassS</StreamLocation>
+<Data name="AuditClassDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>
