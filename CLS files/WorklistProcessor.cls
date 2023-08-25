@@ -1,15 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Export generator="IRIS" version="26" zv="IRIS for Windows (x86-64) 2023.1.1 (Build 380U)" ts="2023-08-25 15:44:12">
-<Class name="RFT.ERS.Process.WorklistProcessor">
-<ClassType>persistent</ClassType>
-<Super>Ens.BusinessProcess</Super>
-<TimeChanged>66711,38544.8217866</TimeChanged>
-<TimeCreated>66392,43790.9226508</TimeCreated>
+Class RFT.ERS.Process.WorklistProcessor Extends Ens.BusinessProcess [ ClassType = persistent ]
+{
 
-<Method name="OnRequest">
-<FormalSpec>pRequest:Ens.Request,*pResponse:Ens.StringContainer</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
+Method OnRequest(pRequest As Ens.Request, Output pResponse As Ens.StringContainer) As %Status
+{
 
 	set t=$$$OK
 	
@@ -162,11 +155,11 @@
 }
 END
 	quit t
-]]></Implementation>
-</Method>
+}
 
-<Storage name="Default">
+Storage Default
+{
 <Type>%Storage.Persistent</Type>
-</Storage>
-</Class>
-</Export>
+}
+
+}
