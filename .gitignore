@@ -1,0 +1,9 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+*.pem
+*.env
+target/
+out/
+build/
+.idea/

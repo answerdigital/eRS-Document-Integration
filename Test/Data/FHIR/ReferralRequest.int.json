@@ -1,0 +1,277 @@
+{
+    "id": "000049663888",
+    "meta": {
+        "versionId": "8",
+        "profile": [
+            "https://fhir.nhs.uk/STU3/StructureDefinition/eRS-ReferralRequest-1"
+        ]
+    },
+    "resourceType": "ReferralRequest",
+    "extension": [
+        {
+            "url": "https://fhir.nhs.uk/STU3/StructureDefinition/Extension-eRS-Appointment-Reference-1",
+            "valueReference": {
+                "reference": "Appointment/948158386"
+            }
+        },
+        {
+            "url": "https://fhir.nhs.uk/STU3/StructureDefinition/Extension-eRS-Appointment-1",
+            "valueReference": {
+                "reference": "#appointment"
+            }
+        },
+        {
+            "url": "https://fhir.nhs.uk/STU3/StructureDefinition/Extension-eRS-ClinicalInfoFirstSubmitted-1",
+            "valueDateTime": "2023-03-22T11:11:40.165Z"
+        },
+        {
+            "url": "https://fhir.nhs.uk/STU3/StructureDefinition/Extension-eRS-ReferralPriority-1",
+            "valueCodeableConcept": {
+                "coding": [
+                    {
+                        "code": "ROUTINE",
+                        "system": "https://fhir.nhs.uk/STU3/CodeSystem/eRS-Priority-1",
+                        "display": "Routine"
+                    }
+                ]
+            }
+        },
+        {
+            "url": "https://fhir.nhs.uk/STU3/StructureDefinition/Extension-eRS-ReferralShortlist-1",
+            "valueReference": {
+                "reference": "#shortlist"
+            }
+        },
+        {
+            "extension": [
+                {
+                    "url": "state",
+                    "valueCoding": {
+                        "code": "DEFERRED_TO_PROVIDER",
+                        "system": "https://fhir.nhs.uk/STU3/CodeSystem/eRS-ReferralState-1",
+                        "display": "Deferred To Provider"
+                    }
+                },
+                {
+                    "url": "reason",
+                    "valueCoding": {
+                        "code": "NO_SLOTS_AT_SERVICE",
+                        "system": "https://fhir.nhs.uk/STU3/CodeSystem/eRS-ReviewReason-1"
+                    }
+                }
+            ],
+            "url": "https://fhir.nhs.uk/STU3/StructureDefinition/Extension-eRS-ReferralState-1"
+        },
+        {
+            "url": "https://fhir.nhs.uk/STU3/StructureDefinition/Extension-eRS-Commissioning-Rule-Org-1",
+            "valueIdentifier": {
+                "system": "https://fhir.nhs.uk/Id/ods-organization-code",
+                "value": "B84612"
+            }
+        }
+    ],
+    "contained": [
+        {
+            "id": "serviceSearchCriteria",
+            "meta": {
+                "profile": [
+                    "https://fhir.nhs.uk/STU3/StructureDefinition/eRS-ServiceSearchCriteria-Parameters-1"
+                ]
+            },
+            "resourceType": "Parameters",
+            "parameter": [
+                {
+                    "name": "priority",
+                    "valueCoding": {
+                        "code": "ROUTINE",
+                        "system": "https://fhir.nhs.uk/STU3/CodeSystem/eRS-Priority-1"
+                    }
+                },
+                {
+                    "name": "specialty",
+                    "valueCoding": {
+                        "code": "ALLERGY",
+                        "system": "https://int.api.service.nhs.uk/referrals/FHIR/STU3/CodeSystem/SPECIALTY"
+                    }
+                },
+                {
+                    "name": "clinicType",
+                    "valueCoding": {
+                        "code": "ALLERGY_1",
+                        "system": "https://fhir.nhs.uk/STU3/CodeSystem/eRS-ClinicType-1"
+                    }
+                },
+                {
+                    "name": "clinicalTerm",
+                    "valueCoding": {
+                        "code": "106190000",
+                        "system": "http://snomed.info/sct"
+                    }
+                },
+                {
+                    "name": "postcode",
+                    "valueString": "HX2 9TB"
+                },
+                {
+                    "name": "ageAndGenderAppropriate",
+                    "valueBoolean": true
+                },
+                {
+                    "name": "commissioningProvisioning",
+                    "valueCoding": {
+                        "code": "ALL_AVAILABLE_FOR_BOOKING",
+                        "system": "https://fhir.nhs.uk/STU3/CodeSystem/eRS-CommissioningProvisioning-1"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "appointment",
+            "meta": {
+                "versionId": "1",
+                "profile": [
+                    "https://fhir.nhs.uk/STU3/StructureDefinition/eRS-Appointment-1",
+                    "https://fhir.hl7.org.uk/STU3/StructureDefinition/CareConnect-Appointment-1"
+                ]
+            },
+            "language": "en",
+            "resourceType": "Appointment",
+            "status": "proposed",
+            "reason": [
+                {
+                    "coding": [
+                        {
+                            "code": "NO_SLOTS_AT_SERVICE",
+                            "system": "https://fhir.nhs.uk/STU3/CodeSystem/eRS-ReviewReason-1"
+                        }
+                    ]
+                }
+            ],
+            "description": "e-Referral Appointment",
+            "created": "2023-03-22T11:14:55.752Z",
+            "comment": "test",
+            "incomingReferral": [
+                {
+                    "reference": "ReferralRequest/000049663888/_history/8"
+                }
+            ],
+            "participant": [
+                {
+                    "actor": {
+                        "identifier": {
+                            "system": "http://fhir.nhs.net/Id/ers-service",
+                            "value": "6709120"
+                        },
+                        "display": "Allergy Clinic"
+                    },
+                    "status": "accepted"
+                },
+                {
+                    "actor": {
+                        "identifier": {
+                            "system": "http://fhir.nhs.net/Id/nhs-number",
+                            "value": "9727846793"
+                        }
+                    },
+                    "status": "accepted"
+                }
+            ]
+        },
+        {
+            "id": "shortlist",
+            "meta": {
+                "profile": [
+                    "https://fhir.nhs.uk/STU3/StructureDefinition/eRS-Shortlist-List-1"
+                ]
+            },
+            "resourceType": "List",
+            "extension": [
+                {
+                    "url": "https://fhir.nhs.uk/STU3/StructureDefinition/Extension-eRS-Shortlist-SearchCriteria-1",
+                    "valueReference": {
+                        "reference": "#serviceSearchCriteria"
+                    }
+                }
+            ],
+            "status": "current",
+            "mode": "snapshot",
+            "entry": [
+                {
+                    "item": {
+                        "identifier": {
+                            "system": "http://fhir.nhs.net/Id/ers-service",
+                            "value": "6709120"
+                        },
+                        "display": "Allergy Clinic"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "DocumentReference-62725",
+            "meta": {
+                "profile": [
+                    "https://fhir.nhs.uk/STU3/StructureDefinition/eRS-DocumentReference-1"
+                ]
+            },
+            "resourceType": "DocumentReference",
+            "type": {
+                "coding": [
+                    {
+                        "code": "REFERRER",
+                        "system": "https://fhir.nhs.uk/STU3/CodeSystem/eRS-AttachmentType-1",
+                        "display": "Referrer"
+                    }
+                ]
+            },
+            "status": "current",
+            "indexed": "2023-03-23T09:57:05.345Z",
+            "description": "Example PDF",
+            "content": [
+                {
+                    "attachment": {
+                        "id": "62725",
+                        "extension": [
+                            {
+                                "url": "https://fhir.nhs.uk/STU3/StructureDefinition/Extension-eRS-AttachedBy-1",
+                                "valueReference": {
+                                    "identifier": {
+                                        "system": "http://fhir.nhs.net/Id/sds-user-id",
+                                        "value": "555263672102"
+                                    }
+                                }
+                            }
+                        ],
+                        "contentType": "application/pdf",
+                        "url": "Binary/att-8086826-62725",
+                        "size": 575537,
+                        "title": "VendorServicesDetails.pdf",
+                        "creation": "2023-03-22"
+                    }
+                }
+            ]
+        }
+    ],
+    "status": "active",
+    "specialty": {
+        "coding": [
+            {
+                "code": "ALLERGY",
+                "system": "https://int.api.service.nhs.uk/referrals/FHIR/STU3/CodeSystem/SPECIALTY",
+                "display": "Allergy"
+            }
+        ]
+    },
+    "subject": {
+        "identifier": {
+            "system": "http://fhir.nhs.net/Id/nhs-number",
+            "value": "9727846793"
+        }
+    },
+    "supportingInfo": [
+        {
+            "reference": "#DocumentReference-62725"
+        }
+    ],
+    "intent": "plan"
+}

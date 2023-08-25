@@ -1,0 +1,97 @@
+name: Build & Package
+
+on: [push]
+
+jobs:
+  build-java:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'corretto'
+          java-version: '17'
+      - name: Build with Maven
+        run: mvn --batch-mode --update-snapshots -f SmartcardAuth/pom.xml package
+      - uses: actions/upload-artifact@v3
+        with:
+          name: SmartcardAuth-Build
+          path: SmartcardAuth/target/*.jar
+  build-api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET Core SDK 6
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '6.0.x'
+      - name: Install dependencies
+        run: dotnet restore API/eRS.API.sln
+      - name: Build with dotnet
+        run: dotnet publish API/eRS.API.sln -c Release -o API/out --no-restore
+      - uses: actions/upload-artifact@v3
+        with:
+          name: API-Build
+          path: API/out/*
+  build-ui:
+    runs-on: ubuntu-latest
+    env:
+      CI: false
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.15.0
+      - run: npm --prefix Client install
+      - run: npm run --prefix Client build --if-present
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Client-Build
+          path: Client/build/*
+  package-release:
+    needs: [build-java, build-ui, build-api]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+      - name: Display structure of downloaded files
+        run: ls -R
+      - name: package with specific release_id for tagged releases
+        if: github.ref_type == 'tag'
+        env:
+          RELEASE_ID: ${{ github.ref_name }}
+        run: ./release.sh $RELEASE_ID
+        shell: bash
+      - name: package with a SNAPSHOT release_id for branch commits
+        if: github.ref_type == 'branch'
+        run: ./release.sh
+        shell: bash
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ers-document-integration
+          path: |
+            target/*.zip
+            target/*.jar
+            target/*.txt
+            target/LICENSE
+  release:
+    if: startsWith(github.event.ref, 'refs/tags/v')
+    needs: [package-release]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: ers-document-integration
+      - name: Display structure of downloaded files
+        run: ls -R
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            LICENSE
+            *.zip
+            *.jar
+          body_path: Release.txt
+          draft: true
+

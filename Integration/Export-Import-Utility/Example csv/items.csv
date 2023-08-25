@@ -1,0 +1,11 @@
+TESTPKG.FoundationProduction,Invoke_DocumentDownloader,RFT.ERS.Service.InvokeDocumentDownloader,1
+TESTPKG.FoundationProduction,Invoke_RefToDB,RFT.ERS.Service.InvokeRefToDB,1
+TESTPKG.FoundationProduction,Sch_InvokeReferralProcessor,RFT.ERS.Service.InvokeReferralProcessor,1
+TESTPKG.FoundationProduction,Sch_InvokeWorklistProcessor,RFT.ERS.Service.InvokeWorklistProcessor,1
+TESTPKG.FoundationProduction,ClinicalInformationDownloadProcessor,RFT.ERS.Process.ClinicalInformationProcessor,1
+TESTPKG.FoundationProduction,DocumentDownloadProcess,RFT.ERS.Process.DocumentProcessor,1
+TESTPKG.FoundationProduction,ReferralProcessor,RFT.ERS.Process.ReferralProcessor,1
+TESTPKG.FoundationProduction,ReferralToDB,RFT.ERS.Process.RefToDB,1
+TESTPKG.FoundationProduction,WorklistProcessor,RFT.ERS.Process.WorklistProcessor,1
+TESTPKG.FoundationProduction,HttpOut_ERS,RFT.ERS.Operation.ERS,1
+TESTPKG.FoundationProduction,ERS_DB_UPDATE,RFT.ERS.Operation.ExecuteQuery,1
