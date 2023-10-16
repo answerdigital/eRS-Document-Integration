@@ -3,3 +3,7 @@
 /workspace.xml
 *.pem
 *.env
+target/
+out/
+build/
+.idea/

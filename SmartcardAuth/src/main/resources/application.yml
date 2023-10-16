@@ -1,8 +1,3 @@
-server:
-  port: 8443
-  ssl:
-    certificate: "classpath:certs/server.pem.pub"
-    certificate-private-key: "classpath:keys/server.pem"
 spring:
   security:
     oauth2:
