@@ -1,0 +1,1 @@
+docker build -f Docker/Smartcard/Dockerfile -t ers-smartcard:latest target/

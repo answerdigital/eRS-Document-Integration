@@ -1,29 +1,27 @@
 version: '3.8'
 services:
-  db:
-    image: postgres:14.1-alpine
-    restart: always
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=HL7-stub-database
+  smartcard:
+    image: ers-smartcard:latest
     ports:
-      - '5432:5432'
-  hl7-api:
-    image: hl7
-    restart: unless-stopped
-    depends_on: 
-      - 'db'
-    ports:
-      - '5000:80'
+      - '8443:8443'
+      - '8080:80'
     environment:
-      - ENVIRONMENT=development
+      - SERVER_PORT=8443
+      - CLIENT_SECRET
+      - ERS_SESSIONHANDOVERENDPOINT
+      - CLIENT_ID
+      - SERVER_SSL_CERTIFICATEPRIVATEKEY
+      - REDIRECT_URI=https://localhost:8443/login/oauth2/code/cis2
+      - OAUTH_ENDPOINT=https://int.api.service.nhs.uk/oauth2-mock
+      - SERVER_HTTPPORT=80
+      - SERVER_SSL_CERTIFICATE
+      - ODS_CODE
+      - SERVER_ENABLETLS=true
   iris:
-    image: containers.intersystems.com/intersystems/irishealth-community:2023.1.0.218.0-linux-amd64
+    image: ers-tie:latest
     ports:
-      - '9091:1972'
-      - '9093:52773'
-      - '9980:9980'
+      - '1972:1972'
+      - '52773:52773'
     volumes:
       - /data/durable:/dur
     cap_add:
@@ -31,6 +29,9 @@ services:
     environment:
       - ISC_DATA_DIRECTORY=/dur/iris_conf.d
       - ISC_CPF_MERGE_FILE=/dur/merge/merge.cpf
+      - IRIS_USERNAME=ersuser
+      - IRIS_PASSWORD=password
+      - IRIS_NAMESPACE=ERS
   sql:
     image: ers-sql:latest
     ports: 

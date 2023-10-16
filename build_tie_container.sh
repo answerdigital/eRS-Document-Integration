@@ -1,0 +1,1 @@
+docker build -f Docker/TIE/Dockerfile -t ers-tie:latest target/

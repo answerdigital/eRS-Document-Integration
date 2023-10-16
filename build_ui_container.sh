@@ -1,1 +1,1 @@
-docker build -f Docker/UI/Dockerfile -t ers-ui:latest .
+docker build -f Docker/UI/Dockerfile -t ers-ui:latest target/

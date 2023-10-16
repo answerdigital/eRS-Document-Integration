@@ -1,10 +1,8 @@
-FROM node:latest
+FROM mcr.microsoft.com/dotnet/aspnet
 WORKDIR /App
-
-# Copy everything
-COPY Client ./
-# Restore as distinct layers
-RUN npm install
-
-ENTRYPOINT ["npm", "start"]
-EXPOSE 3000
+COPY DocumentReviewApplication*.zip DocumentReviewApplication.zip
+RUN apt-get update
+RUN apt-get install zip -y
+RUN unzip DocumentReviewApplication.zip
+ENTRYPOINT ["dotnet", "app/eRS.API.dll"]
+EXPOSE 5001
