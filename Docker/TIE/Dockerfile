@@ -14,11 +14,17 @@ RUN apt-get install zip -y
 RUN ACCEPT_EULA=Y apt-get install -y msodbcsql18
 COPY --chmod=777 <<EOF /etc/odbc.ini
 [ERS_SQL]
-Driver = ODBC Driver 18 for SQL Server  
+Driver = /opt/microsoft/msodbcsql18/lib64/libmsodbcsql-18.3.so.2.1
 Server = tcp:sql,1433
 Encrypt = yes
 TrustServerCertificate = yes
+Database = ers_database
 EOF
+
+# MS SQL ODBC requires 64bit library
+RUN mv /usr/irissys/bin/odbcgateway.so /usr/irissys/bin/odbcgateway.so.old
+RUN cp /usr/irissys/bin/odbcgatewayur64.so /usr/irissys/bin/odbcgateway.so
+RUN chown irisowner:irisowner /usr/irissys/bin/odbcgateway.so
 USER irisowner
 RUN unzip Integration-*.zip
 ENTRYPOINT [ "/iris-main", "-c echo -n ${IRIS_PASSWORD} > password.txt", "-p password.txt"]
