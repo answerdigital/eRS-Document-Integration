@@ -1,3 +1,4 @@
-0.0.5 Release including:
+0.0.6 Release including:
 
-- Corrected incorrect integration packaging
+- Bugfix not including userid in session handover
+- Provide docker builds for all components

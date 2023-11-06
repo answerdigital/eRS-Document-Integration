@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.answerdigital.ers</groupId>
 	<artifactId>ers-user-auth-app</artifactId>
-	<version>v0.0.5-alpha</version>
+	<version>v0.0.6-alpha</version>
 	<name>ers-user-auth</name>
 	<description>User auth component for eRS adaptor</description>
 	<properties>
