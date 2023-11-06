@@ -15,7 +15,6 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import org.slf4j.Logger;
-import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 @Configuration
@@ -43,7 +42,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         clientService.saveAuthorizedClient(client, principal);
     }
 
-    @Scheduled(cron = "0 0/1 * * * ?") //(cron = "0 0/5 * * * ?") //every 5 min
+    @Scheduled(cron = "0 0/5 * * * ?") //every 5 min
     public void reauthorizeCurrentClients() {
         logger.debug("Reauthorizing {} clients", currentClients.size());
         for (Map.Entry<String, Authentication> entry : currentClients.entrySet()) {
@@ -53,8 +52,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
             OAuth2AuthorizedClient reauthorizedClient = clientService.loadAuthorizedClient(DEFAULT_CLIENT_REGISTRATION_ID, key);
             RefreshTokenOAuth2AuthorizedClientProvider authorizedClientProvider = new RefreshTokenOAuth2AuthorizedClientProvider();
-            //authorizedClientProvider.setClockSkew(Duration.ofMinutes(5)); // renew 5 minutes before expiry
-            authorizedClientProvider.setClockSkew(Duration.ofMinutes(10));
+            authorizedClientProvider.setClockSkew(Duration.ofMinutes(5)); // renew 5 minutes before expiry
             OAuth2AuthorizationContext authorizationContext = OAuth2AuthorizationContext.withAuthorizedClient(reauthorizedClient).principal(value).build();
             reauthorizedClient = authorizedClientProvider.authorize(authorizationContext);
 
