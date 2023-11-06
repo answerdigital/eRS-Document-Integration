@@ -1,5 +1,7 @@
 package com.answerdigital.ers.auth;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.*;
@@ -7,6 +9,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProvider;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
@@ -31,7 +36,6 @@ public class WebSecurityConfig {
     SERVICE_PROVIDER_CLINICIAN_ADMIN - R5170
      */
     private List<String> userRoleCodes = Arrays.asList("R0050", "R5170");
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -76,8 +80,9 @@ public class WebSecurityConfig {
             )){
                 mappedAuthorities.add(new SimpleGrantedAuthority("ROLE_ERS_ADMIN_USER"));
             };
-
-            user = new DefaultOAuth2User(mappedAuthorities, user.getAttributes(), "name");
+            String usernameAttribute = userRequest.getClientRegistration()
+                    .getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
+            user = new DefaultOAuth2User(mappedAuthorities, user.getAttributes(), usernameAttribute);
 
             return user;
         };

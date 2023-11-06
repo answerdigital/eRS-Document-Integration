@@ -15,6 +15,8 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import org.slf4j.Logger;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 @Configuration
 @EnableScheduling
@@ -34,11 +36,14 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     @Override
     public void put(OAuth2AuthorizedClient client, Authentication principal){
-        currentClients.put(principal.getName(), principal);
+        currentClients.put(
+                principal.getName(),
+                principal
+        );
         clientService.saveAuthorizedClient(client, principal);
     }
 
-    @Scheduled(cron = "0 0/5 * * * ?") //every 5 min
+    @Scheduled(cron = "0 0/1 * * * ?") //(cron = "0 0/5 * * * ?") //every 5 min
     public void reauthorizeCurrentClients() {
         logger.debug("Reauthorizing {} clients", currentClients.size());
         for (Map.Entry<String, Authentication> entry : currentClients.entrySet()) {
@@ -48,7 +53,8 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
             OAuth2AuthorizedClient reauthorizedClient = clientService.loadAuthorizedClient(DEFAULT_CLIENT_REGISTRATION_ID, key);
             RefreshTokenOAuth2AuthorizedClientProvider authorizedClientProvider = new RefreshTokenOAuth2AuthorizedClientProvider();
-            authorizedClientProvider.setClockSkew(Duration.ofMinutes(5)); // renew 5 minutes before expiry
+            //authorizedClientProvider.setClockSkew(Duration.ofMinutes(5)); // renew 5 minutes before expiry
+            authorizedClientProvider.setClockSkew(Duration.ofMinutes(10));
             OAuth2AuthorizationContext authorizationContext = OAuth2AuthorizationContext.withAuthorizedClient(reauthorizedClient).principal(value).build();
             reauthorizedClient = authorizedClientProvider.authorize(authorizationContext);
 
@@ -57,7 +63,11 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
                 logger.info("Reauthorized client {}", key);
                 logger.debug("new access token: {}", reauthorizedClient.getAccessToken().getTokenValue());
                 logger.debug("new refresh token: {}", reauthorizedClient.getRefreshToken().getTokenValue());
-                AuthenticatedSession session = new AuthenticatedSession(reauthorizedClient.getAccessToken().getTokenValue(), key, reauthorizedClient.getPrincipalName());
+                AuthenticatedSession session = new AuthenticatedSession(
+                        reauthorizedClient.getAccessToken().getTokenValue(),
+                        key,
+                        ((OAuth2User)value.getPrincipal()).getAttribute("name")
+                );
                 AuthenticatedSessionResponse response = null;
                 clientService.saveAuthorizedClient(reauthorizedClient, value);
                 try {

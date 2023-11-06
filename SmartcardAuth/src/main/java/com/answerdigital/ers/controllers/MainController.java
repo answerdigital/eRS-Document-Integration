@@ -47,8 +47,8 @@ public class MainController {
         String accessTokenString = accessToken.getTokenValue();
         String expiresIn = accessToken.getExpiresAt().toString();
 
-        model.addAttribute("userName", user.getName());
-        model.addAttribute("userId", user.getAttribute("sub"));
+        model.addAttribute("userName", user.getAttribute("name"));
+        model.addAttribute("userId", user.getName());
         model.addAttribute("accessToken", accessTokenString);
         model.addAttribute("expiresIn", expiresIn);
 
@@ -62,8 +62,8 @@ public class MainController {
 
         AuthenticatedSession session = new AuthenticatedSession();
         session.setAuthenticationToken(client.getAccessToken().getTokenValue());
-        session.setName(user.getName());
-        session.setUserId(user.getAttribute("sub"));
+        session.setName(user.getAttribute("name"));
+        session.setUserId(user.getName());
 
         AuthenticatedSessionResponse response = null;
         try {

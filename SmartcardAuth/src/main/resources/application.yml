@@ -14,7 +14,7 @@ spring:
             authorization-uri: ${OAUTH_ENDPOINT}/authorize
             token-uri: ${OAUTH_ENDPOINT}/token
             user-info-uri: ${OAUTH_ENDPOINT}/userinfo
-            userNameAttribute: name
+            user-name-attribute: sub
 logging.level:
   com.answerdigital.ers: DEBUG
   root: INFO
