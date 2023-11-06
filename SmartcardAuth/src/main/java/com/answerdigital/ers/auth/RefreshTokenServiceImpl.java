@@ -15,6 +15,7 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import org.slf4j.Logger;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 @Configuration
 @EnableScheduling
@@ -34,7 +35,10 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     @Override
     public void put(OAuth2AuthorizedClient client, Authentication principal){
-        currentClients.put(principal.getName(), principal);
+        currentClients.put(
+                principal.getName(),
+                principal
+        );
         clientService.saveAuthorizedClient(client, principal);
     }
 
@@ -57,7 +61,11 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
                 logger.info("Reauthorized client {}", key);
                 logger.debug("new access token: {}", reauthorizedClient.getAccessToken().getTokenValue());
                 logger.debug("new refresh token: {}", reauthorizedClient.getRefreshToken().getTokenValue());
-                AuthenticatedSession session = new AuthenticatedSession(reauthorizedClient.getAccessToken().getTokenValue(), key, reauthorizedClient.getPrincipalName());
+                AuthenticatedSession session = new AuthenticatedSession(
+                        reauthorizedClient.getAccessToken().getTokenValue(),
+                        key,
+                        ((OAuth2User)value.getPrincipal()).getAttribute("name")
+                );
                 AuthenticatedSessionResponse response = null;
                 clientService.saveAuthorizedClient(reauthorizedClient, value);
                 try {
