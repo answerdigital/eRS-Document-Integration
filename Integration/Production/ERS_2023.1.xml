@@ -1,5 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="IRIS" version="26" zv="IRIS for Windows (x86-64) 2023.1 (Build 229U)" ts="2023-11-08 08:47:56">
+<Export generator="IRIS" version="26" zv="IRIS for Windows (x86-64) 2023.1 (Build 229U)" ts="2023-11-08 11:24:08">
+<Project name="EnsExportProduction_2023-11-08 11-19-37_701+0" LastModified="2023-11-08 11:24:08.9054807">
+  <ProjectDescription>Studio Project generated from Production 'RFT.ERS.Production' at 2023-11-08 11:19:37.701 UTC</ProjectDescription>
+  <Items>
+    <ProjectItem name="RFT.ERS.Classes.Attachment" type="CLS"></ProjectItem>
+    <ProjectItem name="RFT.ERS.Classes.AttachmentResponse" type="CLS"></ProjectItem>
+    <ProjectItem name="RFT.ERS.Classes.AuditClass" type="CLS"></ProjectItem>
+    <ProjectItem name="RFT.ERS.Classes.HttpResponse" type="CLS"></ProjectItem>
+    <ProjectItem name="RFT.ERS.Classes.RefToDB" type="CLS"></ProjectItem>
+    <ProjectItem name="RFT.ERS.Classes.ReferralDetails" type="CLS"></ProjectItem>
+    <ProjectItem name="RFT.ERS.Classes.ReferralDetailsResponse" type="CLS"></ProjectItem>
+    <ProjectItem name="RFT.ERS.Classes.RequestAttachment" type="CLS"></ProjectItem>
+    <ProjectItem name="RFT.ERS.Classes.RequestClinicalInformation" type="CLS"></ProjectItem>
+    <ProjectItem name="RFT.ERS.Classes.RequestReferralDetails" type="CLS"></ProjectItem>
+    <ProjectItem name="RFT.ERS.Classes.RequestWorklist" type="CLS"></ProjectItem>
+    <ProjectItem name="RFT.ERS.Classes.WorklistItem" type="CLS"></ProjectItem>
+    <ProjectItem name="RFT.ERS.Classes.WorklistResponse" type="CLS"></ProjectItem>
+    <ProjectItem name="RFT.ERS.Operation.ERS" type="CLS"></ProjectItem>
+    <ProjectItem name="RFT.ERS.Operation.ExecuteQuery" type="CLS"></ProjectItem>
+    <ProjectItem name="RFT.ERS.Process.ClinicalInformationProcessor" type="CLS"></ProjectItem>
+    <ProjectItem name="RFT.ERS.Process.DocumentProcessor" type="CLS"></ProjectItem>
+    <ProjectItem name="RFT.ERS.Process.RefToDB" type="CLS"></ProjectItem>
+    <ProjectItem name="RFT.ERS.Process.ReferralProcessor" type="CLS"></ProjectItem>
+    <ProjectItem name="RFT.ERS.Process.WorklistProcessor" type="CLS"></ProjectItem>
+    <ProjectItem name="RFT.ERS.Production" type="CLS"></ProjectItem>
+    <ProjectItem name="RFT.ERS.Service.InvokeDocumentDownloader" type="CLS"></ProjectItem>
+    <ProjectItem name="RFT.ERS.Service.InvokeRefToDB" type="CLS"></ProjectItem>
+    <ProjectItem name="RFT.ERS.Service.InvokeReferralProcessor" type="CLS"></ProjectItem>
+    <ProjectItem name="RFT.ERS.Service.InvokeWorklistProcessor" type="CLS"></ProjectItem>
+    <ProjectItem name="RFT.ERS.Tables.Attachments" type="CLS"></ProjectItem>
+    <ProjectItem name="RFT.ERS.Tables.Referrals" type="CLS"></ProjectItem>
+    <ProjectItem name="RFT.ERS.Tables.Worklist" type="CLS"></ProjectItem>
+    <ProjectItem name="RFT.Utility.CodeableConcept" type="CLS"></ProjectItem>
+    <ProjectItem name="Util.ExportClassesUtil" type="CLS"></ProjectItem>
+    <ProjectItem name="Util.ImportClassesUtil" type="CLS"></ProjectItem>
+    <ProjectItem name="ERS.ContentTypeToExtension.LUT" type="LUT"></ProjectItem>
+    <ProjectItem name="ProductionSettings:RFT.ERS.Production.PTD" type="PTD"></ProjectItem>
+    <ProjectItem name="EnsExportNotes.EnsExportProduction_2023-11-08 11-19-37_701+0.PTD" type="PTD"></ProjectItem>
+  </Items>
+</Project>
+
+
 <Class name="RFT.ERS.Classes.Attachment">
 <Super>Ens.Response</Super>
 <TimeChanged>66746,37302.6023422</TimeChanged>
@@ -1755,109 +1796,6 @@ END
 </Class>
 
 
-<Class name="RFT.ERS.Process.HL7Process">
-<ClassType>persistent</ClassType>
-<Super>Ens.BusinessProcess</Super>
-<TimeChanged>66746,37302.9677116</TimeChanged>
-<TimeCreated>66746,37302.9677116</TimeCreated>
-
-<Method name="OnRequest">
-<FormalSpec>pRequest:EnsLib.HL7.Message,*pResponse:Ens.Response</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-
-	set t=$$$OK
-	
-	Set msg=pRequest
-	set nhs="" set mrn=""
-
-	//Loop through PID to get NHS && MRN
-	set x=msg.FindSegmentValues("PID:3(*)")
-	for i=1:1:x
-		{
-			
-			if msg.FindSegmentValues("PID:3("_i_").5")="SS"
-			{
-				set nhs=msg.FindSegmentValues("PID:3("_i_").1")
-					
-			}
-				if msg.FindSegmentValues("PID:3("_i_").5")="MR"
-			{
-				set mrn=msg.FindSegmentValues("PID:3("_i_").1")
-					
-			}
-			
-			
-	}
-	$$$TRACE("NHS NUMBER : "_nhs)	
-		
-	IF nhs=""
-	{	
-		$$$TRACE("NO NHS NUMBER FOUND. DISCARDING MESSAGE")
-		GOTO END
-	}	
-	
-	//Check NHS Numb against worklist to see if we need to send to DB
-	
-	set ubrn="" set specialty=""
-	&sql(SELECT ubrn,specialty into :ubrn,:specialty FROM RFT_ERS_Tables.Worklist WHERE patientID=:nhs)
-	
-	IF ubrn=""
-	{
-		$$$TRACE("PATIENT NOT ON WORKLIST. DISCARDING MESSAGE. NHS NUMBER : "_nhs)
-		GOTO END
-	}	
-	
-	$$$TRACE("Patient exists on worklist. NHS NUMBER : "_nhs)
-	
-	//Get message type
-	
-	set messageType=msg.FindSegmentValues("MSH:9.2")
-	
-	IF messageType="S12"
-	{
-		
-		$$$TRACE("EXTRACTING VALUES FROM HL7")
-		set lastName=msg.FindSegmentValues("PID:5(1).1.1")
-		set firstName=msg.FindSegmentValues("PID:5(1).2")
-		set sex=msg.FindSegmentValues("PID:8")
-		set dob=msg.FindSegmentValues("PID:7.1")
-		set addressOne=msg.FindSegmentValues("PID:11.1")
-		set addressTwo=msg.FindSegmentValues("PID:11.2")
-		set addressThree=msg.FindSegmentValues("PID:11.3")
-		set postcode=msg.FindSegmentValues("PID:11.5")
-		set contactNumber=msg.FindSegmentValues("PID:13.1")
-		
-		set qry="INSERT INTO patients (pat_ubrn,pat_mrn,pat_nhs,pat_familyName,pat_givenName,pat_sex,pat_dob,"
-		set qry=qry_"pat_addressOne,pat_addressTwo,pat_addressThree,pat_PostCode,pat_contactNumber,pat_speciality,"
-		set qry=qry_"rec_Updated,rec_UpdatedBy) VALUES ('"_ubrn_"','"_mrn_"','"_nhs_"','"_lastName_"','"_firstName_"','"
-		set qry=qry_sex_"','"_dob_"','"_addressOne_"','"_addressTwo_"','"_addressThree_"','"_postcode_"','"_contactNumber_"','"_specialty_"','"
-		set qry=qry_$zdatetime($horolog,3)_"','TIE')"	
-		quit t
-		
-	}
-	
-			
-
-	
-	
-	
-
-	
-
-		
-	
-END	
-	quit t
-]]></Implementation>
-</Method>
-
-<Storage name="Default">
-<Type>%Storage.Persistent</Type>
-</Storage>
-</Class>
-
-
 <Class name="RFT.ERS.Process.RefToDB">
 <ClassType>persistent</ClassType>
 <Super>Ens.BusinessProcess</Super>
@@ -3170,6 +3108,249 @@ END
 </Class>
 
 
+<Class name="Util.ExportClassesUtil">
+<Super>%RegisteredObject</Super>
+<TimeChanged>66620,38232.2796087</TimeChanged>
+<TimeCreated>66620,36557.7487099</TimeCreated>
+
+<UDLText name="T">
+<Content><![CDATA[
+// Method to export classes from the given package name
+
+]]></Content>
+</UDLText>
+
+<Method name="UDLExport">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>packageName:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+        set tsc =$$$OK
+        // Construct SQL query to retrieve class names from the given package
+        set Qry= "SELECT Name FROM %Library.RoutineMgr_StudioOpenDialog('"_packageName_"',1,1,0,1,0,0)"
+        Set ST=##class(%SQL.Statement).%New()
+        // Create a new %SQL.Statement object and prepare the query
+        set tsc = ST.%Prepare(Qry)
+        // Execute the prepared query to obtain a result set
+        set rset = ST.%Execute()
+
+        // Loop through each result in the result set
+        while rset.%Next()
+        {
+            // Get the class name from the result set
+            set ClassName = rset.%Get("Name")
+            // Export the class in the form of a UDL file using the $System.OBJ.ExportUDL method
+            set tsc =  $System.OBJ.ExportUDL(ClassName,ClassName,,,)
+            write ClassName,!
+        }
+    quit tsc
+]]></Implementation>
+</Method>
+
+<UDLText name="T">
+<Content><![CDATA[
+// Method to export production classes as xml for a specific IRIS/Cache version 
+
+]]></Content>
+</UDLText>
+
+<Method name="ExportProd">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>version:%String,packageName:%String,ProductionExportFile:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    set tsc =$$$OK
+    // Set the export version qualifier
+    set tsc = $SYSTEM.OBJ.SetQualifiers("/exportversion="_version)
+    // Export the package classes using the $System.OBJ.Export method and store the exported data in the specified production export file
+    do $System.OBJ.Export(.packageName,.ProductionExportFile)
+       
+    quit tsc
+]]></Implementation>
+</Method>
+
+<UDLText name="T">
+<Content><![CDATA[
+/*
+
+Run in terminal: 
+
+Class method 1: to export classes and lookup tables
+    do ##class("Util.ExportClassesUtil").UDLExport("RFT.*.cls,*.LUT") 
+
+Class method 2: to export an entire production 
+    // Use to export PROD to be deployed on Cache systems
+    do ##class("Util.ExportClassesUtil").ExportProd("cache2017.2.1","RFT.*.cls,*.LUT","ProductionToDeploy.xml")
+
+    // Use to export PROD to be deployed on IRIS systems   
+    do ##class("Util.ExportClassesUtil").ExportProd("iris2022.3","RFT.*.cls,*.LUT,*.PTD","ProductionToDeploy.xml")
+
+*/
+]]></Content>
+</UDLText>
+</Class>
+
+
+<Class name="Util.ImportClassesUtil">
+<Super>%RegisteredObject</Super>
+<TimeChanged>66620,38504.8594777</TimeChanged>
+<TimeCreated>66612,47830.951194</TimeCreated>
+
+<UDLText name="T">
+<Content><![CDATA[
+// To import an entire production and automatically create the components 
+
+]]></Content>
+</UDLText>
+
+<Method name="ParentClass">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pDirectory:%String,pCSVFile:%String</FormalSpec>
+<Implementation><![CDATA[
+    set tsc = $$$OK
+    set tsc = ..Import(pDirectory)
+    set tsc = ..ImportCSV(pCSVFile)
+
+
+    quit tsc
+]]></Implementation>
+</Method>
+
+<Method name="Import">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pDirectory:%String</FormalSpec>
+<Implementation><![CDATA[
+	set tsc =$$$OK
+	set ProdToImport =  $SYSTEM.OBJ.ImportDir(pDirectory,,"c")
+
+	quit tsc
+]]></Implementation>
+</Method>
+
+<Method name="ImportCSV">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pCSVFile:%String</FormalSpec>
+<Implementation><![CDATA[
+    set tsc = $$$OK
+    write ("ImportingHere")
+    // read from csv component and class names 
+    set adapter = ##class(%File).%New(pCSVFile)
+    set status = adapter.Open("R")
+
+    if $$$ISERR(status)
+    {
+     do $System.Status.DisplayError(status)
+    }
+
+    set counter =1
+    // looping through the lines in the csv 
+    while 'adapter.AtEnd
+    {
+        set line=adapter.ReadLine()
+        // create a dynamic object 
+        set rec= ##class(%DynamicObject).%New()
+        //// Set the values of the dynamic object's properties based on the values in the current line of the CSV file
+        Set rec.Production = $piece(line,",",1)
+        Set rec.Name = $piece(line,",",2)
+        Set rec.ClassName = $piece(line,",",3)
+        Set rec.PoolSize = $piece(line,",",4)
+        Set rec.Comment = $piece(line,",",5)
+
+        ;Set savestatus=rec.%Save()
+        /*
+        if $$$ISERR(savestatus)
+        {
+         do $System.Status.DisplayError(status)
+        }
+        */
+        if rec.Production '=""
+        {
+            // calling the classmethod below 'addbusinessitem'
+            set tsc= ..AddBusinessItem(rec.Production, rec.Name, rec.ClassName, rec.PoolSize, rec.Comment)
+        }
+        else {quit}
+    }
+    
+      //if error found during processing,show it
+      if $$$ISERR(status)
+      {
+       do $System.Status.DisplayError(status)
+      }
+      quit tsc
+]]></Implementation>
+</Method>
+
+<Method name="AddBusinessItem">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pProduction:%String,pItemName:%String,pClassName:%String,pPoolSize:%Integer=1,pComment:%String=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    Set ret = $$$OK
+    write "started",!
+    Try {
+        // Check the mandatories values
+        If ((pItemName '="") && (pClassName '=""))
+        {
+            If '##class(Ens.Config.Item).NameExists(pProduction,pItemName,.idItem)
+            {
+                Set production = ##class(Ens.Config.Production).%OpenId(pProduction)
+                Write !,"Installing "_pItemName,!
+                Set objItem = ##class(Ens.Config.Item).%New()
+                Set objItem.Name = pItemName
+                write "pClassName : "_pClassName,!
+                Set objItem.ClassName = pClassName
+                Set objItem.Enabled = 1
+                Set objItem.PoolSize = pPoolSize
+                Set objItem.Comment = pComment
+                
+
+
+                Do production.Items.Insert(objItem)
+
+                Set st = production.%Save()
+                Kill objItem
+
+                Do ##class(Ens.Director).RestartProduction(0,1)
+                Write !,"Item "_pItemName_" installed."
+            }
+            Else
+            {
+                Write !,"Item "_pItemName_" already exists."
+            }
+
+        }
+        Else
+        {
+            If (pItemName = "") set attrib = "pItemName"
+            If (pClassName ="") set attrib = "pClassName"
+
+            $$$ThrowOnError($System.Status.Error(406,attrib))
+        }
+    }
+    Catch ex {
+        Set ret = ex.AsStatus()
+        Write !,"Error #",$System.Status.GetErrorCodes(ret),!
+        Write !,$System.Status.GetOneStatusText(ret,1),!
+    }
+
+    Quit ret
+]]></Implementation>
+</Method>
+
+<UDLText name="T">
+<Content><![CDATA[
+/*
+
+Usage Example, run in the terminal: 
+
+do ##class("Util.ImportClassesUtil").ParentClass("C:\Users\MohammedAlhato\OneDrive - Answer Digital\Desktop\Integration-v0.0.2\Script[post_class_import]","C:\Users\MohammedAlhato\OneDrive - Answer Digital\Desktop\Integration-v0.0.2\Script[post_class_import]\items.csv")
+
+*/
+]]></Content>
+</UDLText>
+</Class>
+
+
 <Document name="ERS.ContentTypeToExtension.LUT">
 <lookupTable>
 <entry table="ERS.ContentTypeToExtension" key="application/msword">doc</entry>
@@ -3184,4 +3365,63 @@ END
 <entry table="ERS.ContentTypeToExtension" key="text/plain">txt</entry>
 <entry table="ERS.ContentTypeToExtension" key="text/rtf">rtf</entry>
 </lookupTable>
+</Document>
+
+<Document name="EnsExportNotes.EnsExportProduction_2023-11-08 11-19-37_701+0.PTD"><ProjectTextDocument name="EnsExportNotes.EnsExportProduction_2023-11-08 11-19-37_701+0" description="Export Notes for export EnsExportProduction_2023-11-08 11-19-37_701+0">
+<![CDATA[<Deployment>
+<Creation>
+<Machine>ANS-A1021</Machine>
+<Instance>IRISHEALTH1</Instance>
+<Namespace>USER</Namespace>
+<SourceProduction>RFT.ERS.Production</SourceProduction>
+<Username>HaitemElAaouaniAdmin</Username>
+<UTC>2023-11-08 11:24:08.893</UTC>
+</Creation>
+<Notes>
+</Notes>
+<Contents>
+<ExportProject>EnsExportProduction_2023-11-08 11-19-37_701+0</ExportProject>
+<Item num="1">ERS.ContentTypeToExtension.LUT</Item>
+<Item num="2">ProductionSettings:RFT.ERS.Production.PTD</Item>
+<Item num="3">RFT.ERS.Classes.Attachment.CLS</Item>
+<Item num="4">RFT.ERS.Classes.AttachmentResponse.CLS</Item>
+<Item num="5">RFT.ERS.Classes.AuditClass.CLS</Item>
+<Item num="6">RFT.ERS.Classes.HttpResponse.CLS</Item>
+<Item num="7">RFT.ERS.Classes.RefToDB.CLS</Item>
+<Item num="8">RFT.ERS.Classes.ReferralDetails.CLS</Item>
+<Item num="9">RFT.ERS.Classes.ReferralDetailsResponse.CLS</Item>
+<Item num="10">RFT.ERS.Classes.RequestAttachment.CLS</Item>
+<Item num="11">RFT.ERS.Classes.RequestClinicalInformation.CLS</Item>
+<Item num="12">RFT.ERS.Classes.RequestReferralDetails.CLS</Item>
+<Item num="13">RFT.ERS.Classes.RequestWorklist.CLS</Item>
+<Item num="14">RFT.ERS.Classes.WorklistItem.CLS</Item>
+<Item num="15">RFT.ERS.Classes.WorklistResponse.CLS</Item>
+<Item num="16">RFT.ERS.Operation.ERS.CLS</Item>
+<Item num="17">RFT.ERS.Operation.ExecuteQuery.CLS</Item>
+<Item num="18">RFT.ERS.Process.ClinicalInformationProcessor.CLS</Item>
+<Item num="19">RFT.ERS.Process.DocumentProcessor.CLS</Item>
+<Item num="20">RFT.ERS.Process.RefToDB.CLS</Item>
+<Item num="21">RFT.ERS.Process.ReferralProcessor.CLS</Item>
+<Item num="22">RFT.ERS.Process.WorklistProcessor.CLS</Item>
+<Item num="23">RFT.ERS.Production.CLS</Item>
+<Item num="24">RFT.ERS.Service.InvokeDocumentDownloader.CLS</Item>
+<Item num="25">RFT.ERS.Service.InvokeRefToDB.CLS</Item>
+<Item num="26">RFT.ERS.Service.InvokeReferralProcessor.CLS</Item>
+<Item num="27">RFT.ERS.Service.InvokeWorklistProcessor.CLS</Item>
+<Item num="28">RFT.ERS.Tables.Attachments.CLS</Item>
+<Item num="29">RFT.ERS.Tables.Referrals.CLS</Item>
+<Item num="30">RFT.ERS.Tables.Worklist.CLS</Item>
+<Item num="31">RFT.Utility.CodeableConcept.CLS</Item>
+<Item num="32">Util.ExportClassesUtil.CLS</Item>
+<Item num="33">Util.ImportClassesUtil.CLS</Item>
+</Contents>
+<ProductionClassInExport>RFT.ERS.Production</ProductionClassInExport>
+</Deployment>
+
+]]></ProjectTextDocument>
+</Document>
+
+<Document name="ProductionSettings:RFT.ERS.Production.PTD"><ProjectTextDocument name="ProductionSettings:RFT.ERS.Production" description="Settings for production RFT.ERS.Production">
+<![CDATA[<Production Name='RFT.ERS.Production' LogGeneralTraceEvents='false'><Description/><ActorPoolSize>2</ActorPoolSize></Production>
+]]></ProjectTextDocument>
 </Document></Export>
