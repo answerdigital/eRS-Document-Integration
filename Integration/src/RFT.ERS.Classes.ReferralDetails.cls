@@ -19,6 +19,10 @@ Property priority As %String;
 
 Property docStatus As %String;
 
+Property clinicalInfoFirstSubmitted As %String;
+
+Property clinicalInfoLastUpdate As %String;
+
 Storage Default
 {
 <Data name="ReferralDetailsDefaultData">
@@ -49,6 +53,12 @@ Storage Default
 </Value>
 <Value name="9">
 <Value>docStatus</Value>
+</Value>
+<Value name="10">
+<Value>clinicalInfoFirstSubmitted</Value>
+</Value>
+<Value name="11">
+<Value>clinicalInfoLastUpdate</Value>
 </Value>
 </Data>
 <DefaultData>ReferralDetailsDefaultData</DefaultData>

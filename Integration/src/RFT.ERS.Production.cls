@@ -26,8 +26,9 @@ XData ProductionDefinition
     <Setting Target="Host" Name="OutputDir">C:\Users\HaitemElAaouani\Documents\eRS\OuPut\raw</Setting>
     <Setting Target="Host" Name="PDFsFolder">C:\Users\HaitemElAaouani\Documents\eRS\OuPut\pdf</Setting>
     <Setting Target="Host" Name="DocumentStorageMode">MOUNTHLY</Setting>
+    <Setting Target="Host" Name="AllowedFiles">docx,doc,txt,rtf,tif,jpeg,xml</Setting>
   </Item>
-  <Item Name="ReferralProcessor" Category="ERS" ClassName="RFT.ERS.Process.ReferralProcessor" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+  <Item Name="ReferralProcessor" Category="ERS" ClassName="RFT.ERS.Process.ReferralProcessor" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
   </Item>
   <Item Name="ReferralToDB" Category="ERS" ClassName="RFT.ERS.Process.RefToDB" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
   </Item>
@@ -41,7 +42,7 @@ XData ProductionDefinition
     <Setting Target="Host" Name="WorkListSizeLimitMB">0.1</Setting>
   </Item>
   <Item Name="ERS_DB_UPDATE" Category="ERS" ClassName="RFT.ERS.Operation.ExecuteQuery" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
-    <Setting Target="Adapter" Name="DSN">ERS_DATABASE</Setting>
+    <Setting Target="Adapter" Name="DSN">ERS</Setting>
     <Setting Target="Adapter" Name="StayConnected">30</Setting>
     <Setting Target="Adapter" Name="Credentials">ERS</Setting>
   </Item>

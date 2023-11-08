@@ -5,6 +5,7 @@ Method OnRequest(pInput As RFT.ERS.Classes.RequestReferralDetails, Output pRespo
 {
 	set t=$$$OK
 	$$$TRACE(pInput.ubrn)
+	set ubrn = pInput.ubrn
 	
 	//Query ERS API for referral details
 	set t=..SendRequestSync("HttpOut_ERS",pInput,.refResp)
@@ -12,6 +13,67 @@ Method OnRequest(pInput As RFT.ERS.Classes.RequestReferralDetails, Output pRespo
 
 	IF t
 	{
+		$$$TRACE("Will do  clinicalInfoFirstSubmitted & clinicalInfoFirstSubmitted2")
+		//First check if ubrn exists in local list
+		set workList=##class(RFT.ERS.Tables.Worklist).%OpenId(ubrn)
+		
+		IF $ISOBJECT(workList)
+		{	 //We need to check if there is an update been made on ERS thats not been updated locally
+			$$$TRACE("UBRN "_ubrn_" exists on local list")
+	
+			// Case workList.clinicalInfoFirstSubmitted empty need to pick up the response value
+			if $LENGTH(refResp.Referral.clinicalInfoFirstSubmitted) '= 0
+			{
+				if $LENGTH(workList.clinicalInfoFirstSubmitted) = 0
+				{
+					set workList.clinicalInfoFirstSubmitted = refResp.Referral.clinicalInfoFirstSubmitted
+				}
+			}
+
+			// if refResp.Referral.clinicalInfoLastUpdate exist then Populate the variable ersLastUpdate
+			if $LENGTH(refResp.Referral.clinicalInfoLastUpdate) '= 0
+			{
+				set ersLastUpdate = refResp.Referral.clinicalInfoLastUpdate
+			}
+			else
+			{
+				set ersLastUpdate = refResp.Referral.clinicalInfoFirstSubmitted
+			}
+
+			// Case workList.clinicalInfoLastUpdate empty
+			set localLastUpdated = workList.clinicalInfoLastUpdate
+			if $LENGTH(localLastUpdated) = 0
+			{
+				set workList.clinicalInfoLastUpdate = ersLastUpdate
+			}
+
+			if localLastUpdated '= ersLastUpdate
+			{
+				$$$TRACE("Update to local list required. UBRN: "_ubrn)
+				set workList.specialty=refResp.Referral.specialty
+				set workList.apptStart=refResp.Referral.apptStart
+				;set workList.clinicalInfoLastUpdate=refResp.Referral.clinicalInfoLastUpdate
+				set workList.priority=refResp.Referral.priority
+				;set workList.refType=refResp.Referral.refType
+				;set workList.clinician=refResp.Referral.clinician
+				set workList.apptStart=refResp.Referral.apptStart
+				set workList.statusFlag=0 //We will poll A005 to grab ref details again
+				set workList.UpdatePatientDB=0
+
+				set t=workList.%Save()
+
+				//delete from attachments table as we will redownload
+				&sql(DELETE FROM RFT_ERS_Tables.Attachments where ubrn=:ubrn)
+			}
+			else 
+			{
+				$$$TRACE("No update required for ubrn: "_ubrn)
+			}	
+		}
+
+
+		// Updating referrals table
+
 		set ref=##class(RFT.ERS.Tables.Referrals).%OpenId(pInput.ubrn)
 		
 		IF '$ISOBJECT(ref)
@@ -43,7 +105,6 @@ Method OnRequest(pInput As RFT.ERS.Classes.RequestReferralDetails, Output pRespo
 			
 			IF attchItem.size>5242880
 			{
-			
 				$$$TRACE("Attachment too large")
 				//This will error if we try to download
 				//Send email alert 			
@@ -53,7 +114,6 @@ Method OnRequest(pInput As RFT.ERS.Classes.RequestReferralDetails, Output pRespo
 				set t=..GenerateAlert(errorText)
 			
 			GOTO END
-			
 			}
 		
 			set attach.size=attchItem.size
@@ -90,8 +150,7 @@ END
 	}
 	
 	$$$LOGINFO("refResp :"_refResp)
-	
-	;IF refResp.StatusCode = "200,422,404"
+
 	IF $FIND("200,422,404", refResp.StatusCode ) '= 0
 	{
 		//If api call returns at 404 or 422 we do not need to try again 

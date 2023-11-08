@@ -17,7 +17,9 @@ Parameter SETTINGS = "FhirServer,ODSCode,WorkListSizeLimitMB";
 
 Method RetrieveWorklist(pInput As RFT.ERS.Classes.RequestWorklist, Output pResponse As Ens.Response)
 {
-    set tsc=$$$OK
+    set tsc = $$$OK
+
+    $$$TRACE("Selector: "_ pInput.sessionSelector)
     
     //create body for http request
     set body={}
@@ -32,7 +34,8 @@ Method RetrieveWorklist(pInput As RFT.ERS.Classes.RequestWorklist, Output pRespo
     set parameterObj.valueCodeableConcept.coding=[]
     set coding={}
     set coding.system="https://fhir.nhs.uk/STU3/CodeSystem/eRS-ReferralListSelector-1"
-    set coding.code="APPOINTMENT_SLOT_ISSUES"
+    ;set coding.code="APPOINTMENT_SLOT_ISSUES"
+    set coding.code=pInput.sessionSelector
     do parameterObj.valueCodeableConcept.coding.%Push(coding)
     do body.parameter.%Push(parameterObj)
 
@@ -88,12 +91,14 @@ Method RetrieveWorklist(pInput As RFT.ERS.Classes.RequestWorklist, Output pRespo
     }
     
     //Extract values from fhir response 
-    set data=tHttpResponse.Data
+    set data = tHttpResponse.Data
+    set XRequestID = tHttpResponse.GetHeader("X-Request-ID")
     IF $ISOBJECT(data)
     {
         set obj=[].%FromJSON(data)
         set resp=##class(RFT.ERS.Classes.WorklistResponse).%New()
         set entry=obj.entry
+        //if obj.contained set Contained=obj.contained
     }
     
     IF $ISOBJECT(entry)
@@ -125,12 +130,43 @@ Method RetrieveWorklist(pInput As RFT.ERS.Classes.RequestWorklist, Output pRespo
 		    	}  
     
 		    	if extensionItem.url="clinicalInfoPrinted" set ref.clinicalInfoPrinted=extensionItem.valueBoolean
+		    	if extensionItem.url="clinicalInfoFirstSubmitted" set ref.clinicalInfoFirstSubmitted=extensionItem.valueDateTime
                 if extensionItem.url="clinicalInfoLastUpdated" set ref.clinicalInfoLastUpdate=extensionItem.valueDateTime
-                if extensionItem.url="patient" set ref.patientID=extensionItem.valueReference.identifier.value    
+                if extensionItem.url="patient"
+                {
+                    if extensionItem.valueReference.identifier.value
+                    {
+                        set ref.patientID=extensionItem.valueReference.identifier.value
+
+                    }
+                    elseif $E(extensionItem.valueReference.reference, 1, 9) = "#Patient-"
+                    {
+                        set ref.patientID = $E(extensionItem.valueReference.reference, $L(extensionItem.valueReference.reference)-9, $L(extensionItem.valueReference.reference))
+                    }
+                    else
+                    {
+                        set alert=##class(Ens.AlertRequest).%New()
+                        set alertText = "Failure to extract NHS number from the worklist response."
+                        set alert.AlertText=alertText
+                        set alert.AlertDestination="Ens.Alert"
+                        set tsc = ..SendAlert(alert)
+                    }
+                }
+                $$$TRACE("NHS Number case "_pInput.sessionSelector_" "_ref.patientID)               
 	        }
+
             do resp.Item.Insert(ref)
+
+            // Audit Log Manager
+            Set AuditLogDetails = ##class(%DynamicObject).%New()
+            Set AuditLogDetails.ubrn = ref.ubrn
+            Set AuditLogDetails.patientID = ref.patientID
+            Set AuditLogDetails.type = "WorkList Retrieval"
+            Set AuditLogDetails.XRequestID = XRequestID
+            Set tsc = ..AudiLogManager(AuditLogDetails)
         }
-    }   
+    }
+
     set pResponse=resp
 END 
     quit tsc
@@ -153,6 +189,7 @@ Method RetrieveReferralDetails(pInput As RFT.ERS.Classes.RequestReferralDetails,
     $$$TRACE("Status Code: "_ httpResp.StatusLine)
     
     set data=httpResp.Data
+    set XRequestID = httpResp.GetHeader("X-Request-ID")
     
     IF $ISOBJECT(data)
     {
@@ -162,20 +199,26 @@ Method RetrieveReferralDetails(pInput As RFT.ERS.Classes.RequestReferralDetails,
         
         set extension=obj.extension
         set extIter=extension.%GetIterator()
+
         while extIter.%GetNext(.key,.extItem)
-        
         {
-            
-          if extItem.url="https://fhir.nhs.uk/STU3/StructureDefinition/Extension-eRS-ReferralPriority-1"
-           {
-                //set refDetails.priority=extItem.valueCodeableConcept.coding.GetAt(1).code
-                               
+            if extItem.url="https://fhir.nhs.uk/STU3/StructureDefinition/Extension-eRS-ReferralPriority-1"
+            {
 				set priorityCode=##class(RFT.Utility.CodeableConcept).RetriveCode(extItem)
 				set refDetails.priority=priorityCode
-				    
             }
-                   
-        }  
+
+            // Clinical information First submitted/Last updated
+            if extItem.url="https://fhir.nhs.uk/STU3/StructureDefinition/Extension-eRS-ClinicalInfoFirstSubmitted-1"
+            {
+                set refDetails.clinicalInfoFirstSubmitted = extItem.valueDateTime
+            }
+
+            if extItem.url="https://fhir.nhs.uk/STU3/StructureDefinition/Extension-eRS-ClinicalInfoLastUpdated-1"
+            {
+                set refDetails.clinicalInfoLastUpdate = extItem.valueDateTime
+            }
+        }
         
         set contained=obj.contained
         set containedIter=contained.%GetIterator()
@@ -230,9 +273,18 @@ Method RetrieveReferralDetails(pInput As RFT.ERS.Classes.RequestReferralDetails,
 	  		set refDetails.specialty=item.code
   		}	
 		//set refDetails.specialty=obj.specialty.coding
-        set refDetails.patientID=obj.subject.identifier.value 
+        set refDetails.patientID = obj.subject.identifier.value 
         set resp.Referral=refDetails
         set pResponse=resp
+
+        
+        // Audit Log Manager
+        Set AuditLogDetails = ##class(%DynamicObject).%New()
+        Set AuditLogDetails.ubrn = pInput.ubrn
+        Set AuditLogDetails.patientID = refDetails.patientID
+        Set AuditLogDetails.type = "Retrieve Referral Details"
+        Set AuditLogDetails.XRequestID = XRequestID
+        Set tsc = ..AudiLogManager(AuditLogDetails)
     }   
         
 END
@@ -251,12 +303,13 @@ Method RetrieveAttachment(pInput As RFT.ERS.Classes.RequestAttachment, Output pR
     do httpReq.SetHeader("NHSD-End-User-Organisation-ODS",..ODSCode)
     set httpReq.Authorization = "Bearer "_^LastToken("auth_token")
     
-    set tURL=..Adapter.HTTPServer_"/referrals/FHIR/STU3/Binary/"_pInput.url    
+    set tURL=..Adapter.HTTPServer_"/referrals/FHIR/STU3/Binary/"_pInput.url
     SET sc=..Adapter.SendFormDataURL(tURL, .httpResp, "GET", httpReq)
     #DIM httpResp as %Net.HttpResponse
     
     set response=##class(RFT.ERS.Classes.AttachmentResponse).%New()
     set response.StatusCode=httpResp.StatusCode
+    set XRequestID = httpResp.GetHeader("X-Request-ID")
     
     $$$LOGINFO("StatusCode: "_httpResp.StatusCode)
     
@@ -270,21 +323,17 @@ Method RetrieveAttachment(pInput As RFT.ERS.Classes.RequestAttachment, Output pR
         // Get extension
         Set Qry = "SELECT REPLACE(title,' ', '') as TrimmedTitle, ubrn as ubrnQry FROM RFT_ERS_Tables.Attachments WHERE url ='"_pInput.url_"'"
 
-        Set ST=##class(%SQL.Statement).%New()   
+        Set ST=##class(%SQL.Statement).%New()
         set tsc = ST.%Prepare(Qry)
-        if $$$ISERR(tsc) {write "%Prepare failed:" do $SYSTEM.Status.DisplayError(tsc) quit} 
+        if $$$ISERR(tsc) {write "%Prepare failed:" do $SYSTEM.Status.DisplayError(tsc) quit}
         set rset = ST.%Execute()
         if $$$ISERR(tsc) {write "%Prepare failed:" do $SYSTEM.Status.DisplayError(tsc) quit}
 
         Set TrimmedTitle = ""
         Set ubrnQry = ""
 
-        $$$TRACE("OutSide While")
-
         while (rset.%Next()) && (TrimmedTitle = "") && (ubrnQry = "")
         {
-            $$$TRACE("Inside While")
-
             set TrimmedTitle = $PIECE(rset.%Get("TrimmedTitle"),".",1)
             set TrimmedTitle = TrimmedTitle_"_"_$zstrip($zdatetime($horolog,3), "*P")
             Set ubrn = rset.%Get("ubrnQry")
@@ -330,7 +379,6 @@ Method RetrieveAttachment(pInput As RFT.ERS.Classes.RequestAttachment, Output pR
             set response.FilePath=fileName
             set response.FileType=fileExt
         }
-
     }
     elseif httpResp.StatusCode = 401
     {
@@ -344,6 +392,15 @@ Method RetrieveAttachment(pInput As RFT.ERS.Classes.RequestAttachment, Output pR
     }
     
     $$$TRACE(response.StatusCode)
+
+    // Audit Log Manager
+    Set AuditLogDetails = ##class(%DynamicObject).%New()
+    Set AuditLogDetails.ubrn = ubrn
+    Set AuditLogDetails.patientID = PatientDetails.NHSnumber
+    Set AuditLogDetails.type = "Retrieve Attachment"
+    Set AuditLogDetails.XRequestID = XRequestID
+    Set tsc = ..AudiLogManager(AuditLogDetails)
+
     set pResponse=response
     
     quit t
@@ -395,6 +452,7 @@ Method RetrieveClincalInformation(pInput As RFT.ERS.Classes.RequestClinicalInfor
     {
         set response=##class(RFT.ERS.Classes.AttachmentResponse).%New()
         set response.StatusCode=tHttpResponse.StatusCode
+        set XRequestID = tHttpResponse.GetHeader("X-Request-ID")
     
         set data=tHttpResponse.Data
         set respTitle = $PIECE(tHttpResponse.GetHeader("Content-Disposition"),"=",2)
@@ -468,9 +526,16 @@ Method RetrieveClincalInformation(pInput As RFT.ERS.Classes.RequestClinicalInfor
 
     if response
     {
-        set pResponse=response
+        // Audit Log Mamager
+        Set AuditLogDetails = ##class(%DynamicObject).%New()
+        Set AuditLogDetails.ubrn = ubrn
+        Set AuditLogDetails.patientID = PatientDetails.NHSnumber
+        Set AuditLogDetails.type = "Clinical Information"
+        Set AuditLogDetails.XRequestID = XRequestID
+        Set tsc = ..AudiLogManager(AuditLogDetails)
+
+        set pResponse = response
     }
-    
     
     quit tsc
 }
@@ -700,6 +765,81 @@ Method ExtractPatientID(Input As Ens.StringContainer, Output DmgContainer As Ens
     Set tsc = ..LookUpPatient(PatientID, .PatientDetails)
     Set DmgContainer = ##class(Ens.StringContainer).%New()
 	Set DmgContainer.StringValue = PatientDetails.%ToJSON() 
+
+    quit tsc
+}
+
+Method AudiLogManager(pInput As %DynamicObject) As %Status
+{
+    set tsc = $$$OK
+
+    Set Selector = pInput.type
+    Set XRequestID = pInput.XRequestID
+
+	set UBRN=pInput.ubrn
+	//First check if ubrn exists in local list
+	//We need to check if there is an update been made on ERS thats not been updated locally
+	$$$TRACE("UBRN: "_UBRN_" exists on local list")
+	
+	//get username
+	set Username = $USERNAME
+    ;set Username = $SYSTEM.Process.UserName()
+	$$$TRACE("Username: "_Username)
+	
+	//code seg to create Audit event on response from server
+	Set ProdNS = $SYSTEM.SYS.NameSpace()
+	$$$TRACE(ProdNS)
+	Set $Namespace = "%SYS" ; Switch to the target namespace
+	//source, type, name
+	set AuditEvent = ##class(Security.Events).Exists(Username, Selector, "ERSResponse")
+	Set $Namespace = ProdNS ; Switch back to the original namespace
+	$$$LOGINFO("AuditEvent Exists? 1 = yes, 0 = no"_AuditEvent)
+	
+	//create audit event if doesn't exist
+	if AuditEvent = 0 {
+	Set $Namespace = "%SYS" ; Switch to the target namespace
+	Set status = ##class(Security.Events).Create(Username, Selector, "ERSResponse", "Description", 1)
+	Set $Namespace = ProdNS ; Switch back to the original namespace 
+	}
+	
+	//format NHS Number
+	set patientID = pInput.patientID
+	If $Length(patientID) = 10 {
+		Set NHSNum = $E(patientID, 1, 3)_" "_$E(patientID, 4, 6)_" "_$E(patientID, 7, 9)_" "_$E(patientID, 10)
+		Write NHSNum
+	} Else {
+		Write "Invalid input number"
+	}
+	//format UBRN
+	If $Length(UBRN) = 12 {
+		Set formattedUBRN = $E(UBRN, 1, 4)_" "_$E(UBRN, 5, 8)_" "_$E(UBRN, 9, 12)
+		Write formattedUBRN
+	} Else {
+		Write "Invalid input number"
+	}
+	set EndUserID = ^LastToken("nhsid_useruid")
+	
+	$$$TRACE("EndUserID: "_EndUserID)
+	$$$TRACE("patientID: "_NHSNum)
+	$$$TRACE("UBRN :"_formattedUBRN)
+	$$$TRACE("UBRN :"_formattedUBRN)
+	$$$TRACE("Selector type :"_Selector)
+	//print created audit event to audit DB
+    Set PerformActionArgs = ##class(%DynamicObject).%New()
+    Set PerformActionArgs.username = Username
+    ;Set PerformActionArgs.username = EndUserID
+    Set PerformActionArgs.action = "ERSResponse"
+    Set PerformActionArgs.type = Selector
+    Set PerformActionArgs.details = "Description: NHS Number: "_NHSNum_" UBRN: "_formattedUBRN_" EndUserID: "_EndUserID_" XRequestID: "_XRequestID
+
+    Set tsc = ##class(RFT.ERS.Classes.AuditClass).PerformAction(PerformActionArgs)
+    $$$TRACE("PerformAction Performed: "_PerformActionArgs.type)
+
+	//Set status = ##class(RFT.ERS.Classes.AuditClass).PerformAction(Username, "ERSResponse", "Description: NHS Number: "_NHSNum_" UBRN: "_formattedUBRN_" EndUserID: "_EndUserID)
+	If $$$ISERR(tsc)
+    {
+	    $$$LOGINFO("error updating audit")
+	}
 
     quit tsc
 }

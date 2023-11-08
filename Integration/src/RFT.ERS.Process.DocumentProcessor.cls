@@ -79,6 +79,7 @@ Method OnRequest(pInput As RFT.ERS.Classes.RequestAttachment, Output pResponse A
 	ELSE
 	{
 		//set retry count
+		$$$TRACE("attach.retryCount :"_attach.retryCount)
 		set attach.retryCount=attach.retryCount+1
 		IF attach.retryCount>=..AttachmentRetryCount
 		{

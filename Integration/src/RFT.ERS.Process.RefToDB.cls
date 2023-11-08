@@ -80,7 +80,6 @@ Method OnRequest(pInput As Ens.Request, Output pResponse As Ens.Response) As %St
 		set t=..SendRequestSync("HttpOut_ERS",pInput, .DmgContainer)
     	set PatientDetails = ##class(%DynamicAbstractObject).%FromJSON(DmgContainer.StringValue)
 
-
 		// Build query to fetch patientID (NHS Number)
 		//Check if nhs number and DOB exist
     	Set Qry = "SELECT COUNT(*) FROM dbo.patients WHERE pat_nhs = '"_PatientDetails.NHSnumber_"' and pat_dob = '"_PatientDetails.dob_"';"

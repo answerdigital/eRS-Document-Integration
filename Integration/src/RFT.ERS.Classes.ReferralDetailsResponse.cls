@@ -9,6 +9,10 @@ Property StatusCode As %Integer;
 
 Property ErrorText As %String;
 
+Property clinicalInfoFirstSubmitted As %String;
+
+Property clinicalInfoLastUpdate As %String;
+
 Storage Default
 {
 <Data name="ReferralDetailsResponseDefaultData">
@@ -24,6 +28,12 @@ Storage Default
 </Value>
 <Value name="4">
 <Value>ErrorText</Value>
+</Value>
+<Value name="5">
+<Value>clinicalInfoFirstSubmitted</Value>
+</Value>
+<Value name="6">
+<Value>clinicalInfoLastUpdate</Value>
 </Value>
 </Data>
 <DefaultData>ReferralDetailsResponseDefaultData</DefaultData>

@@ -15,7 +15,7 @@ Method OnProcessInput(pInput As %RegisteredObject, Output pOutput As %Registered
 	
 	&SQL(OPEN DocCursor)
 	
-	FOR {&SQL(FETCH DocCursor)	
+	FOR {&SQL(FETCH DocCursor)
 		
 		QUIT:SQLCODE
 		set req=##class(RFT.ERS.Classes.RequestReferralDetails).%New()
