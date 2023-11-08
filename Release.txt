@@ -1,6 +1,3 @@
-0.0.7 Release including:
+0.0.8 Release including:
 
-- Pull referrals from ASI and REferrals for Review worklists
-- Re-download documents ewhen clinical info has changes
-- Log individual http calls to audit log
-- Include requestID in audit log
+- Fox incorrectly formatted IRIS production export
