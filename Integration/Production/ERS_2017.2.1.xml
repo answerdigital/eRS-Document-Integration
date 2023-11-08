@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25" zv="IRIS for Windows (x86-64) 2023.2 (Build 227U)" ts="2023-09-29 11:34:06">
+<Export generator="Cache" version="25" zv="IRIS for Windows (x86-64) 2023.1 (Build 229U)" ts="2023-11-08 08:46:06">
 <Class name="RFT.ERS.Classes.Attachment">
 <Super>Ens.Response</Super>
 <TimeChanged>66746,37302.6023422</TimeChanged>
@@ -113,27 +113,33 @@
 
 <Class name="RFT.ERS.Classes.AuditClass">
 <Super>%Persistent</Super>
-<TimeChanged>66746,37302.559841</TimeChanged>
+<TimeChanged>66785,40541.5764359</TimeChanged>
 <TimeCreated>66746,37302.559841</TimeCreated>
 
 <Method name="PerformAction">
 <ClassMethod>1</ClassMethod>
-<FormalSpec>userID:%String,action:%String,details:%String</FormalSpec>
+<FormalSpec>pInput:%DynamicObject</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-        // Construct the audit event data
-        Set eventSource = "NHS ERS API"
-        Set eventType = "WorkList Retrieval"
-        Set event = action
-        Set DateTime = $zts
-        Set HumanDateTime = $zdatetime(DateTime, 5)
-        Set eventData = details_". User: "_userID_"."_" Performed Action: "_action_". DateTime: "_HumanDateTime_"."
-        Set description = "User '" _ userID _ "' Performed action: " _ action _"DateTime: " _HumanDateTime
+     Set userID = pInput.username
+     Set action = pInput.action
+     Set details = pInput.details
 
-        // Call the $SYSTEM.Security.Audit() command
-        Do $SYSTEM.Security.Audit(userID, eventType, action, eventData, description)
+     //ClassMethod PerformAction(userID As %String, action As %String, details As %String) As %Status
+     // Construct the audit event data
+     Set eventSource = "NHS ERS API"
+     ;Set eventType = "WorkList Retrieval"
+     Set eventType = pInput.type
+     Set event = action
+     Set DateTime = $zts
+     Set HumanDateTime = $zdatetime(DateTime, 5)
+     Set eventData = details_". Performed Action: "_action_". DateTime: "_HumanDateTime_"."
+     Set description = "Performed action: " _ action _"DateTime: " _HumanDateTime
 
-        Quit $$$OK
+     // Call the $SYSTEM.Security.Audit() command
+     Do $SYSTEM.Security.Audit(userID, eventType, action, eventData, description)
+
+     Quit $$$OK
 ]]></Implementation>
 </Method>
 
@@ -221,7 +227,7 @@
 
 <Class name="RFT.ERS.Classes.ReferralDetails">
 <Super>Ens.Response</Super>
-<TimeChanged>66746,37302.6675987</TimeChanged>
+<TimeChanged>66784,53389.3250177</TimeChanged>
 <TimeCreated>66746,37302.6675987</TimeCreated>
 
 <Property name="ubrn">
@@ -260,6 +266,14 @@
 <Type>%String</Type>
 </Property>
 
+<Property name="clinicalInfoFirstSubmitted">
+<Type>%String</Type>
+</Property>
+
+<Property name="clinicalInfoLastUpdate">
+<Type>%String</Type>
+</Property>
+
 <Storage name="Default">
 <Type>%Library.CacheStorage</Type>
 <DefaultData>ReferralDetailsDefaultData</DefaultData>
@@ -292,6 +306,12 @@
 <Value name="9">
 <Value>docStatus</Value>
 </Value>
+<Value name="10">
+<Value>clinicalInfoFirstSubmitted</Value>
+</Value>
+<Value name="11">
+<Value>clinicalInfoLastUpdate</Value>
+</Value>
 </Data>
 </Storage>
 </Class>
@@ -299,7 +319,7 @@
 
 <Class name="RFT.ERS.Classes.ReferralDetailsResponse">
 <Super>Ens.Response</Super>
-<TimeChanged>66746,37302.6880051</TimeChanged>
+<TimeChanged>66784,51631.3449345</TimeChanged>
 <TimeCreated>66746,37302.6880051</TimeCreated>
 
 <Property name="Referral">
@@ -319,10 +339,19 @@
 <Type>%String</Type>
 </Property>
 
+<Property name="clinicalInfoFirstSubmitted">
+<Type>%String</Type>
+</Property>
+
+<Property name="clinicalInfoLastUpdate">
+<Type>%String</Type>
+</Property>
+
 <Storage name="Default">
 <Type>%Library.CacheStorage</Type>
 <DefaultData>ReferralDetailsResponseDefaultData</DefaultData>
 <Data name="ReferralDetailsResponseDefaultData">
+<Structure>listnode</Structure>
 <Subscript>"ReferralDetailsResponse"</Subscript>
 <Value name="1">
 <Value>Referral</Value>
@@ -335,6 +364,12 @@
 </Value>
 <Value name="4">
 <Value>ErrorText</Value>
+</Value>
+<Value name="5">
+<Value>clinicalInfoFirstSubmitted</Value>
+</Value>
+<Value name="6">
+<Value>clinicalInfoLastUpdate</Value>
 </Value>
 </Data>
 </Storage>
@@ -416,11 +451,15 @@
 
 <Class name="RFT.ERS.Classes.RequestWorklist">
 <Super>Ens.Request</Super>
-<TimeChanged>66746,37302.798703</TimeChanged>
+<TimeChanged>66780,54286.5812287</TimeChanged>
 <TimeCreated>66746,37302.798703</TimeCreated>
 
 <Property name="sessionID">
 <Type>%Integer</Type>
+</Property>
+
+<Property name="sessionSelector">
+<Type>%String</Type>
 </Property>
 
 <Storage name="Default">
@@ -430,6 +469,9 @@
 <Subscript>"RequestWorklist"</Subscript>
 <Value name="1">
 <Value>sessionID</Value>
+</Value>
+<Value name="2">
+<Value>sessionSelector</Value>
 </Value>
 </Data>
 </Storage>
@@ -560,7 +602,7 @@
 
 <Class name="RFT.ERS.Operation.ERS">
 <Super>Ens.BusinessOperation</Super>
-<TimeChanged>66746,37302.8625698</TimeChanged>
+<TimeChanged>66785,55470.8433657</TimeChanged>
 <TimeCreated>66746,37302.8625698</TimeCreated>
 
 <Parameter name="ADAPTER">
@@ -597,7 +639,9 @@
 <Method name="RetrieveWorklist">
 <FormalSpec>pInput:RFT.ERS.Classes.RequestWorklist,*pResponse:Ens.Response</FormalSpec>
 <Implementation><![CDATA[
-    set tsc=$$$OK
+    set tsc = $$$OK
+
+    $$$TRACE("Selector: "_ pInput.sessionSelector)
     
     //create body for http request
     set body={}
@@ -612,7 +656,8 @@
     set parameterObj.valueCodeableConcept.coding=[]
     set coding={}
     set coding.system="https://fhir.nhs.uk/STU3/CodeSystem/eRS-ReferralListSelector-1"
-    set coding.code="APPOINTMENT_SLOT_ISSUES"
+    ;set coding.code="APPOINTMENT_SLOT_ISSUES"
+    set coding.code=pInput.sessionSelector
     do parameterObj.valueCodeableConcept.coding.%Push(coding)
     do body.parameter.%Push(parameterObj)
 
@@ -668,12 +713,14 @@
     }
     
     //Extract values from fhir response 
-    set data=tHttpResponse.Data
+    set data = tHttpResponse.Data
+    set XRequestID = tHttpResponse.GetHeader("X-Request-ID")
     IF $ISOBJECT(data)
     {
         set obj=[].%FromJSON(data)
         set resp=##class(RFT.ERS.Classes.WorklistResponse).%New()
         set entry=obj.entry
+        //if obj.contained set Contained=obj.contained
     }
     
     IF $ISOBJECT(entry)
@@ -705,12 +752,43 @@
 		    	}  
     
 		    	if extensionItem.url="clinicalInfoPrinted" set ref.clinicalInfoPrinted=extensionItem.valueBoolean
+		    	if extensionItem.url="clinicalInfoFirstSubmitted" set ref.clinicalInfoFirstSubmitted=extensionItem.valueDateTime
                 if extensionItem.url="clinicalInfoLastUpdated" set ref.clinicalInfoLastUpdate=extensionItem.valueDateTime
-                if extensionItem.url="patient" set ref.patientID=extensionItem.valueReference.identifier.value    
+                if extensionItem.url="patient"
+                {
+                    if extensionItem.valueReference.identifier.value
+                    {
+                        set ref.patientID=extensionItem.valueReference.identifier.value
+
+                    }
+                    elseif $E(extensionItem.valueReference.reference, 1, 9) = "#Patient-"
+                    {
+                        set ref.patientID = $E(extensionItem.valueReference.reference, $L(extensionItem.valueReference.reference)-9, $L(extensionItem.valueReference.reference))
+                    }
+                    else
+                    {
+                        set alert=##class(Ens.AlertRequest).%New()
+                        set alertText = "Failure to extract NHS number from the worklist response."
+                        set alert.AlertText=alertText
+                        set alert.AlertDestination="Ens.Alert"
+                        set tsc = ..SendAlert(alert)
+                    }
+                }
+                $$$TRACE("NHS Number case "_pInput.sessionSelector_" "_ref.patientID)               
 	        }
+
             do resp.Item.Insert(ref)
+
+            // Audit Log Manager
+            Set AuditLogDetails = ##class(%DynamicObject).%New()
+            Set AuditLogDetails.ubrn = ref.ubrn
+            Set AuditLogDetails.patientID = ref.patientID
+            Set AuditLogDetails.type = "WorkList Retrieval"
+            Set AuditLogDetails.XRequestID = XRequestID
+            Set tsc = ..AudiLogManager(AuditLogDetails)
         }
-    }   
+    }
+
     set pResponse=resp
 END 
     quit tsc
@@ -735,6 +813,7 @@ END
     $$$TRACE("Status Code: "_ httpResp.StatusLine)
     
     set data=httpResp.Data
+    set XRequestID = httpResp.GetHeader("X-Request-ID")
     
     IF $ISOBJECT(data)
     {
@@ -744,20 +823,26 @@ END
         
         set extension=obj.extension
         set extIter=extension.%GetIterator()
+
         while extIter.%GetNext(.key,.extItem)
-        
         {
-            
-          if extItem.url="https://fhir.nhs.uk/STU3/StructureDefinition/Extension-eRS-ReferralPriority-1"
-           {
-                //set refDetails.priority=extItem.valueCodeableConcept.coding.GetAt(1).code
-                               
+            if extItem.url="https://fhir.nhs.uk/STU3/StructureDefinition/Extension-eRS-ReferralPriority-1"
+            {
 				set priorityCode=##class(RFT.Utility.CodeableConcept).RetriveCode(extItem)
 				set refDetails.priority=priorityCode
-				    
             }
-                   
-        }  
+
+            // Clinical information First submitted/Last updated
+            if extItem.url="https://fhir.nhs.uk/STU3/StructureDefinition/Extension-eRS-ClinicalInfoFirstSubmitted-1"
+            {
+                set refDetails.clinicalInfoFirstSubmitted = extItem.valueDateTime
+            }
+
+            if extItem.url="https://fhir.nhs.uk/STU3/StructureDefinition/Extension-eRS-ClinicalInfoLastUpdated-1"
+            {
+                set refDetails.clinicalInfoLastUpdate = extItem.valueDateTime
+            }
+        }
         
         set contained=obj.contained
         set containedIter=contained.%GetIterator()
@@ -812,9 +897,18 @@ END
 	  		set refDetails.specialty=item.code
   		}	
 		//set refDetails.specialty=obj.specialty.coding
-        set refDetails.patientID=obj.subject.identifier.value 
+        set refDetails.patientID = obj.subject.identifier.value 
         set resp.Referral=refDetails
         set pResponse=resp
+
+        
+        // Audit Log Manager
+        Set AuditLogDetails = ##class(%DynamicObject).%New()
+        Set AuditLogDetails.ubrn = pInput.ubrn
+        Set AuditLogDetails.patientID = refDetails.patientID
+        Set AuditLogDetails.type = "Retrieve Referral Details"
+        Set AuditLogDetails.XRequestID = XRequestID
+        Set tsc = ..AudiLogManager(AuditLogDetails)
     }   
         
 END
@@ -835,12 +929,13 @@ END
     do httpReq.SetHeader("NHSD-End-User-Organisation-ODS",..ODSCode)
     set httpReq.Authorization = "Bearer "_^LastToken("auth_token")
     
-    set tURL=..Adapter.HTTPServer_"/referrals/FHIR/STU3/Binary/"_pInput.url    
+    set tURL=..Adapter.HTTPServer_"/referrals/FHIR/STU3/Binary/"_pInput.url
     SET sc=..Adapter.SendFormDataURL(tURL, .httpResp, "GET", httpReq)
     #DIM httpResp as %Net.HttpResponse
     
     set response=##class(RFT.ERS.Classes.AttachmentResponse).%New()
     set response.StatusCode=httpResp.StatusCode
+    set XRequestID = httpResp.GetHeader("X-Request-ID")
     
     $$$LOGINFO("StatusCode: "_httpResp.StatusCode)
     
@@ -854,21 +949,17 @@ END
         // Get extension
         Set Qry = "SELECT REPLACE(title,' ', '') as TrimmedTitle, ubrn as ubrnQry FROM RFT_ERS_Tables.Attachments WHERE url ='"_pInput.url_"'"
 
-        Set ST=##class(%SQL.Statement).%New()   
+        Set ST=##class(%SQL.Statement).%New()
         set tsc = ST.%Prepare(Qry)
-        if $$$ISERR(tsc) {write "%Prepare failed:" do $SYSTEM.Status.DisplayError(tsc) quit} 
+        if $$$ISERR(tsc) {write "%Prepare failed:" do $SYSTEM.Status.DisplayError(tsc) quit}
         set rset = ST.%Execute()
         if $$$ISERR(tsc) {write "%Prepare failed:" do $SYSTEM.Status.DisplayError(tsc) quit}
 
         Set TrimmedTitle = ""
         Set ubrnQry = ""
 
-        $$$TRACE("OutSide While")
-
         while (rset.%Next()) && (TrimmedTitle = "") && (ubrnQry = "")
         {
-            $$$TRACE("Inside While")
-
             set TrimmedTitle = $PIECE(rset.%Get("TrimmedTitle"),".",1)
             set TrimmedTitle = TrimmedTitle_"_"_$zstrip($zdatetime($horolog,3), "*P")
             Set ubrn = rset.%Get("ubrnQry")
@@ -914,7 +1005,6 @@ END
             set response.FilePath=fileName
             set response.FileType=fileExt
         }
-
     }
     elseif httpResp.StatusCode = 401
     {
@@ -928,6 +1018,15 @@ END
     }
     
     $$$TRACE(response.StatusCode)
+
+    // Audit Log Manager
+    Set AuditLogDetails = ##class(%DynamicObject).%New()
+    Set AuditLogDetails.ubrn = ubrn
+    Set AuditLogDetails.patientID = PatientDetails.NHSnumber
+    Set AuditLogDetails.type = "Retrieve Attachment"
+    Set AuditLogDetails.XRequestID = XRequestID
+    Set tsc = ..AudiLogManager(AuditLogDetails)
+
     set pResponse=response
     
     quit t
@@ -981,6 +1080,7 @@ END
     {
         set response=##class(RFT.ERS.Classes.AttachmentResponse).%New()
         set response.StatusCode=tHttpResponse.StatusCode
+        set XRequestID = tHttpResponse.GetHeader("X-Request-ID")
     
         set data=tHttpResponse.Data
         set respTitle = $PIECE(tHttpResponse.GetHeader("Content-Disposition"),"=",2)
@@ -1054,9 +1154,16 @@ END
 
     if response
     {
-        set pResponse=response
+        // Audit Log Mamager
+        Set AuditLogDetails = ##class(%DynamicObject).%New()
+        Set AuditLogDetails.ubrn = ubrn
+        Set AuditLogDetails.patientID = PatientDetails.NHSnumber
+        Set AuditLogDetails.type = "Clinical Information"
+        Set AuditLogDetails.XRequestID = XRequestID
+        Set tsc = ..AudiLogManager(AuditLogDetails)
+
+        set pResponse = response
     }
-    
     
     quit tsc
 ]]></Implementation>
@@ -1297,6 +1404,84 @@ END
 ]]></Implementation>
 </Method>
 
+<Method name="AudiLogManager">
+<FormalSpec>pInput:%DynamicObject</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    set tsc = $$$OK
+
+    Set Selector = pInput.type
+    Set XRequestID = pInput.XRequestID
+
+	set UBRN=pInput.ubrn
+	//First check if ubrn exists in local list
+	//We need to check if there is an update been made on ERS thats not been updated locally
+	$$$TRACE("UBRN: "_UBRN_" exists on local list")
+	
+	//get username
+	set Username = $USERNAME
+    ;set Username = $SYSTEM.Process.UserName()
+	$$$TRACE("Username: "_Username)
+	
+	//code seg to create Audit event on response from server
+	Set ProdNS = $SYSTEM.SYS.NameSpace()
+	$$$TRACE(ProdNS)
+	Set $Namespace = "%SYS" ; Switch to the target namespace
+	//source, type, name
+	set AuditEvent = ##class(Security.Events).Exists(Username, Selector, "ERSResponse")
+	Set $Namespace = ProdNS ; Switch back to the original namespace
+	$$$LOGINFO("AuditEvent Exists? 1 = yes, 0 = no"_AuditEvent)
+	
+	//create audit event if doesn't exist
+	if AuditEvent = 0 {
+	Set $Namespace = "%SYS" ; Switch to the target namespace
+	Set status = ##class(Security.Events).Create(Username, Selector, "ERSResponse", "Description", 1)
+	Set $Namespace = ProdNS ; Switch back to the original namespace 
+	}
+	
+	//format NHS Number
+	set patientID = pInput.patientID
+	If $Length(patientID) = 10 {
+		Set NHSNum = $E(patientID, 1, 3)_" "_$E(patientID, 4, 6)_" "_$E(patientID, 7, 9)_" "_$E(patientID, 10)
+		Write NHSNum
+	} Else {
+		Write "Invalid input number"
+	}
+	//format UBRN
+	If $Length(UBRN) = 12 {
+		Set formattedUBRN = $E(UBRN, 1, 4)_" "_$E(UBRN, 5, 8)_" "_$E(UBRN, 9, 12)
+		Write formattedUBRN
+	} Else {
+		Write "Invalid input number"
+	}
+	set EndUserID = ^LastToken("nhsid_useruid")
+	
+	$$$TRACE("EndUserID: "_EndUserID)
+	$$$TRACE("patientID: "_NHSNum)
+	$$$TRACE("UBRN :"_formattedUBRN)
+	$$$TRACE("UBRN :"_formattedUBRN)
+	$$$TRACE("Selector type :"_Selector)
+	//print created audit event to audit DB
+    Set PerformActionArgs = ##class(%DynamicObject).%New()
+    Set PerformActionArgs.username = Username
+    ;Set PerformActionArgs.username = EndUserID
+    Set PerformActionArgs.action = "ERSResponse"
+    Set PerformActionArgs.type = Selector
+    Set PerformActionArgs.details = "Description: NHS Number: "_NHSNum_" UBRN: "_formattedUBRN_" EndUserID: "_EndUserID_" XRequestID: "_XRequestID
+
+    Set tsc = ##class(RFT.ERS.Classes.AuditClass).PerformAction(PerformActionArgs)
+    $$$TRACE("PerformAction Performed: "_PerformActionArgs.type)
+
+	//Set status = ##class(RFT.ERS.Classes.AuditClass).PerformAction(Username, "ERSResponse", "Description: NHS Number: "_NHSNum_" UBRN: "_formattedUBRN_" EndUserID: "_EndUserID)
+	If $$$ISERR(tsc)
+    {
+	    $$$LOGINFO("error updating audit")
+	}
+
+    quit tsc
+]]></Implementation>
+</Method>
+
 <XData name="MessageMap">
 <Data><![CDATA[
 <MapItems>
@@ -1416,7 +1601,7 @@ END
 <Class name="RFT.ERS.Process.DocumentProcessor">
 <ClassType>persistent</ClassType>
 <Super>Ens.BusinessProcess</Super>
-<TimeChanged>66746,37302.900059</TimeChanged>
+<TimeChanged>66785,56351.7283388</TimeChanged>
 <TimeCreated>66746,37302.900059</TimeCreated>
 
 <Property name="LibreOffice">
@@ -1526,6 +1711,7 @@ END
 	ELSE
 	{
 		//set retry count
+		$$$TRACE("attach.retryCount :"_attach.retryCount)
 		set attach.retryCount=attach.retryCount+1
 		IF attach.retryCount>=..AttachmentRetryCount
 		{
@@ -1675,7 +1861,7 @@ END
 <Class name="RFT.ERS.Process.RefToDB">
 <ClassType>persistent</ClassType>
 <Super>Ens.BusinessProcess</Super>
-<TimeChanged>66746,37302.9890946</TimeChanged>
+<TimeChanged>66786,31297.5838845</TimeChanged>
 <TimeCreated>66746,37302.9890946</TimeCreated>
 
 <UDLText name="T">
@@ -1764,7 +1950,6 @@ END
 		set t=..SendRequestSync("HttpOut_ERS",pInput, .DmgContainer)
     	set PatientDetails = ##class(%DynamicAbstractObject).%FromJSON(DmgContainer.StringValue)
 
-
 		// Build query to fetch patientID (NHS Number)
 		//Check if nhs number and DOB exist
     	Set Qry = "SELECT COUNT(*) FROM dbo.patients WHERE pat_nhs = '"_PatientDetails.NHSnumber_"' and pat_dob = '"_PatientDetails.dob_"';"
@@ -1840,7 +2025,7 @@ END
 <Class name="RFT.ERS.Process.ReferralProcessor">
 <ClassType>persistent</ClassType>
 <Super>Ens.BusinessProcess</Super>
-<TimeChanged>66746,37302.9713997</TimeChanged>
+<TimeChanged>66786,29995.6948648</TimeChanged>
 <TimeCreated>66746,37302.9713997</TimeCreated>
 
 <Method name="OnRequest">
@@ -1849,6 +2034,7 @@ END
 <Implementation><![CDATA[
 	set t=$$$OK
 	$$$TRACE(pInput.ubrn)
+	set ubrn = pInput.ubrn
 	
 	//Query ERS API for referral details
 	set t=..SendRequestSync("HttpOut_ERS",pInput,.refResp)
@@ -1856,6 +2042,67 @@ END
 
 	IF t
 	{
+		$$$TRACE("Will do  clinicalInfoFirstSubmitted & clinicalInfoFirstSubmitted2")
+		//First check if ubrn exists in local list
+		set workList=##class(RFT.ERS.Tables.Worklist).%OpenId(ubrn)
+		
+		IF $ISOBJECT(workList)
+		{	 //We need to check if there is an update been made on ERS thats not been updated locally
+			$$$TRACE("UBRN "_ubrn_" exists on local list")
+	
+			// Case workList.clinicalInfoFirstSubmitted empty need to pick up the response value
+			if $LENGTH(refResp.Referral.clinicalInfoFirstSubmitted) '= 0
+			{
+				if $LENGTH(workList.clinicalInfoFirstSubmitted) = 0
+				{
+					set workList.clinicalInfoFirstSubmitted = refResp.Referral.clinicalInfoFirstSubmitted
+				}
+			}
+
+			// if refResp.Referral.clinicalInfoLastUpdate exist then Populate the variable ersLastUpdate
+			if $LENGTH(refResp.Referral.clinicalInfoLastUpdate) '= 0
+			{
+				set ersLastUpdate = refResp.Referral.clinicalInfoLastUpdate
+			}
+			else
+			{
+				set ersLastUpdate = refResp.Referral.clinicalInfoFirstSubmitted
+			}
+
+			// Case workList.clinicalInfoLastUpdate empty
+			set localLastUpdated = workList.clinicalInfoLastUpdate
+			if $LENGTH(localLastUpdated) = 0
+			{
+				set workList.clinicalInfoLastUpdate = ersLastUpdate
+			}
+
+			if localLastUpdated '= ersLastUpdate
+			{
+				$$$TRACE("Update to local list required. UBRN: "_ubrn)
+				set workList.specialty=refResp.Referral.specialty
+				set workList.apptStart=refResp.Referral.apptStart
+				;set workList.clinicalInfoLastUpdate=refResp.Referral.clinicalInfoLastUpdate
+				set workList.priority=refResp.Referral.priority
+				;set workList.refType=refResp.Referral.refType
+				;set workList.clinician=refResp.Referral.clinician
+				set workList.apptStart=refResp.Referral.apptStart
+				set workList.statusFlag=0 //We will poll A005 to grab ref details again
+				set workList.UpdatePatientDB=0
+
+				set t=workList.%Save()
+
+				//delete from attachments table as we will redownload
+				&sql(DELETE FROM RFT_ERS_Tables.Attachments where ubrn=:ubrn)
+			}
+			else 
+			{
+				$$$TRACE("No update required for ubrn: "_ubrn)
+			}	
+		}
+
+
+		// Updating referrals table
+
 		set ref=##class(RFT.ERS.Tables.Referrals).%OpenId(pInput.ubrn)
 		
 		IF '$ISOBJECT(ref)
@@ -1887,7 +2134,6 @@ END
 			
 			IF attchItem.size>5242880
 			{
-			
 				$$$TRACE("Attachment too large")
 				//This will error if we try to download
 				//Send email alert 			
@@ -1897,7 +2143,6 @@ END
 				set t=..GenerateAlert(errorText)
 			
 			GOTO END
-			
 			}
 		
 			set attach.size=attchItem.size
@@ -1934,8 +2179,7 @@ END
 	}
 	
 	$$$LOGINFO("refResp :"_refResp)
-	
-	;IF refResp.StatusCode = "200,422,404"
+
 	IF $FIND("200,422,404", refResp.StatusCode ) '= 0
 	{
 		//If api call returns at 404 or 422 we do not need to try again 
@@ -1979,7 +2223,7 @@ END
 <Class name="RFT.ERS.Process.WorklistProcessor">
 <ClassType>persistent</ClassType>
 <Super>Ens.BusinessProcess</Super>
-<TimeChanged>66746,37303.1934449</TimeChanged>
+<TimeChanged>66786,29910.3544901</TimeChanged>
 <TimeCreated>66746,37302.9962584</TimeCreated>
 
 <Method name="OnRequest">
@@ -1988,154 +2232,160 @@ END
 <Implementation><![CDATA[
 
 	set t=$$$OK
-	
-	//Request worklist from ERS 
-	
-	set req=##class(RFT.ERS.Classes.RequestWorklist).%New()
-	set req.sessionID=1
-	
-	set t=..SendRequestSync("HttpOut_ERS",req,.worklistResponse)
 
-	Set ClassType = $CLASSNAME(worklistResponse)
-	$$$LOGINFO("ClassType : "_ClassType)
+	set tsc = $$$OK
+    set ColdeList = $LISTBUILD("APPOINTMENT_SLOT_ISSUES", "REFERRALS_FOR_REVIEW")
+    SET ptr=0
+    WHILE $LISTNEXT(ColdeList,ptr,Selector)
+    {
+		set req=##class(RFT.ERS.Classes.RequestWorklist).%New()
+		set req.sessionID=1
+		set req.sessionSelector = Selector
+		set t=..SendRequestSync("HttpOut_ERS",req,.worklistResponse)
+		
+		//Request worklist from ERS
+		
+		Set ClassType = $CLASSNAME(worklistResponse)
+		$$$LOGINFO("ClassType : "_ClassType)
 
-	if ClassType= "Ens.StringContainer"
-	{
-		Set pResponse = ##class(Ens.StringContainer).%New()
-		;set pResponse.StringValue = "{"_worklistResponse.StringValue_"}"
-		set pResponse.StringValue = "{"_$c(34)_"responseCode"_$c(34)_":200,"_$c(34)_"message"_$c(34)_":"_$c(34)_"OK"_$c(34)_"}"
-		GOTO END
-	}
-	
-	IF '$$$ISERR(t)
-	{
-	
-	#DIM worklistResponse As RFT.ERS.Classes.WorklistResponse
-	
-	//Loop through response
-	//add worklist to local list
-		for i=1:1:worklistResponse.Item.Count()
+		if ClassType= "Ens.StringContainer"
 		{
-			set item=worklistResponse.Item.GetAt(i)
-			set ubrn=item.ubrn
-			//First check if ubrn exists in local list
-			set workList=##class(RFT.ERS.Tables.Worklist).%OpenId(ubrn)
+			Set pResponse = ##class(Ens.StringContainer).%New()
+			;set pResponse.StringValue = "{"_worklistResponse.StringValue_"}"
+			set pResponse.StringValue = "{"_$c(34)_"responseCode"_$c(34)_":200,"_$c(34)_"message"_$c(34)_":"_$c(34)_"OK"_$c(34)_"}"
+			GOTO END
+		}
+		
+		IF '$$$ISERR(t)
+		{	
+			#DIM worklistResponse As RFT.ERS.Classes.WorklistResponse
+			
+			//Loop through response
+			//add worklist to local list
+			for i=1:1:worklistResponse.Item.Count()
+			{
+				set item=worklistResponse.Item.GetAt(i)
+				set ubrn=item.ubrn
+				//First check if ubrn exists in local list
+				set workList=##class(RFT.ERS.Tables.Worklist).%OpenId(ubrn)
 
-			IF $ISOBJECT(workList)
-			{	 //We need to check if there is an update been made on ERS thats not been updated locally
+				$$$TRACE(ubrn _ "/" _ $ISOBJECT(workList) _ "/"_ Selector _ "/" )
 
-				$$$TRACE("UBRN "_ubrn_" exists on local list")
-				set localLastUpdated=workList.clinicalInfoLastUpdate
-
-
-				if $ISOBJECT(item.clinicalInfoLastUpdate) 
-				{
-					set ersLastUpdate=item.clincicalInfoLastUpdate
-				}else
-				{
-					set ersLastUpdate=item.clinicalInfoFirstSubmitted
-				}
-
-				set dateDiff=##class(%SYSTEM.SQL).DATEDIFF("ss",localLastUpdated,ersLastUpdate)		
+				IF $ISOBJECT(workList)
+				{	 //We need to check if there is an update been made on ERS thats not been updated locally
 				
-				//get username
-				set Username = $USERNAME
-	 			$$$TRACE("Username "_Username)
-	 			
-				//code seg to create Audit event on response from server
-				Set ProdNS = $SYSTEM.SYS.NameSpace()
-				$$$TRACE(ProdNS)
-				Set $Namespace = "%SYS" ; Switch to the target namespace
-				//source, type, name
-				set AuditEvent = ##class(Security.Events).Exists(Username, "WorkList Retrieval", "ERSResponse")
-				Set $Namespace = ProdNS ; Switch back to the original namespace
-				$$$LOGINFO("AuditEvent Exists? 1 = yes, 0 = no"_AuditEvent)
+					//$$$TRACE("UBRN "_ubrn_" exists on local list")
+					//set localLastUpdated=workList.clinicalInfoLastUpdate
 				
-				//create audit event if doesn't exist
-				if AuditEvent = 0 {
-				Set $Namespace = "%SYS" ; Switch to the target namespace
-				Set status = ##class(Security.Events).Create(Username,"WorkList Retrieval","ERSResponse","Description", 1)
-				Set $Namespace = ProdNS ; Switch back to the original namespace 
+					//if $ISOBJECT(item.clinicalInfoLastUpdate) 
+					//{
+					//	set ersLastUpdate=item.clincicalInfoLastUpdate
+					//}
+					//else
+					//{
+					//	set ersLastUpdate=item.clinicalInfoFirstSubmitted
+					//}
+
+					IF Selector = "REFERRALS_FOR_REVIEW"
+					{
+						// Case workList.clinicalInfoFirstSubmitted empty need to pick up the response value
+						if $LENGTH(item.clinicalInfoFirstSubmitted) '= 0
+						{
+							if $LENGTH(workList.clinicalInfoFirstSubmitted) = 0
+							{
+								set workList.clinicalInfoFirstSubmitted = item.clinicalInfoFirstSubmitted
+							}
+						}
+
+						// if refResp.Referral.clinicalInfoLastUpdate exist then Populate the variable ersLastUpdate
+						if $LENGTH(item.clinicalInfoLastUpdate) '= 0
+						{
+							set ersLastUpdate = item.clinicalInfoLastUpdate
+						}
+						// Case workList.clinicalInfoLastUpdate empty need to pick up the response value
+						elseif $LENGTH(item.clinicalInfoLastUpdate) = 0
+						{					
+							if $LENGTH(item.clinicalInfoFirstSubmitted) '= 0
+							{
+								set ersLastUpdate = item.clinicalInfoFirstSubmitted
+							}	
+						}
+
+						// Case workList.clinicalInfoLastUpdate empty
+						set localLastUpdated = workList.clinicalInfoLastUpdate
+						if $LENGTH(localLastUpdated) = 0
+						{
+							set workList.clinicalInfoLastUpdate = ersLastUpdate
+						}
+						
+						//if $G(dateDiff)'=0
+						if localLastUpdated '= ersLastUpdate
+						{
+							$$$TRACE("Update to local list required. UBRN: "_ubrn)
+							set workList.specialty=item.specialty
+							set workList.apptStart=item.apptStart
+							if item.clinicalInfoLastUpdate
+							{
+								set workList.clinicalInfoLastUpdate=item.clinicalInfoLastUpdate
+							}
+							else  {set workList.clinicalInfoLastUpdate=item.clinicalInfoFirstSubmitted}
+							set workList.clinicalInfoFirstSubmitted=item.clinicalInfoFirstSubmitted
+							set workList.priority=item.priority
+							set workList.refType=item.refType
+							set workList.clinician=item.clinician
+							set workList.apptStart=item.apptStart
+							set workList.statusFlag=0 //We will poll A005 to grab ref details again
+							set workList.UpdatePatientDB=0
+					
+							set t=workList.%Save()
+					
+							//delete from attachments table as we will redownload
+							&sql(DELETE FROM RFT_ERS_Tables.Attachments where ubrn=:ubrn)
+						}
+
+					}
+
+					
+					else 
+					{
+						$$$TRACE("No update required for ubrn: "_ubrn)
+					}	
 				}
-				
-				//format NHS Number
-				set patientID = item.patientID
-				If $Length(patientID) = 10 {
-    				Set NHSNum = $E(patientID, 1, 3)_" "_$E(patientID, 4, 6)_" "_$E(patientID, 7, 9)_" "_$E(patientID, 10)
-    				Write NHSNum
-				} Else {
-    				Write "Invalid input number"
-				}
-				//format UBRN
-				set UBRN = item.ubrn
-				If $Length(UBRN) = 12 {
-    				Set formattedUBRN = $E(UBRN, 1, 4)_" "_$E(UBRN, 5, 8)_" "_$E(UBRN, 9, 12)
-    				Write formattedUBRN
-				} Else {
-   					 Write "Invalid input number"
-				}
-	
-	
-				set EndUserID = ^LastToken("nhsid_useruid")
-	 			
-				$$$TRACE("EndUserID "_EndUserID)
-				$$$TRACE("patientID: "_NHSNum)
-				$$$TRACE("UBRN :"_formattedUBRN)
-	
-				//print created audit event to audit DB
-				Set status = ##class(RFT.ERS.Classes.AuditClass).PerformAction(Username, "ERSResponse", "Description: NHS Number: "_NHSNum_" UBRN: "_formattedUBRN_" EndUserID: "_EndUserID)
-				If $$$ISERR(status) {
-    			$$$LOGINFO("error updating audit")
-				}
-				
-				if $G(dateDiff)>0
-				{
-					$$$TRACE("Update to local list required. UBRN: "_ubrn)
+				else
+				//IF '$ISOBJECT(workList) 
+				{	
+					$$$TRACE("Adding new record on local list for: "_ubrn)
+					set workList=##class(RFT.ERS.Tables.Worklist).%New()
 					set workList.specialty=item.specialty
-					set workList.apptStart=item.apptStart
-					set workList.clinicalInfoLastUpdate=item.clinicalInfoLastUpdate
+					set workList.requestContextStatus=item.requestContextStatus
+					set workList.clinicalInfoPrinted=item.clinicalInfoPrinted
+					set workList.clinicalInfoFirstSubmitted=item.clinicalInfoFirstSubmitted
+					;set workList.clinicalInfoLastUpdate=item.clinicalInfoLastUpdate
+
+					if item.clinicalInfoLastUpdate
+					{
+						set workList.clinicalInfoLastUpdate=item.clinicalInfoLastUpdate
+					}
+					else  {set workList.clinicalInfoLastUpdate=item.clinicalInfoFirstSubmitted}
+							
+					set workList.eRefPathwayStart=item.eRefPathwayStart
 					set workList.priority=item.priority
 					set workList.refType=item.refType
 					set workList.clinician=item.clinician
 					set workList.apptStart=item.apptStart
-					set workList.statusFlag=0 //We will poll A005 to grab ref details again
+					set workList.statusFlag=0 
+					set workList.ubrn=item.ubrn
+					set workList.patientID=item.patientID
 					set workList.UpdatePatientDB=0
-
 					set t=workList.%Save()
-
-					//delete from attachments table as we will redownload
-					&sql(DELETE FROM RFT_ERS_Tables.Attachments where ubrn=:ubrn)
 				}
-				else 
-				{
-					$$$TRACE("No update required for ubrn: "_ubrn)
-				}	
 			}
-			else 
-			{	
-				$$$TRACE("Adding new record on local list for: "_ubrn)
-				set workList=##class(RFT.ERS.Tables.Worklist).%New()
-				set workList.specialty=item.specialty
-				set workList.requestContextStatus=item.requestContextStatus
-				set workList.clinicalInfoPrinted=item.clinicalInfoPrinted
-				set workList.clinicalInfoFirstSubmitted=item.clinicalInfoFirstSubmitted
-				set workList.eRefPathwayStart=item.eRefPathwayStart
-				set workList.priority=item.priority
-				set workList.refType=item.refType
-				set workList.clinician=item.clinician
-				set workList.apptStart=item.apptStart
-				set workList.statusFlag=0 
-				set workList.ubrn=item.ubrn
-				set workList.patientID=item.patientID
-				set workList.UpdatePatientDB=0
-				set t=workList.%Save()
-			}		
-
-
+			Set pResponse = ##class(Ens.StringContainer).%New()
+			set pResponse.StringValue = "{"_$c(34)_"responseCode"_$c(34)_":200,"_$c(34)_"message"_$c(34)_":"_$c(34)_"OK"_$c(34)_"}"
 		}
-		Set pResponse = ##class(Ens.StringContainer).%New()
-		set pResponse.StringValue = "{"_$c(34)_"responseCode"_$c(34)_":200,"_$c(34)_"message"_$c(34)_":"_$c(34)_"OK"_$c(34)_"}"
-}
+    }
+	
+
 END
 	quit t
 ]]></Implementation>
@@ -2149,7 +2399,7 @@ END
 
 <Class name="RFT.ERS.Production">
 <Super>Ens.Production</Super>
-<TimeChanged>66746,37303.0484964</TimeChanged>
+<TimeChanged>66786,30769.6227476</TimeChanged>
 <TimeCreated>66746,37303.0484964</TimeCreated>
 
 <XData name="ProductionDefinition">
@@ -2177,8 +2427,9 @@ END
     <Setting Target="Host" Name="OutputDir">C:\Users\HaitemElAaouani\Documents\eRS\OuPut\raw</Setting>
     <Setting Target="Host" Name="PDFsFolder">C:\Users\HaitemElAaouani\Documents\eRS\OuPut\pdf</Setting>
     <Setting Target="Host" Name="DocumentStorageMode">MOUNTHLY</Setting>
+    <Setting Target="Host" Name="AllowedFiles">docx,doc,txt,rtf,tif,jpeg,xml</Setting>
   </Item>
-  <Item Name="ReferralProcessor" Category="ERS" ClassName="RFT.ERS.Process.ReferralProcessor" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+  <Item Name="ReferralProcessor" Category="ERS" ClassName="RFT.ERS.Process.ReferralProcessor" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
   </Item>
   <Item Name="ReferralToDB" Category="ERS" ClassName="RFT.ERS.Process.RefToDB" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
   </Item>
@@ -2192,7 +2443,7 @@ END
     <Setting Target="Host" Name="WorkListSizeLimitMB">0.1</Setting>
   </Item>
   <Item Name="ERS_DB_UPDATE" Category="ERS" ClassName="RFT.ERS.Operation.ExecuteQuery" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
-    <Setting Target="Adapter" Name="DSN">ERS_DATABASE</Setting>
+    <Setting Target="Adapter" Name="DSN">ERS</Setting>
     <Setting Target="Adapter" Name="StayConnected">30</Setting>
     <Setting Target="Adapter" Name="Credentials">ERS</Setting>
   </Item>
@@ -2323,7 +2574,7 @@ END
 
 <Class name="RFT.ERS.Service.InvokeReferralProcessor">
 <Super>Ens.BusinessService</Super>
-<TimeChanged>66746,37303.0689839</TimeChanged>
+<TimeChanged>66785,44287.7534988</TimeChanged>
 <TimeCreated>66746,37303.0689839</TimeCreated>
 
 <Parameter name="ADAPTER">
@@ -2344,7 +2595,7 @@ END
 	
 	&SQL(OPEN DocCursor)
 	
-	FOR {&SQL(FETCH DocCursor)	
+	FOR {&SQL(FETCH DocCursor)
 		
 		QUIT:SQLCODE
 		set req=##class(RFT.ERS.Classes.RequestReferralDetails).%New()
