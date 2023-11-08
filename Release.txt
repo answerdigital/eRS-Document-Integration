@@ -1,4 +1,6 @@
-0.0.6 Release including:
+0.0.7 Release including:
 
-- Bugfix not including userid in session handover
-- Provide docker builds for all components
+- Pull referrals from ASI and REferrals for Review worklists
+- Re-download documents ewhen clinical info has changes
+- Log individual http calls to audit log
+- Include requestID in audit log
