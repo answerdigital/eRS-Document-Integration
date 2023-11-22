@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25" zv="IRIS for Windows (x86-64) 2023.1 (Build 229U)" ts="2023-11-08 08:46:06">
+<Export generator="Cache" version="25" zv="IRIS for Windows (x86-64) 2023.1 (Build 229U)" ts="2023-11-22 09:36:00">
 <Class name="RFT.ERS.Classes.Attachment">
 <Super>Ens.Response</Super>
 <TimeChanged>66746,37302.6023422</TimeChanged>
@@ -1601,7 +1601,7 @@ END
 <Class name="RFT.ERS.Process.DocumentProcessor">
 <ClassType>persistent</ClassType>
 <Super>Ens.BusinessProcess</Super>
-<TimeChanged>66785,56351.7283388</TimeChanged>
+<TimeChanged>66800,31602.0493878</TimeChanged>
 <TimeCreated>66746,37302.900059</TimeCreated>
 
 <Property name="LibreOffice">
@@ -1695,8 +1695,20 @@ END
 			}
 			elseif fileType'="pdf"
 			{
-				set cmd=""""_..LibreOffice_""""_" --headless --writer --convert-to pdf "_filePath_" --outdir "_TargetDir
-				SET runCmd=$ZF(-1,cmd)
+				If $$IsFileTypeAllowed(fileType)
+				{
+					set cmd=""""_..LibreOffice_""""_" --headless --writer --convert-to pdf "_filePath_" --outdir "_TargetDir
+					$$$TRACE("Will create PDF: "_cmd)
+					SET runCmd=$ZF(-1,cmd)
+				}
+				Else
+				{
+        			; File type is not allowed, so just copy the original file to the target directory
+        			Set copyCmd = "copy "_filePath_" "_TargetDir
+					$$$LOGINFO("Will NOT create PDF. Will copy yhr orginal file to PDF direcotry: "_copyCmd)
+
+        			Set copyResult = $ZF(-1, copyCmd)
+    			}
 			}
 			//update local list
 			$$$TRACE("PDF File saved. Attchment ID: "_pInput.attachmentID)
@@ -1721,6 +1733,17 @@ END
 		}
 	}
 	quit t
+]]></Implementation>
+</Method>
+
+<Method name="IsFileTypeAllowed">
+<FormalSpec>fileType:%String</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[
+    Set fileType = $ZCONVERT(fileType, "L")  ; Convert to uppercase for case-insensitive comparison
+    //Set allowedFiles = $LISTBUILD("DOCX", "DOC", "TXT", "RTF", "JPEG")
+	Set allowedFiles = $LISTFROMSTRING(..AllowedFiles,",",0)
+    Quit $LISTFIND(allowedFiles, fileType)
 ]]></Implementation>
 </Method>
 
@@ -2399,7 +2422,7 @@ END
 
 <Class name="RFT.ERS.Production">
 <Super>Ens.Production</Super>
-<TimeChanged>66786,30769.6227476</TimeChanged>
+<TimeChanged>66800,33712.364391</TimeChanged>
 <TimeCreated>66746,37303.0484964</TimeCreated>
 
 <XData name="ProductionDefinition">
@@ -2427,7 +2450,7 @@ END
     <Setting Target="Host" Name="OutputDir">C:\Users\HaitemElAaouani\Documents\eRS\OuPut\raw</Setting>
     <Setting Target="Host" Name="PDFsFolder">C:\Users\HaitemElAaouani\Documents\eRS\OuPut\pdf</Setting>
     <Setting Target="Host" Name="DocumentStorageMode">MOUNTHLY</Setting>
-    <Setting Target="Host" Name="AllowedFiles">docx,doc,txt,rtf,tif,jpeg,xml</Setting>
+    <Setting Target="Host" Name="AllowedFiles">docx,doc,txt,rtf,jpeg,xml</Setting>
   </Item>
   <Item Name="ReferralProcessor" Category="ERS" ClassName="RFT.ERS.Process.ReferralProcessor" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
   </Item>
@@ -3183,5 +3206,14 @@ END
 <entry table="ERS.ContentTypeToExtension" key="text/html">html</entry>
 <entry table="ERS.ContentTypeToExtension" key="text/plain">txt</entry>
 <entry table="ERS.ContentTypeToExtension" key="text/rtf">rtf</entry>
+</lookupTable>
+</Document>
+
+<Document name="NCA.GenderCode.LUT">
+<lookupTable>
+<entry table="NCA.GenderCode" key="F">female</entry>
+<entry table="NCA.GenderCode" key="I">other</entry>
+<entry table="NCA.GenderCode" key="M">male</entry>
+<entry table="NCA.GenderCode" key="U">unknown</entry>
 </lookupTable>
 </Document></Export>
