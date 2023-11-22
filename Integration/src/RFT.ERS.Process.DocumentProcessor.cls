@@ -63,8 +63,20 @@ Method OnRequest(pInput As RFT.ERS.Classes.RequestAttachment, Output pResponse A
 			}
 			elseif fileType'="pdf"
 			{
-				set cmd=""""_..LibreOffice_""""_" --headless --writer --convert-to pdf "_filePath_" --outdir "_TargetDir
-				SET runCmd=$ZF(-1,cmd)
+				If $$IsFileTypeAllowed(fileType)
+				{
+					set cmd=""""_..LibreOffice_""""_" --headless --writer --convert-to pdf "_filePath_" --outdir "_TargetDir
+					$$$TRACE("Will create PDF: "_cmd)
+					SET runCmd=$ZF(-1,cmd)
+				}
+				Else
+				{
+        			; File type is not allowed, so just copy the original file to the target directory
+        			Set copyCmd = "copy "_filePath_" "_TargetDir
+					$$$LOGINFO("Will NOT create PDF. Will copy yhr orginal file to PDF direcotry: "_copyCmd)
+
+        			Set copyResult = $ZF(-1, copyCmd)
+    			}
 			}
 			//update local list
 			$$$TRACE("PDF File saved. Attchment ID: "_pInput.attachmentID)
@@ -89,6 +101,14 @@ Method OnRequest(pInput As RFT.ERS.Classes.RequestAttachment, Output pResponse A
 		}
 	}
 	quit t
+}
+
+Method IsFileTypeAllowed(fileType As %String) As %Boolean
+{
+    Set fileType = $ZCONVERT(fileType, "L")  ; Convert to uppercase for case-insensitive comparison
+    //Set allowedFiles = $LISTBUILD("DOCX", "DOC", "TXT", "RTF", "JPEG")
+	Set allowedFiles = $LISTFROMSTRING(..AllowedFiles,",",0)
+    Quit $LISTFIND(allowedFiles, fileType)
 }
 
 Storage Default
@@ -122,4 +142,3 @@ Storage Default
 }
 
 }
-
