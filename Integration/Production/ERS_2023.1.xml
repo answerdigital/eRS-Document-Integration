@@ -1760,7 +1760,8 @@ END
 <ReturnType>%Boolean</ReturnType>
 <Implementation><![CDATA[
     Set fileType = $ZCONVERT(fileType, "U")  ; Convert to uppercase for case-insensitive comparison
-    Set allowedFiles = $LISTBUILD("DOCX", "DOC", "TXT", "RTF", "TIF", "JPEG")
+    //Set allowedFiles = $LISTBUILD("DOCX", "DOC", "TXT", "RTF", "TIF", "JPEG")
+    Set allowedFiles = $LISTFROMSTRING(..AllowedFiles)
     Quit $LISTFIND(allowedFiles, fileType)
 ]]></Implementation>
 </Method>
