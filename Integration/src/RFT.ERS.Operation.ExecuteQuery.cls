@@ -7,31 +7,30 @@ Property Adapter As EnsLib.SQL.OutboundAdapter;
 
 Parameter INVOCATION = "Queue";
 
-Method UpdateData(pRequest As Ens.StringContainer, Output pResponse As Ens.Response)
+Method OnRequest(pRequest As %DynamicObject, Output pResponse As Ens.Response)
 {
-		Set sc = $$$OK
+		Set tsc = $$$OK
+		$$$TRACE("Start")
 	Try {
 		Set pResponse = ##class(EnsLib.SQL.Snapshot).%New()
-		Set SQL = pRequest.StringValue
-	
-		Set sc = ..Adapter.ExecuteUpdate(.pResponse, SQL) 
-		
-
+		Set Qry = "INSERT INTO TABLE patients" _ pRequest.Identifier _ " " _ pRequest.FamilyName  _ " " _ pRequest.GivenName _ " " _ pRequest.Gender _ " " _ pRequest.DOB _ " " _ pRequest.Telecom
+		$$$TRACE(Qry)
+		Set tsc = ..Adapter.ExecuteUpdate(.pResponse, Qry)
 	}
 	Catch Ex {
-		Set sc = Ex.AsStatus()
+		Set tsc = Ex.AsStatus()
 	}
 	
-	quit sc
-}
+	quit tsc
 
-XData MessageMap
-{
-<MapItems>
-  <MapItem MessageType="Ens.StringContainer">
-    <Method>UpdateData</Method>
-  </MapItem>
-  </MapItems>
+	//XData MessageMap
+	//{
+	//<MapItems>
+	//  <MapItem MessageType="Ens.StringContainer">
+	//    <Method>UpdateData</Method>
+	//  </MapItem>
+	//  </MapItems>
+	//}
 }
 
 }

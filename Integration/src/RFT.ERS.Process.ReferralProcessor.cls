@@ -46,6 +46,12 @@ Method OnRequest(pInput As RFT.ERS.Classes.RequestReferralDetails, Output pRespo
 			{
 				set workList.clinicalInfoLastUpdate = ersLastUpdate
 			}
+			// Case workList.clinicalInfoLastUpdate got a value
+			//if $LENGTH(ersLastUpdate) '= 0
+			//{
+
+			//set dateDiff=##class(%SYSTEM.SQL).DATEDIFF("ss",localLastUpdated,ersLastUpdate)
+			//if $G(dateDiff)'=0
 
 			if localLastUpdated '= ersLastUpdate
 			{
