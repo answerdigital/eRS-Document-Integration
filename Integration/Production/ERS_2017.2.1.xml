@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25" zv="IRIS for Windows (x86-64) 2023.1 (Build 229U)" ts="2023-11-22 09:36:00">
+<Export generator="Cache" version="25" zv="IRIS for Windows (x86-64) 2023.2 (Build 227U)" ts="2023-12-09 11:54:59">
 <Class name="RFT.ERS.Classes.Attachment">
 <Super>Ens.Response</Super>
-<TimeChanged>66746,37302.6023422</TimeChanged>
+<TimeChanged>66817,39649.226</TimeChanged>
 <TimeCreated>66746,37302.6023422</TimeCreated>
 
 <Property name="attachmentID">
@@ -75,7 +75,7 @@
 
 <Class name="RFT.ERS.Classes.AttachmentResponse">
 <Super>Ens.Response</Super>
-<TimeChanged>66746,37302.6369144</TimeChanged>
+<TimeChanged>66817,39649.226</TimeChanged>
 <TimeCreated>66746,37302.6369144</TimeCreated>
 
 <Property name="StatusCode">
@@ -113,7 +113,7 @@
 
 <Class name="RFT.ERS.Classes.AuditClass">
 <Super>%Persistent</Super>
-<TimeChanged>66785,40541.5764359</TimeChanged>
+<TimeChanged>66817,39649.226</TimeChanged>
 <TimeCreated>66746,37302.559841</TimeCreated>
 
 <Method name="PerformAction">
@@ -161,7 +161,7 @@
 
 <Class name="RFT.ERS.Classes.HttpResponse">
 <Super>Ens.Response</Super>
-<TimeChanged>66746,37302.6466368</TimeChanged>
+<TimeChanged>66817,39649.226</TimeChanged>
 <TimeCreated>66746,37302.6466368</TimeCreated>
 
 <Property name="StatusCode">
@@ -191,7 +191,7 @@
 
 <Class name="RFT.ERS.Classes.RefToDB">
 <Super>Ens.Request</Super>
-<TimeChanged>66746,37302.7150215</TimeChanged>
+<TimeChanged>66817,39649.226</TimeChanged>
 <TimeCreated>66746,37302.7150215</TimeCreated>
 
 <Property name="ubrn">
@@ -227,7 +227,7 @@
 
 <Class name="RFT.ERS.Classes.ReferralDetails">
 <Super>Ens.Response</Super>
-<TimeChanged>66784,53389.3250177</TimeChanged>
+<TimeChanged>66817,39649.226</TimeChanged>
 <TimeCreated>66746,37302.6675987</TimeCreated>
 
 <Property name="ubrn">
@@ -319,7 +319,7 @@
 
 <Class name="RFT.ERS.Classes.ReferralDetailsResponse">
 <Super>Ens.Response</Super>
-<TimeChanged>66784,51631.3449345</TimeChanged>
+<TimeChanged>66817,39649.226</TimeChanged>
 <TimeCreated>66746,37302.6880051</TimeCreated>
 
 <Property name="Referral">
@@ -378,7 +378,7 @@
 
 <Class name="RFT.ERS.Classes.RequestAttachment">
 <Super>Ens.Request</Super>
-<TimeChanged>66746,37302.7323202</TimeChanged>
+<TimeChanged>66817,39649.226</TimeChanged>
 <TimeCreated>66746,37302.7323202</TimeCreated>
 
 <Property name="attachmentID">
@@ -407,7 +407,7 @@
 
 <Class name="RFT.ERS.Classes.RequestClinicalInformation">
 <Super>Ens.Request</Super>
-<TimeChanged>66746,37302.7506526</TimeChanged>
+<TimeChanged>66817,39649.226</TimeChanged>
 <TimeCreated>66746,37302.7506526</TimeCreated>
 
 <Property name="ubrn">
@@ -429,7 +429,7 @@
 
 <Class name="RFT.ERS.Classes.RequestReferralDetails">
 <Super>Ens.Request</Super>
-<TimeChanged>66746,37302.7707207</TimeChanged>
+<TimeChanged>66817,39649.226</TimeChanged>
 <TimeCreated>66746,37302.7707207</TimeCreated>
 
 <Property name="ubrn">
@@ -451,7 +451,7 @@
 
 <Class name="RFT.ERS.Classes.RequestWorklist">
 <Super>Ens.Request</Super>
-<TimeChanged>66780,54286.5812287</TimeChanged>
+<TimeChanged>66817,39649.226</TimeChanged>
 <TimeCreated>66746,37302.798703</TimeCreated>
 
 <Property name="sessionID">
@@ -480,7 +480,7 @@
 
 <Class name="RFT.ERS.Classes.WorklistItem">
 <Super>Ens.Response</Super>
-<TimeChanged>66746,37302.8043897</TimeChanged>
+<TimeChanged>66817,39649.226</TimeChanged>
 <TimeCreated>66746,37302.8043897</TimeCreated>
 
 <Property name="specialty">
@@ -579,7 +579,7 @@
 
 <Class name="RFT.ERS.Classes.WorklistResponse">
 <Super>Ens.Response</Super>
-<TimeChanged>66746,37302.8168636</TimeChanged>
+<TimeChanged>66817,39649.226</TimeChanged>
 <TimeCreated>66746,37302.8168636</TimeCreated>
 
 <Property name="Item">
@@ -602,7 +602,7 @@
 
 <Class name="RFT.ERS.Operation.ERS">
 <Super>Ens.BusinessOperation</Super>
-<TimeChanged>66785,55470.8433657</TimeChanged>
+<TimeChanged>66817,39649.226</TimeChanged>
 <TimeCreated>66746,37302.8625698</TimeCreated>
 
 <Parameter name="ADAPTER">
@@ -1508,7 +1508,7 @@ END
 
 <Class name="RFT.ERS.Operation.ExecuteQuery">
 <Super>Ens.BusinessOperation</Super>
-<TimeChanged>66746,37302.8802699</TimeChanged>
+<TimeChanged>66817,39649.226</TimeChanged>
 <TimeCreated>66746,37302.8802699</TimeCreated>
 
 <Parameter name="ADAPTER">
@@ -1523,42 +1523,40 @@ END
 <Default>Queue</Default>
 </Parameter>
 
-<Method name="UpdateData">
-<FormalSpec>pRequest:Ens.StringContainer,*pResponse:Ens.Response</FormalSpec>
+<Method name="OnRequest">
+<FormalSpec>pRequest:%DynamicObject,*pResponse:Ens.Response</FormalSpec>
 <Implementation><![CDATA[
-		Set sc = $$$OK
+		Set tsc = $$$OK
+		$$$TRACE("Start")
 	Try {
 		Set pResponse = ##class(EnsLib.SQL.Snapshot).%New()
-		Set SQL = pRequest.StringValue
-	
-		Set sc = ..Adapter.ExecuteUpdate(.pResponse, SQL) 
-		
-
+		Set Qry = "INSERT INTO TABLE patients" _ pRequest.Identifier _ " " _ pRequest.FamilyName  _ " " _ pRequest.GivenName _ " " _ pRequest.Gender _ " " _ pRequest.DOB _ " " _ pRequest.Telecom
+		$$$TRACE(Qry)
+		Set tsc = ..Adapter.ExecuteUpdate(.pResponse, Qry)
 	}
 	Catch Ex {
-		Set sc = Ex.AsStatus()
+		Set tsc = Ex.AsStatus()
 	}
 	
-	quit sc
+	quit tsc
+
+	//XData MessageMap
+	//{
+	//<MapItems>
+	//  <MapItem MessageType="Ens.StringContainer">
+	//    <Method>UpdateData</Method>
+	//  </MapItem>
+	//  </MapItems>
+	//}
 ]]></Implementation>
 </Method>
-
-<XData name="MessageMap">
-<Data><![CDATA[
-<MapItems>
-  <MapItem MessageType="Ens.StringContainer">
-    <Method>UpdateData</Method>
-  </MapItem>
-  </MapItems>
-]]></Data>
-</XData>
 </Class>
 
 
 <Class name="RFT.ERS.Process.ClinicalInformationProcessor">
 <ClassType>persistent</ClassType>
 <Super>Ens.BusinessProcess</Super>
-<TimeChanged>66746,37302.8859743</TimeChanged>
+<TimeChanged>66817,39649.226</TimeChanged>
 <TimeCreated>66746,37302.8859743</TimeCreated>
 
 <Method name="OnRequest">
@@ -1601,7 +1599,7 @@ END
 <Class name="RFT.ERS.Process.DocumentProcessor">
 <ClassType>persistent</ClassType>
 <Super>Ens.BusinessProcess</Super>
-<TimeChanged>66800,31602.0493878</TimeChanged>
+<TimeChanged>66817,42271.312114</TimeChanged>
 <TimeCreated>66746,37302.900059</TimeCreated>
 
 <Property name="LibreOffice">
@@ -1698,16 +1696,15 @@ END
 				If $$IsFileTypeAllowed(fileType)
 				{
 					set cmd=""""_..LibreOffice_""""_" --headless --writer --convert-to pdf "_filePath_" --outdir "_TargetDir
-					$$$TRACE("Will create PDF: "_cmd)
 					SET runCmd=$ZF(-1,cmd)
+					Quit runCmd
 				}
 				Else
 				{
         			; File type is not allowed, so just copy the original file to the target directory
-        			Set copyCmd = "copy "_filePath_" "_TargetDir
-					$$$LOGINFO("Will NOT create PDF. Will copy yhr orginal file to PDF direcotry: "_copyCmd)
-
+        			Set copyCmd = "cp "_filePath_" "_TargetDir
         			Set copyResult = $ZF(-1, copyCmd)
+        			Quit copyResult
     			}
 			}
 			//update local list
@@ -1737,12 +1734,13 @@ END
 </Method>
 
 <Method name="IsFileTypeAllowed">
+<ClassMethod>1</ClassMethod>
 <FormalSpec>fileType:%String</FormalSpec>
 <ReturnType>%Boolean</ReturnType>
 <Implementation><![CDATA[
-    Set fileType = $ZCONVERT(fileType, "L")  ; Convert to uppercase for case-insensitive comparison
-    //Set allowedFiles = $LISTBUILD("DOCX", "DOC", "TXT", "RTF", "JPEG")
-	Set allowedFiles = $LISTFROMSTRING(..AllowedFiles,",",0)
+    Set fileType = $ZCONVERT(fileType, "U")  ; Convert to uppercase for case-insensitive comparison
+    ;Set allowedFiles = $LISTBUILD("DOCX", "DOC", "TXT", "RTF", "TIF", "JPEG")
+    Set allowedFiles = $LISTFROMSTRING(..AllowedFiles)
     Quit $LISTFIND(allowedFiles, fileType)
 ]]></Implementation>
 </Method>
@@ -1778,113 +1776,10 @@ END
 </Class>
 
 
-<Class name="RFT.ERS.Process.HL7Process">
-<ClassType>persistent</ClassType>
-<Super>Ens.BusinessProcess</Super>
-<TimeChanged>66746,37302.9677116</TimeChanged>
-<TimeCreated>66746,37302.9677116</TimeCreated>
-
-<Method name="OnRequest">
-<FormalSpec>pRequest:EnsLib.HL7.Message,*pResponse:Ens.Response</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-
-	set t=$$$OK
-	
-	Set msg=pRequest
-	set nhs="" set mrn=""
-
-	//Loop through PID to get NHS && MRN
-	set x=msg.FindSegmentValues("PID:3(*)")
-	for i=1:1:x
-		{
-			
-			if msg.FindSegmentValues("PID:3("_i_").5")="SS"
-			{
-				set nhs=msg.FindSegmentValues("PID:3("_i_").1")
-					
-			}
-				if msg.FindSegmentValues("PID:3("_i_").5")="MR"
-			{
-				set mrn=msg.FindSegmentValues("PID:3("_i_").1")
-					
-			}
-			
-			
-	}
-	$$$TRACE("NHS NUMBER : "_nhs)	
-		
-	IF nhs=""
-	{	
-		$$$TRACE("NO NHS NUMBER FOUND. DISCARDING MESSAGE")
-		GOTO END
-	}	
-	
-	//Check NHS Numb against worklist to see if we need to send to DB
-	
-	set ubrn="" set specialty=""
-	&sql(SELECT ubrn,specialty into :ubrn,:specialty FROM RFT_ERS_Tables.Worklist WHERE patientID=:nhs)
-	
-	IF ubrn=""
-	{
-		$$$TRACE("PATIENT NOT ON WORKLIST. DISCARDING MESSAGE. NHS NUMBER : "_nhs)
-		GOTO END
-	}	
-	
-	$$$TRACE("Patient exists on worklist. NHS NUMBER : "_nhs)
-	
-	//Get message type
-	
-	set messageType=msg.FindSegmentValues("MSH:9.2")
-	
-	IF messageType="S12"
-	{
-		
-		$$$TRACE("EXTRACTING VALUES FROM HL7")
-		set lastName=msg.FindSegmentValues("PID:5(1).1.1")
-		set firstName=msg.FindSegmentValues("PID:5(1).2")
-		set sex=msg.FindSegmentValues("PID:8")
-		set dob=msg.FindSegmentValues("PID:7.1")
-		set addressOne=msg.FindSegmentValues("PID:11.1")
-		set addressTwo=msg.FindSegmentValues("PID:11.2")
-		set addressThree=msg.FindSegmentValues("PID:11.3")
-		set postcode=msg.FindSegmentValues("PID:11.5")
-		set contactNumber=msg.FindSegmentValues("PID:13.1")
-		
-		set qry="INSERT INTO patients (pat_ubrn,pat_mrn,pat_nhs,pat_familyName,pat_givenName,pat_sex,pat_dob,"
-		set qry=qry_"pat_addressOne,pat_addressTwo,pat_addressThree,pat_PostCode,pat_contactNumber,pat_speciality,"
-		set qry=qry_"rec_Updated,rec_UpdatedBy) VALUES ('"_ubrn_"','"_mrn_"','"_nhs_"','"_lastName_"','"_firstName_"','"
-		set qry=qry_sex_"','"_dob_"','"_addressOne_"','"_addressTwo_"','"_addressThree_"','"_postcode_"','"_contactNumber_"','"_specialty_"','"
-		set qry=qry_$zdatetime($horolog,3)_"','TIE')"	
-		quit t
-		
-	}
-	
-			
-
-	
-	
-	
-
-	
-
-		
-	
-END	
-	quit t
-]]></Implementation>
-</Method>
-
-<Storage name="Default">
-<Type>%Library.CacheStorage</Type>
-</Storage>
-</Class>
-
-
 <Class name="RFT.ERS.Process.RefToDB">
 <ClassType>persistent</ClassType>
 <Super>Ens.BusinessProcess</Super>
-<TimeChanged>66786,31297.5838845</TimeChanged>
+<TimeChanged>66817,39649.226</TimeChanged>
 <TimeCreated>66746,37302.9890946</TimeCreated>
 
 <UDLText name="T">
@@ -1915,7 +1810,8 @@ END
 		{
 			//Insert referral into external DB 
 			;set refQry="INSERT INTO ersdocs_workflow.ersRefReq_Details "
-			set refQry="INSERT INTO dbo.ersRefReq_Details "
+			;set refQry="INSERT INTO dbo.ersRefReq_Details "
+			set refQry="INSERT INTO ers_database.dbo.ersRefReq_Details "
 			set refQry=refQry_"(RefReq_UniqueID,RefReq_NHSNo,RefReq_UBRN,RefReq_TrustNACS,Appt_StDttm,Appt_EndDttm,RefReq_Specialty,RefReq_Status,"
 			set refQry=refQry_"RefReq_intent,RefReq_Priority,RefReq_Noofdocs,RefReq_FullURL,rec_UpdatedBy,rec_insertedBy) "
 			set refQry=refQry_"VALUES ('"_ubrn_"','"_referral.patientID_"','"_referral.ubrn_"','RFR','"_referral.apptStart_"','"_referral.apptEnd_"','"_referral.specialty_"','"
@@ -1946,7 +1842,8 @@ END
 				$$$LOGINFO("here")
 
 				QUIT:SQLCODE	
-				set attchQry="INSERT INTO dbo.ersdoc_attachments " 
+				;set attchQry="INSERT INTO dbo.ersdoc_attachments " 
+				set attchQry="INSERT INTO ers_database.dbo.ersdoc_attachments " 
 				set attchQry=attchQry_"(RefDoc_UniqueID,RefDocStatus,Attach_ID,Attach_InsertedBy,Attach_ContentType,Attach_URL,Attach_Size,Attach_Title,Attach_CrtdDTTM,"
 				set attchQry=attchQry_"DocDownloadURL,DocLocationURI,rec_Updated) "
 				set attchQry=attchQry_"VALUES ('"_ubrn_"','"_docStatus_"','"_attachmentID_"','"_insertedBy_"','"
@@ -1975,22 +1872,26 @@ END
 
 		// Build query to fetch patientID (NHS Number)
 		//Check if nhs number and DOB exist
-    	Set Qry = "SELECT COUNT(*) FROM dbo.patients WHERE pat_nhs = '"_PatientDetails.NHSnumber_"' and pat_dob = '"_PatientDetails.dob_"';"
+    	;Set Qry = "SELECT COUNT(*) FROM dbo.patients WHERE pat_nhs = '"_PatientDetails.NHSnumber_"' and pat_dob = '"_PatientDetails.dob_"';"
+    	Set Qry = "SELECT COUNT(*) FROM ers_database.dbo.patients WHERE pat_nhs = '"_PatientDetails.NHSnumber_"' and pat_dob = '"_PatientDetails.dob_"';"
     	//update if nhs number exists
     	$$$TRACE("MPI:"_PatientDetails.MPI)
-    	Set Qry = Qry_"UPDATE dbo.patients SET pat_mrn = '"_PatientDetails.MPI
+    	;Set Qry = Qry_"UPDATE dbo.patients SET pat_mrn = '"_PatientDetails.MPI
+    	Set Qry = Qry_"UPDATE ers_database.dbo.patients SET pat_mrn = '"_PatientDetails.MPI
     	Set Qry = Qry_"', pat_familyName = '"_PatientDetails.FamilyName_"', pat_givenName = '"_PatientDetails.GivenName_"', pat_sex = '"_PatientDetails.Gender
     	Set Qry = Qry_"', pat_addressOne = '"_PatientDetails.Address1_"', pat_addressTwo = '"_PatientDetails.Address2_"', pat_addressThree = '"_PatientDetails.Address3
     	Set Qry = Qry_"', pat_PostCode = '"_PatientDetails.postalCode
 		Set Qry = Qry_"', pat_contactNumber = '"_PatientDetails.phone
     	Set Qry = Qry_"' WHERE pat_nhs = '"_PatientDetails.NHSnumber_"' and rec_UpdatedBy = 'TIE'; "
     	//Insert if nhs number is new
-    	Set Qry = Qry_"INSERT INTO dbo.patients (pat_mrn, pat_nhs, pat_familyName, pat_givenName, pat_sex, pat_dob, pat_addressOne, pat_addressTwo, pat_addressThree, "
+    	;Set Qry = Qry_"INSERT INTO dbo.patients (pat_mrn, pat_nhs, pat_familyName, pat_givenName, pat_sex, pat_dob, pat_addressOne, pat_addressTwo, pat_addressThree, "
+    	Set Qry = Qry_"INSERT INTO ers_database.dbo.patients (pat_mrn, pat_nhs, pat_familyName, pat_givenName, pat_sex, pat_dob, pat_addressOne, pat_addressTwo, pat_addressThree, "
     	Set Qry = Qry_"pat_PostCode, pat_contactNumber, rec_UpdatedBy) "
     	Set Qry = Qry_"SELECT '"_PatientDetails.MPI_"', '"_PatientDetails.NHSnumber_"', '"_PatientDetails.FamilyName_"', '"_PatientDetails.GivenName_"', '"_PatientDetails.Gender
     	Set Qry = Qry_"', '"_PatientDetails.dob_"', '"_PatientDetails.Address1_"', '"_PatientDetails.Address2_"', '"_PatientDetails.Address3_"', '"_PatientDetails.postalCode
     	Set Qry = Qry_"', '"_PatientDetails.phone_"', 'TIE'"
-    	Set Qry = Qry_" WHERE NOT EXISTS (SELECT * FROM dbo.patients WHERE pat_nhs = '"_PatientDetails.NHSnumber_"' and pat_dob = '"_PatientDetails.dob_"');"
+    	;Set Qry = Qry_" WHERE NOT EXISTS (SELECT * FROM dbo.patients WHERE pat_nhs = '"_PatientDetails.NHSnumber_"' and pat_dob = '"_PatientDetails.dob_"');"
+    	Set Qry = Qry_" WHERE NOT EXISTS (SELECT * FROM ers_database.dbo.patients WHERE pat_nhs = '"_PatientDetails.NHSnumber_"' and pat_dob = '"_PatientDetails.dob_"');"
 
 		// Send query to ODBC operation
 		set insertAttachment=##class(Ens.StringContainer).%New()
@@ -2048,7 +1949,7 @@ END
 <Class name="RFT.ERS.Process.ReferralProcessor">
 <ClassType>persistent</ClassType>
 <Super>Ens.BusinessProcess</Super>
-<TimeChanged>66786,29995.6948648</TimeChanged>
+<TimeChanged>66817,39649.226</TimeChanged>
 <TimeCreated>66746,37302.9713997</TimeCreated>
 
 <Method name="OnRequest">
@@ -2098,6 +1999,12 @@ END
 			{
 				set workList.clinicalInfoLastUpdate = ersLastUpdate
 			}
+			// Case workList.clinicalInfoLastUpdate got a value
+			//if $LENGTH(ersLastUpdate) '= 0
+			//{
+
+			//set dateDiff=##class(%SYSTEM.SQL).DATEDIFF("ss",localLastUpdated,ersLastUpdate)
+			//if $G(dateDiff)'=0
 
 			if localLastUpdated '= ersLastUpdate
 			{
@@ -2246,7 +2153,7 @@ END
 <Class name="RFT.ERS.Process.WorklistProcessor">
 <ClassType>persistent</ClassType>
 <Super>Ens.BusinessProcess</Super>
-<TimeChanged>66786,29910.3544901</TimeChanged>
+<TimeChanged>66817,39649.226</TimeChanged>
 <TimeCreated>66746,37302.9962584</TimeCreated>
 
 <Method name="OnRequest">
@@ -2422,7 +2329,7 @@ END
 
 <Class name="RFT.ERS.Production">
 <Super>Ens.Production</Super>
-<TimeChanged>66800,33712.364391</TimeChanged>
+<TimeChanged>66817,40078.2238824</TimeChanged>
 <TimeCreated>66746,37303.0484964</TimeCreated>
 
 <XData name="ProductionDefinition">
@@ -2480,7 +2387,7 @@ END
 
 <Class name="RFT.ERS.Service.InvokeDocumentDownloader">
 <Super>Ens.BusinessService</Super>
-<TimeChanged>66746,37303.0643983</TimeChanged>
+<TimeChanged>66817,39649.226</TimeChanged>
 <TimeCreated>66746,37303.0643983</TimeCreated>
 
 <Parameter name="ADAPTER">
@@ -2521,7 +2428,7 @@ END
 
 <Class name="RFT.ERS.Service.InvokeRefToDB">
 <Super>Ens.BusinessService</Super>
-<TimeChanged>66746,37303.0725104</TimeChanged>
+<TimeChanged>66817,39649.226</TimeChanged>
 <TimeCreated>66746,37303.0725104</TimeCreated>
 
 <Parameter name="ADAPTER">
@@ -2597,7 +2504,7 @@ END
 
 <Class name="RFT.ERS.Service.InvokeReferralProcessor">
 <Super>Ens.BusinessService</Super>
-<TimeChanged>66785,44287.7534988</TimeChanged>
+<TimeChanged>66817,39649.226</TimeChanged>
 <TimeCreated>66746,37303.0689839</TimeCreated>
 
 <Parameter name="ADAPTER">
@@ -2651,7 +2558,7 @@ END
 
 <Class name="RFT.ERS.Service.InvokeWorklistProcessor">
 <Super>Ens.BusinessService</Super>
-<TimeChanged>66746,37303.117783</TimeChanged>
+<TimeChanged>66817,39649.226</TimeChanged>
 <TimeCreated>66746,37303.117783</TimeCreated>
 
 <UDLText name="T">
@@ -2709,7 +2616,7 @@ END
 
 <Class name="RFT.ERS.Tables.Attachments">
 <Super>%Persistent</Super>
-<TimeChanged>66746,37303.1350866</TimeChanged>
+<TimeChanged>66817,39649.226</TimeChanged>
 <TimeCreated>66746,37303.1350866</TimeCreated>
 
 <Property name="attachmentID">
@@ -2879,7 +2786,7 @@ END
 
 <Class name="RFT.ERS.Tables.Referrals">
 <Super>%Persistent</Super>
-<TimeChanged>66746,37303.1472712</TimeChanged>
+<TimeChanged>66817,39649.226</TimeChanged>
 <TimeCreated>66746,37303.1472712</TimeCreated>
 
 <Property name="ubrn">
@@ -2980,7 +2887,7 @@ END
 
 <Class name="RFT.ERS.Tables.Worklist">
 <Super>%Persistent</Super>
-<TimeChanged>66746,37303.1408536</TimeChanged>
+<TimeChanged>66817,39649.226</TimeChanged>
 <TimeCreated>66746,37303.1408536</TimeCreated>
 
 <Property name="ubrn">
@@ -3170,7 +3077,7 @@ END
 
 <Class name="RFT.Utility.CodeableConcept">
 <Super>%RegisteredObject</Super>
-<TimeChanged>66746,37303.1926134</TimeChanged>
+<TimeChanged>66817,39649.226</TimeChanged>
 <TimeCreated>66746,37303.1926134</TimeCreated>
 
 <Method name="RetriveCode">
@@ -3190,6 +3097,89 @@ END
 		quit code
 ]]></Implementation>
 </Method>
+</Class>
+
+
+<Class name="RFT.Utility.ExportClassesUtil">
+<Super>%RegisteredObject</Super>
+<TimeChanged>66817,42726.8917975</TimeChanged>
+<TimeCreated>66817,42726.8917975</TimeCreated>
+
+<UDLText name="T">
+<Content><![CDATA[
+// Method to export classes from the given package name
+
+]]></Content>
+</UDLText>
+
+<Method name="UDLExport">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>packageName:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+        set tsc =$$$OK
+        // Construct SQL query to retrieve class names from the given package
+        set Qry= "SELECT Name FROM %Library.RoutineMgr_StudioOpenDialog('"_packageName_"',1,1,0,1,0,0)"
+        Set ST=##class(%SQL.Statement).%New()
+        // Create a new %SQL.Statement object and prepare the query
+        set tsc = ST.%Prepare(Qry)
+        // Execute the prepared query to obtain a result set
+        set rset = ST.%Execute()
+
+        // Loop through each result in the result set
+        while rset.%Next()
+        {
+            // Get the class name from the result set
+            set ClassName = rset.%Get("Name")
+            // Export the class in the form of a UDL file using the $System.OBJ.ExportUDL method
+            set tsc =  $System.OBJ.ExportUDL(ClassName,ClassName,,,)
+            write ClassName,!
+        }
+    quit tsc
+]]></Implementation>
+</Method>
+
+<UDLText name="T">
+<Content><![CDATA[
+// Method to export production classes as xml for a specific IRIS/Cache version 
+
+]]></Content>
+</UDLText>
+
+<Method name="ExportProd">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>version:%String,packageName:%String,ProductionExportFile:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    set tsc =$$$OK
+    // Set the export version qualifier
+    set tsc = $SYSTEM.OBJ.SetQualifiers("/exportversion="_version)
+    // Export the package classes using the $System.OBJ.Export method and store the exported data in the specified production export file
+    do $System.OBJ.Export(.packageName,.ProductionExportFile)
+       
+    quit tsc
+]]></Implementation>
+</Method>
+
+<UDLText name="T">
+<Content><![CDATA[
+/*
+
+Run in terminal: 
+
+Class method 1: to export classes and lookup tables
+    do ##class("test.ExportClassesUtil").UDLExport("RFT.*.cls,*.LUT") 
+
+Class method 2: to export an entire production 
+    // Use to export PROD to be deployed on Cache systems
+    do ##class("test.ExportClassesUtil").ExportProd("cache2017.2.1","RFT.*.cls,*.LUT","ProductionToDeploy.xml")
+
+    // Use to export PROD to be deployed on IRIS systems   
+    do ##class("test.ExportClassesUtil").ExportProd("iris2022.3","RFT.*.cls,*.LUT,*.PTD","ProductionToDeploy.xml")
+
+*/
+]]></Content>
+</UDLText>
 </Class>
 
 
