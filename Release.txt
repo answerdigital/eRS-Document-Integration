@@ -1,3 +1,4 @@
-0.0.9 Release including:
+0.0.10 Release including:
 
-- Pass docs which can't be PDFed (e.g. videos, DICOM images) straight through to output
+- Add Acceptable Use Policy to login
+- Add response logging for userInfo to support debugging login issue
