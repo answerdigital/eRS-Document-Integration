@@ -1,4 +1,4 @@
-FROM containers.intersystems.com/intersystems/irishealth-community:2023.2.0.227.0
+FROM containers.intersystems.com/intersystems/irishealth-community:2023.1
 WORKDIR /home/irisowner/
 COPY --chown=irisowner:irisowner Integration-*.zip .
 USER root

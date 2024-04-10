@@ -1712,6 +1712,7 @@ END
 				set cmd= "copy "_filePath_" "_TargetDir
 				SET runCmd=$ZF(-1,cmd)
 			}
+
 			elseif fileType'="pdf"
 			{
 				If $$IsFileTypeAllowed(fileType)
@@ -1728,6 +1729,10 @@ END
         			Quit copyResult
     			}
 			}
+
+
+
+	
 			//update local list
 			$$$TRACE("PDF File saved. Attchment ID: "_pInput.attachmentID)
 			IF $ISOBJECT(attach)

@@ -2357,7 +2357,7 @@ END
     <Setting Target="Host" Name="OutputDir">C:\Users\HaitemElAaouani\Documents\eRS\OuPut\raw</Setting>
     <Setting Target="Host" Name="PDFsFolder">C:\Users\HaitemElAaouani\Documents\eRS\OuPut\pdf</Setting>
     <Setting Target="Host" Name="DocumentStorageMode">MOUNTHLY</Setting>
-    <Setting Target="Host" Name="AllowedFiles">docx,doc,txt,rtf,tif,jpeg,xml</Setting>
+    <Setting Target="Host" Name="AllowedFiles">docx,doc,txt,rtf,jpeg,xml</Setting>
   </Item>
   <Item Name="ReferralProcessor" Category="ERS" ClassName="RFT.ERS.Process.ReferralProcessor" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
   </Item>
@@ -3196,5 +3196,14 @@ Class method 2: to export an entire production
 <entry table="ERS.ContentTypeToExtension" key="text/html">html</entry>
 <entry table="ERS.ContentTypeToExtension" key="text/plain">txt</entry>
 <entry table="ERS.ContentTypeToExtension" key="text/rtf">rtf</entry>
+</lookupTable>
+</Document>
+
+<Document name="NCA.GenderCode.LUT">
+<lookupTable>
+<entry table="NCA.GenderCode" key="F">female</entry>
+<entry table="NCA.GenderCode" key="I">other</entry>
+<entry table="NCA.GenderCode" key="M">male</entry>
+<entry table="NCA.GenderCode" key="U">unknown</entry>
 </lookupTable>
 </Document></Export>
