@@ -19,8 +19,8 @@ mkdir target/WindowsServiceDeployment
 cp SmartcardAuth/WindowsServiceDeployment/* target/WindowsServiceDeployment
 cd SmartcardAuth-Build
 for file in ers-user-auth-app-*.jar; do mv "$file" "${file%-v*}.jar"; done
-cp SmartcardAuth-Build/ers-user-auth-app.jar target/WindowsServiceDeployment
 cd -
+cp SmartcardAuth-Build/ers-user-auth-app.jar target/WindowsServiceDeployment
 
 cd target/WindowsServiceDeployment
 zip ../WindowsServiceDeployment-$RELEASE_TAG.zip *
