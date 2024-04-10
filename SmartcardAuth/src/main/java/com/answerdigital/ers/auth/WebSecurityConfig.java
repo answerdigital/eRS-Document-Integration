@@ -3,6 +3,7 @@ package com.answerdigital.ers.auth;
 import com.answerdigital.ers.logging.LoggingInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.*;
@@ -33,7 +34,8 @@ public class WebSecurityConfig {
 
     Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
 
-    private String orgId = System.getenv("ODS_CODE");
+    @Value("${ers.ods-code}")
+    private String orgId;
 
     /*
     In order to use this endpoint you must be an authenticated e-RS user or application and use one of the following e-RS roles:
@@ -85,7 +87,8 @@ public class WebSecurityConfig {
             ResponseEntity<Cis2User> userInfoResponse = userInfoTemplate.exchange(userInfoUrl, HttpMethod.GET, requestEntity, Cis2User.class);
             Cis2User cis2User = userInfoResponse.getBody();
             Set<GrantedAuthority> mappedAuthorities = new HashSet<>();
-
+            logger.debug("Attempting to authorize for organization {}", orgId);
+            logger.debug("Attempting to authorize with roles {}", (Object) userRoleCodes);
             if (cis2User.getRoles().stream().anyMatch(
                     cis2RbacRole ->
                             orgId.equals(cis2RbacRole.getOrgCode()) &&
@@ -96,8 +99,7 @@ public class WebSecurityConfig {
             )){
                 mappedAuthorities.add(new SimpleGrantedAuthority("ROLE_ERS_ADMIN_USER"));
             }
-            logger.debug("User Selected Role: {}", cis2User.getSelectedRoleId());
-            logger.debug("Roles: {}", cis2User.getRoles().stream().map(Cis2RbacRole::getRoleCode).collect(Collectors.joining(", ")));
+            logger.debug("User roles: {}", cis2User.getRoles().stream().map(Cis2RbacRole::getRoleCode).collect(Collectors.joining(", ")));
 
             String usernameAttribute = userRequest.getClientRegistration()
                     .getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
