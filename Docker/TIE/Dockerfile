@@ -2,13 +2,13 @@ FROM containers.intersystems.com/intersystems/irishealth-community:2023.1
 WORKDIR /home/irisowner/
 COPY --chown=irisowner:irisowner Integration-*.zip .
 USER root
-RUN apt-get update
+RUN apt-get update && apt-get update
 RUN apt-get install -y curl
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | tee /etc/apt/trusted.gpg.d/microsoft.asc
 RUN curl https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/prod.list | tee /etc/apt/sources.list.d/mssql-release.list
 RUN apt-get update
 RUN apt-get install zip -y
-#RUN apt-get install libreoffice --no-install-recommends -y
+RUN apt-get install libreoffice --no-install-recommends -y
 #RUN apt-get install clamav -y
 #RUN freshclam
 RUN ACCEPT_EULA=Y apt-get install -y msodbcsql18
