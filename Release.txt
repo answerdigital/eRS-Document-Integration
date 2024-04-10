@@ -2,3 +2,5 @@
 
 - Add Acceptable Use Policy to login
 - Add response logging for userInfo to support debugging login issue
+- Correct incorrect environment variable references in Windows service
+- Add error email as environment variable
