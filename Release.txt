@@ -1,7 +1,3 @@
-0.0.10 Release including:
+0.0.11 Release including:
 
-- Add Acceptable Use Policy to login
-- Add response logging for userInfo to support debugging login issue
-- Correct incorrect environment variable references in Windows service
-- Update build script to correct incorrect jar filename referenced in Windows service 
-- Add error email as environment variable
+- Correcting windows service filename
