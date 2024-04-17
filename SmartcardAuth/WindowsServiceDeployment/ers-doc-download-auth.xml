@@ -103,7 +103,7 @@ SECTION: Executable management
     OPTION: arguments
     Arguments, which should be passed to the executable.
   -->
-  <arguments>-jar %BASE%\ers-document-download-auth.jar</arguments>
+  <arguments>-jar %BASE%\ers-user-auth-app.jar</arguments>
 
   <!--
     OPTION: priority
@@ -167,15 +167,15 @@ SECTION: Environment setup
     There may be multiple entries configured on the top level.
   -->
   <env name="SERVER_PORT" value="8443" />
-  <env name="SERVER_SSL_CERTIFICATE" value="" />
-  <env name="SERVER_SSL_CERTIFICATE-PRIVATE-KEY" value="" />
+  <env name="SERVER_SSL_CERTIFICATE" value="C:\Users\AledGreenhalgh\Documents\workspace\eRS-Document-Integration\SmartcardAuth\src\main\resources\certs\server.pem.pub" />
+  <env name="SERVER_SSL_CERTIFICATEPRIVATEKEY" value="C:\Users\AledGreenhalgh\Documents\workspace\eRS-Document-Integration\SmartcardAuth\src\main\resources\keys\server.pem" />
   <env name="CLIENT_ID" value="OXNNxo6x0fjKkWFgWGHunFD0ZjQ7rAnl" />
-  <env name="CLIENT_SECRET" value="" />
+  <env name="CLIENT_SECRET" value="nnoGui9enVyfVVL3" />
   <env name="REDIRECT_URI" value="https://localhost:8443/login/oauth2/code/cis2" />
-  <env name="OAUTH_ENDPOINT" value="https://int.api.service.nhs.uk/oauth2" />
-  <env name="SERVER_HTTP-PORT" value="8080" />
-  <env name="SERVER_ENABLE-TLS" value="true" />
-  <env name="ERS_ODS-CODE" value="B9J4U" />
-  <env name="ERS_SESSION-HANDOVER-ENDPOINT" value="https://49faed90-208f-4680-9e39-0542957b62d6.mock.pstmn.io:443" />
+  <env name="OAUTH_ENDPOINT" value="https://int.api.service.nhs.uk/oauth2-mock" />
+  <env name="SERVER_HTTPPORT" value="8080" />
+  <env name="SERVER_ENABLETLS" value="true" />
+  <env name="ERS_ODSCODE" value="B9J4U" />
+  <env name="ERS_SESSIONHANDOVERENDPOINT" value="https://49faed90-208f-4680-9e39-0542957b62d6.mock.pstmn.io:443" />
   <env name="TRUSTED_CERTS" value="" />
 </service>
