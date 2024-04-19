@@ -42,7 +42,7 @@ public class WebSecurityConfig {
     SERVICE_PROVIDER_CLINICIAN - R0050
     SERVICE_PROVIDER_CLINICIAN_ADMIN - R5170
      */
-    private List<String> userRoleCodes = Arrays.asList("R0050", "R5170", "R8008");
+    private List<String> userRoleCodes = Arrays.asList("R0050", "R5170");
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -73,8 +73,6 @@ public class WebSecurityConfig {
             } else {
                 userInfoTemplate = new RestTemplate();
             }
-            //TODO: add logout behaviour
-            //userInfoTemplate.setErrorHandler(delegate.);
             delegate.setRestOperations(userInfoTemplate);
             OAuth2User user = delegate.loadUser(userRequest);
             OAuth2AccessToken accessToken = userRequest.getAccessToken();
